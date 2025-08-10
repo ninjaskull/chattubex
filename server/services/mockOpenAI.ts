@@ -88,8 +88,8 @@ class MockOpenAIService {
 
   private async handleLeadAnalytics(message: string, assistantName: string): Promise<string> {
     try {
-      const campaigns = await storage.getAllCampaigns();
-      const contacts = await storage.getAllContacts();
+      const campaigns = await storage.getCampaigns();
+      const contacts = await storage.getContacts();
       
       if (message.includes('score') || message.includes('quality')) {
         return this.generateLeadScoringAnalysis(contacts, assistantName);
@@ -101,6 +101,7 @@ class MockOpenAIService {
       
       return this.generateComprehensiveAnalysis(campaigns, contacts, assistantName);
     } catch (error) {
+      console.error('Lead analytics error:', error);
       return `I encountered an issue accessing the database. Let me provide you with lead scoring best practices instead.`;
     }
   }
@@ -108,7 +109,7 @@ class MockOpenAIService {
   private async handleDatabaseOperations(message: string, assistantName: string): Promise<string> {
     try {
       if (message.includes('search') || message.includes('find')) {
-        const contacts = await storage.getAllContacts();
+        const contacts = await storage.getContacts();
         return this.searchContacts(message, contacts, assistantName);
       }
       
@@ -116,11 +117,12 @@ class MockOpenAIService {
         return `I can help you add new contacts! Please provide the contact details like name, email, company, and title, and I'll help you create a new contact entry with automatic lead scoring.`;
       }
       
-      const campaigns = await storage.getAllCampaigns();
-      const contacts = await storage.getAllContacts();
+      const campaigns = await storage.getCampaigns();
+      const contacts = await storage.getContacts();
       
       return this.generateDatabaseSummary(campaigns, contacts, assistantName);
     } catch (error) {
+      console.error('Database operations error:', error);
       return `I'm having trouble accessing the database right now. Let me provide you with general lead management guidance instead.`;
     }
   }
@@ -179,6 +181,10 @@ ${scoredContacts.slice(0, 5).map((contact, i) =>
 - Consider automated nurturing for medium-quality leads
 
 Ready to analyze specific contacts or generate outreach recommendations?`;
+  }
+
+  private generateComprehensiveAnalysis(campaigns: any[], contacts: any[], assistantName: string): string {
+    return this.generateCampaignAnalysis(campaigns, contacts, assistantName);
   }
 
   private generateCampaignAnalysis(campaigns: any[], contacts: any[], assistantName: string): string {
