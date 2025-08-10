@@ -6,10 +6,17 @@ interface WebSocketMessage {
   data: any;
 }
 
+interface TypingUser {
+  userId: string;
+  timestamp: number;
+}
+
 export function useWebSocket() {
   const [isConnected, setIsConnected] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
   const queryClient = useQueryClient();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -83,6 +90,19 @@ export function useWebSocket() {
             return oldData.filter(note => note.id !== message.data.id);
           });
           break;
+
+        case 'user_typing':
+          // User is typing
+          setTypingUsers(prev => {
+            const filtered = prev.filter(user => user.userId !== message.data.userId);
+            return [...filtered, { userId: message.data.userId, timestamp: Date.now() }];
+          });
+          break;
+
+        case 'user_stopped_typing':
+          // User stopped typing
+          setTypingUsers(prev => prev.filter(user => user.userId !== message.data.userId));
+          break;
           
         default:
           console.log('Unknown WebSocket message type:', message.type);
@@ -91,12 +111,53 @@ export function useWebSocket() {
 
     connect();
 
+    // Clean up typing users periodically
+    const cleanupInterval = setInterval(() => {
+      setTypingUsers(prev => prev.filter(user => Date.now() - user.timestamp < 5000));
+    }, 2000);
+
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      clearInterval(cleanupInterval);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
   }, [queryClient]);
 
-  return { isConnected };
+  const sendTyping = () => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'typing',
+        data: { userId: 'current_user' }
+      }));
+    }
+  };
+
+  const sendStoppedTyping = () => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'stopped_typing',
+        data: { userId: 'current_user' }
+      }));
+    }
+  };
+
+  const handleTyping = () => {
+    sendTyping();
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set new timeout to stop typing after 1 second
+    typingTimeoutRef.current = setTimeout(() => {
+      sendStoppedTyping();
+    }, 1000);
+  };
+
+  return { isConnected, typingUsers, handleTyping };
 }

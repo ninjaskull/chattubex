@@ -94,6 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Store connected WebSocket clients
   const wsClients = new Set<WebSocket>();
+  const typingUsers = new Map<string, NodeJS.Timeout>();
 
   wss.on('connection', (ws) => {
     console.log('New WebSocket connection established');
@@ -122,6 +123,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('WebSocket error:', error);
       wsClients.delete(ws);
     });
+
+    ws.on('message', (data) => {
+      try {
+        const message = JSON.parse(data.toString());
+        
+        switch (message.type) {
+          case 'typing':
+            // Clear existing timeout for this user
+            if (typingUsers.has(message.data.userId)) {
+              clearTimeout(typingUsers.get(message.data.userId)!);
+            }
+            
+            // Broadcast typing indicator to other clients
+            broadcastToOthers(ws, {
+              type: 'user_typing',
+              data: message.data
+            });
+            
+            // Set timeout to automatically stop typing after 3 seconds
+            const timeout = setTimeout(() => {
+              broadcastToOthers(ws, {
+                type: 'user_stopped_typing',
+                data: message.data
+              });
+              typingUsers.delete(message.data.userId);
+            }, 3000);
+            
+            typingUsers.set(message.data.userId, timeout);
+            break;
+            
+          case 'stopped_typing':
+            // Clear timeout and broadcast stop typing
+            if (typingUsers.has(message.data.userId)) {
+              clearTimeout(typingUsers.get(message.data.userId)!);
+              typingUsers.delete(message.data.userId);
+            }
+            
+            broadcastToOthers(ws, {
+              type: 'user_stopped_typing',
+              data: message.data
+            });
+            break;
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    });
   });
 
   // Function to broadcast notes updates to all connected clients
@@ -135,6 +183,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       } else {
+        wsClients.delete(client);
+      }
+    });
+  }
+
+  // Function to broadcast to all clients except sender
+  function broadcastToOthers(sender: WebSocket, data: any) {
+    const message = JSON.stringify(data);
+    
+    wsClients.forEach(client => {
+      if (client !== sender && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      } else if (client.readyState !== WebSocket.OPEN) {
         wsClients.delete(client);
       }
     });

@@ -16,7 +16,7 @@ export default function NotesDocuments() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isConnected } = useWebSocket();
+  const { isConnected, typingUsers, handleTyping } = useWebSocket();
 
   const { data: notes = [] } = useQuery({
     queryKey: ['/api/notes'],
@@ -259,6 +259,30 @@ export default function NotesDocuments() {
             </div>
           ))
         )}
+        
+        {/* Typing Indicator */}
+        {typingUsers.length > 0 && (
+          <div className="flex items-start space-x-3 animate-pulse">
+            <Avatar className="h-8 w-8 mt-1">
+              <AvatarFallback className="bg-green-100 text-green-600">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <div className="flex items-center space-x-1">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                  <span className="text-sm text-slate-500 ml-2">Someone is typing...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
 
@@ -286,7 +310,10 @@ export default function NotesDocuments() {
             <Textarea
               placeholder="Type a message..."
               value={noteContent}
-              onChange={(e) => setNoteContent(e.target.value)}
+              onChange={(e) => {
+                setNoteContent(e.target.value);
+                handleTyping(); // Trigger typing indicator
+              }}
               className="resize-none pr-12 min-h-[60px] max-h-32"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {

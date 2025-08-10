@@ -8,13 +8,16 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Create pool with proper error handling
+// Create pool with optimized settings for faster connections
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
   ssl: false, // Replit internal PostgreSQL doesn't need SSL
-  max: 5,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  max: 10, // Increased pool size
+  min: 2,  // Keep minimum connections alive
+  idleTimeoutMillis: 60000,
+  connectionTimeoutMillis: 5000, // Increased timeout
+  acquireTimeoutMillis: 8000,
+  allowExitOnIdle: false, // Keep pool alive
 });
 
 // Handle pool errors
