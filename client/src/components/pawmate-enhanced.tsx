@@ -13,9 +13,13 @@ import {
   Heart, MessageCircle, Zap, Dog, Settings, Send, Sparkles, Bot,
   Search, Database, Target, Phone, Mail, Building, Globe, 
   ExternalLink, Users, Filter, SortAsc, Grid, List, Download,
-  User, Eye, ChevronDown, ChevronUp
+  User, Eye, ChevronDown, ChevronUp, Upload, FileSpreadsheet
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import { CsvExportModal } from './CsvExportModal';
+import { CsvImportModal } from './CsvImportModal';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface Message {
   id: string;
@@ -210,10 +214,25 @@ const SearchResultsDisplay = ({ searchResults, searchQuery }: SearchResultsDispl
         </div>
       )}
       
-      <div className="mt-4 pt-3 border-t border-green-200 dark:border-green-700 text-xs text-green-700 dark:text-green-300">
-        <div className="flex items-center justify-between">
-          <span>Query: "{searchQuery}"</span>
-          <span>{searchResults.total} total matches found</span>
+      <div className="mt-4 pt-3 border-t border-green-200 dark:border-green-700">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-xs text-green-700 dark:text-green-300">
+            <span>Query: "{searchQuery}"</span>
+            <span className="ml-4">{searchResults.total} total matches found</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => setLastSearchQuery(searchQuery) || setCsvExportOpen(true)}
+              disabled={!searchQuery}
+              className="text-xs h-7"
+              data-testid="button-export-results"
+            >
+              <Download className="w-3 h-3 mr-1" />
+              Export CSV
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -229,7 +248,13 @@ export default function PawMate() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isUsingRealAI, setIsUsingRealAI] = useState<boolean | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(() => localStorage.getItem('pawmate_session_id'));
+  const [csvExportOpen, setCsvExportOpen] = useState(false);
+  const [csvImportOpen, setCsvImportOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [lastSearchQuery, setLastSearchQuery] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -265,7 +290,7 @@ export default function PawMate() {
         setMessages([{
           id: '1',
           type: 'bot',
-          content: `👋 Welcome! I'm ${petName || 'Duggu'}, your AI-powered lead intelligence assistant with direct database access. 
+          content: `👋 Welcome! I'm ${petName || 'Duggu'}, your AI-powered lead intelligence assistant with direct database access and advanced CSV operations.
 
 **🔍 Advanced Search Capabilities:**
 • Search through 263+ contact records instantly
@@ -273,6 +298,13 @@ export default function PawMate() {
 • Filter by name, email, phone, company, title
 • Real-time search through encrypted campaign data
 • Advanced data visualization for large datasets
+
+**📊 CSV Export & Import Module:**
+• Export search results to customizable CSV files
+• Import new data with automatic encryption
+• Create campaigns from uploaded CSV files
+• Batch operations with custom naming
+• Full data integrity and error handling
 
 **💬 Conversational AI:**
 • Natural business intelligence conversations
@@ -285,6 +317,10 @@ export default function PawMate() {
 • "find all CEOs" - Search by job titles
 • "show contacts at Dakkota" - Company-based searches
 • "What's the best lead scoring strategy?" - AI conversation
+
+**CSV Operations:**
+• Use Export CSV button after any search to download results
+• Use Import CSV button to add new contact data to the system
 
 I automatically detect whether you want to search or chat - just type naturally!`,
           timestamp: new Date()
@@ -364,6 +400,9 @@ I automatically detect whether you want to search or chat - just type naturally!
           const searchData = await searchResponse.json();
           
           if (searchData.total > 0) {
+            // Store the last search query for CSV export
+            setLastSearchQuery(query);
+            
             const searchResultMessage: Message = {
               id: Date.now().toString(),
               type: 'search-results',
@@ -454,6 +493,124 @@ I automatically detect whether you want to search or chat - just type naturally!
         return '🐱';
       default:
         return '🤖';
+    }
+  };
+
+  // CSV Export handler
+  const handleCsvExport = async (options: any) => {
+    setIsExporting(true);
+    try {
+      const response = await fetch('/api/export/csv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(options)
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Get filename from content-disposition header or use default
+        const contentDisposition = response.headers.get('content-disposition');
+        const filename = contentDisposition
+          ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') || 'export.csv'
+          : 'export.csv';
+        
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        toast({
+          title: "Export Successful",
+          description: `CSV file "${filename}" has been downloaded`,
+        });
+        setCsvExportOpen(false);
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Export Failed",
+          description: error.message || "Failed to export CSV",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Export Error",
+        description: "An error occurred while exporting CSV",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // CSV Import handler
+  const handleCsvImport = async (file: File, options: any) => {
+    setIsImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append('csvFile', file);
+      formData.append('customName', options.customName);
+      formData.append('overwrite', options.overwrite.toString());
+
+      const response = await fetch('/api/import/csv', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Import Successful",
+          description: `Imported ${result.importedRecords} records into campaign "${result.campaign.name}"`,
+        });
+        setCsvImportOpen(false);
+        
+        // Add success message to chat
+        const successMessage: Message = {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: `✅ **CSV Import Complete!**
+
+**Campaign Created:** ${result.campaign.name}
+**Records Imported:** ${result.importedRecords}
+**Headers Detected:** ${result.campaign.headers.join(', ')}
+
+Your data has been securely encrypted and added to the system. You can now search through this data using commands like:
+• "search ${result.campaign.name}"
+• "find contacts in ${result.campaign.name}"`,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, successMessage]);
+      } else {
+        if (response.status === 409) {
+          toast({
+            title: "Import Conflict",
+            description: result.message + (result.suggestedName ? `\n\nSuggested name: ${result.suggestedName}` : ''),
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Import Failed",
+            description: result.message || "Failed to import CSV",
+            variant: "destructive"
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Import Error",
+        description: "An error occurred while importing CSV",
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -622,9 +779,46 @@ I automatically detect whether you want to search or chat - just type naturally!
               <Sparkles className="w-3 h-3 mr-1" />
               AI Question
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setCsvExportOpen(true)}
+              className="text-xs"
+              disabled={!lastSearchQuery}
+              data-testid="button-csv-export"
+            >
+              <Download className="w-3 h-3 mr-1" />
+              Export CSV
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setCsvImportOpen(true)}
+              className="text-xs"
+              data-testid="button-csv-import"
+            >
+              <Upload className="w-3 h-3 mr-1" />
+              Import CSV
+            </Button>
           </div>
         </div>
       </CardContent>
+      
+      {/* CSV Modals */}
+      <CsvExportModal 
+        isOpen={csvExportOpen}
+        onClose={() => setCsvExportOpen(false)}
+        searchQuery={lastSearchQuery}
+        onExport={handleCsvExport}
+        isExporting={isExporting}
+      />
+      
+      <CsvImportModal 
+        isOpen={csvImportOpen}
+        onClose={() => setCsvImportOpen(false)}
+        onImport={handleCsvImport}
+        isImporting={isImporting}
+      />
     </Card>
   );
 }

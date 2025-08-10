@@ -693,7 +693,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const searchQuery = query.toLowerCase().trim();
-      const results = {
+      const results: {
+        contacts: any[];
+        campaigns: any[];
+        campaignData: any[];
+        total: number;
+      } = {
         contacts: [],
         campaigns: [],
         campaignData: [],
@@ -762,6 +767,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export search results to CSV
+  app.post('/api/export/csv', async (req, res) => {
+    try {
+      const { query, searchType = 'all', customFileName, includeHeaders = true } = req.body;
+      
+      if (!query || typeof query !== 'string' || query.trim().length < 1) {
+        return res.status(400).json({ message: 'Search query is required for export' });
+      }
+
+      const searchQuery = query.toLowerCase().trim();
+      let exportData: any[] = [];
+      let headers: string[] = [];
+
+      // Search and collect data for export
+      if (searchType === 'all' || searchType === 'contacts') {
+        const contacts = await storage.getContacts();
+        const filteredContacts = contacts.filter(contact => 
+          contact.name.toLowerCase().includes(searchQuery) ||
+          contact.email.toLowerCase().includes(searchQuery) ||
+          contact.mobile.includes(searchQuery)
+        );
+
+        if (filteredContacts.length > 0) {
+          headers = ['Name', 'Email', 'Mobile', 'Email Sent', 'Created At'];
+          exportData = filteredContacts.map(contact => [
+            contact.name,
+            contact.email,
+            contact.mobile,
+            contact.emailSent ? 'Yes' : 'No',
+            contact.createdAt?.toISOString() || ''
+          ]);
+        }
+      }
+
+      // Search campaign data if no direct contacts found or if specifically requested
+      if ((exportData.length === 0 && searchType === 'all') || searchType === 'campaign-data') {
+        const campaigns = await storage.getCampaigns();
+        for (const campaign of campaigns) {
+          try {
+            const campaignData = await storage.getCampaignData(campaign.id);
+            
+            if (campaignData && campaignData.rows && Array.isArray(campaignData.rows)) {
+              const matchingRows = campaignData.rows.filter((row: any) => {
+                if (!row || typeof row !== 'object') return false;
+                
+                return Object.values(row).some((value: any) => {
+                  if (value === null || value === undefined) return false;
+                  const stringValue = String(value).toLowerCase();
+                  return stringValue.includes(searchQuery);
+                });
+              });
+              
+              if (matchingRows.length > 0) {
+                headers = campaignData.headers || Object.keys(matchingRows[0] || {});
+                exportData = matchingRows.map((row: any) => 
+                  headers.map(header => row[header] || '')
+                );
+                break; // Use first matching campaign
+              }
+            }
+          } catch (error) {
+            console.error(`Error exporting campaign ${campaign.id}:`, error);
+          }
+        }
+      }
+
+      if (exportData.length === 0) {
+        return res.status(404).json({ message: 'No data found for export' });
+      }
+
+      // Generate CSV using csv-stringify
+      const { stringify } = await import('csv-stringify');
+      
+      const csvOptions = {
+        header: includeHeaders,
+        columns: includeHeaders ? headers : undefined
+      };
+
+      const csvData = await new Promise<string>((resolve, reject) => {
+        const output: string[] = [];
+        const csvStream = stringify(exportData, csvOptions);
+        
+        csvStream.on('data', (chunk) => output.push(chunk));
+        csvStream.on('end', () => resolve(output.join('')));
+        csvStream.on('error', reject);
+        
+        // Add headers manually if needed
+        if (includeHeaders && headers.length > 0) {
+          csvStream.write(headers);
+        }
+        
+        exportData.forEach(row => csvStream.write(row));
+        csvStream.end();
+      });
+
+      // Generate filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+      const filename = customFileName 
+        ? `${customFileName}_${timestamp}.csv`
+        : `search_export_${timestamp}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(csvData);
+
+    } catch (error) {
+      console.error('CSV export error:', error);
+      res.status(500).json({ message: 'Failed to export CSV' });
+    }
+  });
+
+  // Upload CSV data to create new campaign
+  app.post('/api/import/csv', upload.single('csvFile'), async (req, res) => {
+    try {
+      const { customName, overwrite = false } = req.body;
+      
+      if (!req.file) {
+        return res.status(400).json({ message: 'CSV file is required' });
+      }
+
+      const csvContent = req.file.buffer.toString('utf-8');
+      const { parse } = await import('csv-parse');
+      
+      // Parse CSV data
+      const records = await new Promise<any[]>((resolve, reject) => {
+        parse(csvContent, {
+          columns: true, // Use first row as headers
+          skip_empty_lines: true,
+          trim: true
+        }, (err, records) => {
+          if (err) reject(err);
+          else resolve(records);
+        });
+      });
+
+      if (records.length === 0) {
+        return res.status(400).json({ message: 'CSV file contains no valid data' });
+      }
+
+      // Generate campaign name
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+      const campaignName = customName || `Imported_Campaign_${timestamp}`;
+
+      // Check if campaign with same name exists
+      if (!overwrite) {
+        const existingCampaigns = await storage.getCampaigns();
+        const nameExists = existingCampaigns.some(c => c.name === campaignName);
+        if (nameExists) {
+          return res.status(409).json({ 
+            message: 'Campaign with this name already exists',
+            suggestedName: `${campaignName}_${Date.now()}`
+          });
+        }
+      }
+
+      // Prepare field mappings
+      const headers = Object.keys(records[0]);
+      const fieldMappings = headers.reduce((acc: any, header, index) => {
+        acc[header] = index;
+        return acc;
+      }, {});
+
+      // Create campaign with encrypted data
+      const campaignDataToStore = {
+        headers: headers,
+        rows: records
+      };
+
+      // Simple encryption for demo purposes
+      const encryptedData = Buffer.from(JSON.stringify(campaignDataToStore)).toString('base64');
+
+      const campaignInput = {
+        name: campaignName,
+        encryptedData: encryptedData,
+        fieldMappings: fieldMappings,
+        recordCount: records.length
+      };
+
+      const campaign = await storage.createCampaign(campaignInput);
+
+      res.status(201).json({
+        message: 'CSV imported successfully',
+        campaign: {
+          id: campaign.id,
+          name: campaign.name,
+          recordCount: campaign.recordCount,
+          headers: headers
+        },
+        importedRecords: records.length
+      });
+
+    } catch (error) {
+      console.error('CSV import error:', error);
+      res.status(500).json({ message: 'Failed to import CSV file' });
+    }
+  });
+
   // Advanced search with filters
   app.post('/api/search/advanced', async (req, res) => {
     try {
@@ -774,7 +976,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
       
       const searchQuery = query?.toLowerCase().trim() || '';
-      const results = [];
+      const results: any[] = [];
 
       // Get all campaigns and search through their data
       const campaigns = await storage.getCampaigns();
