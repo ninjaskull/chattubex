@@ -40,6 +40,7 @@ export interface IStorage {
   createContact(contact: InsertContact): Promise<Contact>;
   getContacts(): Promise<Contact[]>;
   updateContactEmailStatus(id: number, emailSent: boolean): Promise<void>;
+  getCampaignData(campaignId: number): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -131,6 +132,21 @@ export class DatabaseStorage implements IStorage {
 
   async updateContactEmailStatus(id: number, emailSent: boolean): Promise<void> {
     await db.update(contacts).set({ emailSent }).where(eq(contacts.id, id));
+  }
+
+  async getCampaignData(campaignId: number): Promise<any> {
+    const campaign = await this.getCampaign(campaignId);
+    if (!campaign) return null;
+
+    try {
+      // Import encryption service and decrypt the data
+      const { decrypt } = await import('../utils/encryption');
+      const decryptedData = decrypt(campaign.encryptedData);
+      return JSON.parse(decryptedData);
+    } catch (error) {
+      console.error('Error decrypting campaign data:', error);
+      return null;
+    }
   }
 }
 

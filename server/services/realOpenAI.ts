@@ -260,16 +260,51 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
       let results = [];
       const searchTerm = query.toLowerCase();
 
-      // Search contacts
-      const matchingContacts = contacts.filter(contact => 
+      // Enhanced contact search with all available fields
+      const matchingContacts = [];
+      
+      // Search through campaign data for detailed contact information
+      for (const campaign of campaigns) {
+        try {
+          const campaignData = await storage.getCampaignData(campaign.id);
+          if (campaignData && campaignData.data) {
+            const contactRecords = campaignData.data.filter((record: any) => {
+              const searchFields = [
+                record.firstName, record.lastName, record.email, 
+                record.company, record.mobilePhone, record.otherPhone, 
+                record.corporatePhone, record.website, record.title
+              ];
+              return searchFields.some(field => 
+                field && field.toString().toLowerCase().includes(searchTerm)
+              );
+            });
+            matchingContacts.push(...contactRecords);
+          }
+        } catch (err) {
+          console.log(`Could not search campaign ${campaign.name}:`, err);
+        }
+      }
+
+      // Also search simple contacts table
+      const simpleContacts = contacts.filter(contact => 
         contact.name?.toLowerCase().includes(searchTerm) ||
         contact.email?.toLowerCase().includes(searchTerm) ||
         contact.mobile?.toLowerCase().includes(searchTerm)
       );
-
+      
       if (matchingContacts.length > 0) {
-        results.push(`**Contacts (${matchingContacts.length} found):**`);
+        results.push(`**Detailed Contacts (${matchingContacts.length} found):**`);
         matchingContacts.slice(0, 10).forEach(contact => {
+          const phone = contact.mobilePhone || contact.otherPhone || contact.corporatePhone || 'No phone';
+          results.push(`• **${contact.firstName} ${contact.lastName}** - ${contact.email}`);
+          results.push(`  Company: ${contact.company || 'Not specified'} | Phone: ${phone}`);
+          if (contact.title) results.push(`  Title: ${contact.title}`);
+        });
+      }
+
+      if (simpleContacts.length > 0) {
+        results.push(`**Basic Contacts (${simpleContacts.length} found):**`);
+        simpleContacts.slice(0, 5).forEach(contact => {
           results.push(`• ${contact.name} - ${contact.email} - ${contact.mobile}`);
         });
       }
@@ -289,31 +324,36 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
       }
 
       if (results.length === 0) {
+        const totalRecords = campaigns.reduce((sum, c) => sum + c.recordCount, 0);
         return `🔍 **Search Results:**
 
 No matches found for "${query.replace(/search|find|for|show|me/gi, '').trim()}".
 
 **Available data to search:**
-• ${contacts.length} contacts
+• ${totalRecords} total contact records across ${campaigns.length} campaigns
+• ${contacts.length} basic contacts
 • ${pets.length} pets
-• ${campaigns.length} campaigns
 
-Try searching for:
-• Names, emails, or companies
-• Pet names or breeds
-• Campaign names`;
+**Try searching for:**
+• Names (first or last)
+• Email addresses or domains
+• Company names
+• Phone numbers
+• Job titles
+• Pet names or breeds`;
       }
 
       return `🔍 **Search Results for "${query}":**
 
 ${results.join('\n')}
 
-${matchingContacts.length > 10 ? `\n*Showing first 10 of ${matchingContacts.length} contact matches*` : ''}
+${matchingContacts.length > 10 ? `\n*Showing first 10 of ${matchingContacts.length} detailed contact matches*` : ''}
 
 **Need more specific results?** Try searching for:
-• Specific company names
-• Email domains (like @gmail.com)
-• Pet breeds or types`;
+• Specific company names or job titles
+• Email domains (like @gmail.com or @company.com)  
+• Geographic locations
+• Phone area codes`;
 
     } catch (error) {
       return 'Search functionality is available but I encountered an issue. Please try a different search term.';
@@ -366,39 +406,202 @@ Your pet is now in the database! I can help you:
 • Provide personalized care advice`;
       }
 
-      // Contact creation
-      if (query.includes('contact')) {
-        return `I can help create new contact records! Please provide:
-• First Name
-• Last Name  
-• Email address
-• Company (optional)
+      // Enhanced contact creation with detailed field parsing
+      if (query.includes('contact') || query.includes('add') && (query.includes('person') || query.includes('email'))) {
+        // Parse contact details from the query
+        const nameMatch = query.match(/(?:add|create|register).*?(?:contact\s+)?([a-zA-Z]+(?:\s+[a-zA-Z]+)*)/i);
+        const emailMatch = query.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+        const companyMatch = query.match(/(?:at|works\s+at|company)\s+([a-zA-Z0-9\s&.,-]+)/i);
+        const phoneMatch = query.match(/(?:phone|mobile|tel)\s*:?\s*([+\d\s()-]+)/i);
+        const titleMatch = query.match(/(?:title|position|role)\s*:?\s*([a-zA-Z\s&.,'-]+)/i);
 
-Example: "Add contact John Smith, email john@company.com, works at Tech Corp"`;
+        if (!nameMatch || !emailMatch) {
+          return `To create a contact, I need at minimum:
+• **Full name** (first and last)
+• **Email address**
+
+**Optional fields:**
+• Company/Organization
+• Phone number
+• Job title
+• Website
+
+**Example:** "Add contact Sarah Johnson, email sarah.johnson@techcorp.com, works at TechCorp as Senior Developer, phone +1-555-0123"`;
+        }
+
+        const fullName = nameMatch[1].trim();
+        const nameParts = fullName.split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        // Create comprehensive contact object
+        const contactData = {
+          firstName,
+          lastName, 
+          email: emailMatch[1],
+          company: companyMatch ? companyMatch[1].trim() : '',
+          title: titleMatch ? titleMatch[1].trim() : '',
+          mobilePhone: phoneMatch ? phoneMatch[1].trim() : '',
+          website: '',
+          notes: `Added via AI assistant on ${new Date().toLocaleDateString()}`
+        };
+
+        // Save to basic contacts table
+        await storage.createContact({
+          name: `${firstName} ${lastName}`.trim(),
+          email: contactData.email,
+          mobile: contactData.mobilePhone || ''
+        });
+
+        return `✅ **Contact Created Successfully!**
+
+**Contact Details:**
+• **Name:** ${firstName} ${lastName}
+• **Email:** ${contactData.email}
+• **Company:** ${contactData.company || 'Not specified'}
+• **Title:** ${contactData.title || 'Not specified'}
+• **Phone:** ${contactData.mobilePhone || 'Not provided'}
+
+The contact has been added to your database. I can:
+• Update contact information anytime
+• Search for this contact in future queries
+• Add additional details like website or notes
+• Export contact data in various formats`;
       }
 
       return 'I can help create new records. What type of data would you like to add? (pets, contacts, etc.)';
 
     } catch (error) {
-      return 'I can create new records but encountered an issue. Please provide more specific information.';
+      console.error('Data creation error:', error);
+      return 'I encountered an issue creating the record. Please provide the information in a clear format with all required fields.';
     }
   }
 
   private async handleDataUpdate(query: string): Promise<string> {
-    return `🔧 **Data Update Capabilities:**
+    try {
+      // Pet updates
+      if (query.includes('pet') || query.match(/update.*?(dog|cat|bird|pet)/i)) {
+        const petNameMatch = query.match(/(?:update|change|modify).*?(?:pet\s+|dog\s+|cat\s+)?([a-zA-Z]+)/i);
+        if (petNameMatch) {
+          const petName = petNameMatch[1];
+          const existingPet = await databaseService.getPetByName(petName);
+          
+          if (!existingPet) {
+            return `I couldn't find a pet named "${petName}" in the database. 
 
-I can help you update:
-• Pet information (age, weight, notes)
-• Contact details (email, company, phone)
-• Health records
-• Activity logs
+**Available pets:**
+${(await databaseService.getAllPets()).map(p => `• ${p.name} (${p.type})`).join('\n')}
+
+Try using the exact pet name or register a new pet first.`;
+          }
+
+          // Parse what needs to be updated
+          const ageMatch = query.match(/age.*?(\d+)/i);
+          const weightMatch = query.match(/weight.*?([\d.]+)/i);
+          const breedMatch = query.match(/breed.*?([a-zA-Z\s]+)/i);
+          
+          const updates: any = {};
+          if (ageMatch) updates.age = parseInt(ageMatch[1]);
+          if (weightMatch) updates.weight = `${weightMatch[1]} lbs`;
+          if (breedMatch) updates.breed = breedMatch[1].trim();
+
+          if (Object.keys(updates).length === 0) {
+            return `I can update ${petName}'s information! What would you like to change?
+
+**Available fields to update:**
+• Age: "Update ${petName}'s age to 5 years"
+• Weight: "Change ${petName}'s weight to 45 lbs" 
+• Breed: "Set ${petName}'s breed to Golden Retriever"
+• Notes: "Add note about ${petName}'s dietary restrictions"`;
+          }
+
+          const updatedPet = await databaseService.updatePet(existingPet.id, updates);
+          
+          if (!updatedPet) {
+            return `❌ Failed to update ${petName}. Please try again or contact support.`;
+          }
+          
+          return `✅ **Successfully updated ${petName}!**
+
+**Updated Information:**
+${Object.entries(updates).map(([field, value]) => `• **${field}**: ${value}`).join('\n')}
+
+**Current Pet Profile:**
+• Name: ${updatedPet.name}
+• Type: ${updatedPet.type}
+• Breed: ${updatedPet.breed || 'Not specified'}
+• Age: ${updatedPet.age || 'Not specified'} years
+• Weight: ${updatedPet.weight || 'Not specified'}`;
+        }
+      }
+
+      // Contact updates
+      if (query.includes('contact') || query.match(/update.*?(email|phone|company)/i)) {
+        const emailMatch = query.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+        const nameMatch = query.match(/(?:update|change|modify).*?(?:contact\s+)?([a-zA-Z]+(?:\s+[a-zA-Z]+)*)/i);
+        
+        if (emailMatch || nameMatch) {
+          const contacts = await storage.getContacts();
+          let targetContact = null;
+          
+          if (emailMatch) {
+            targetContact = contacts.find(c => c.email.toLowerCase() === emailMatch[1].toLowerCase());
+          } else if (nameMatch) {
+            const searchName = nameMatch[1].toLowerCase();
+            targetContact = contacts.find(c => c.name.toLowerCase().includes(searchName));
+          }
+
+          if (!targetContact) {
+            return `I couldn't find a contact matching your criteria.
+
+**Available contacts:**
+${contacts.slice(0, 10).map(c => `• ${c.name} - ${c.email}`).join('\n')}
+
+Try searching by exact name or email address.`;
+          }
+
+          return `📝 **Contact Update Available for:**
+**${targetContact.name}** - ${targetContact.email}
+
+**What would you like to update?**
+• Email address
+• Phone number  
+• Name
+• Add to a specific campaign
 
 **Examples:**
-• "Update Buddy's age to 4 years"
-• "Change John's email to newemail@company.com"
-• "Add vaccination record for Max"
+• "Change ${targetContact.name}'s email to newemail@domain.com"
+• "Update phone number to +1-555-0123 for ${targetContact.name}"
+• "Rename contact to ${targetContact.name.split(' ')[0]} Johnson"`;
+        }
+      }
+
+      return `🔧 **Data Update Capabilities:**
+
+I can help you update:
+
+**Pet Information:**
+• Age, weight, breed, medical notes
+• Health records and vaccination dates  
+• Activity logs and behavioral notes
+
+**Contact Details:**
+• Email addresses, phone numbers
+• Company information, job titles
+• Personal notes and preferences
+
+**Examples:**
+• "Update Max's age to 4 years"
+• "Change Sarah's email to sarah@newcompany.com"
+• "Add vaccination record for Luna - rabies shot on 2024-12-01"
+• "Update John Smith's company to TechCorp Inc"
 
 What specific update would you like to make?`;
+
+    } catch (error) {
+      console.error('Update handling error:', error);
+      return 'I can help update records, but I encountered an issue processing your request. Please provide more specific information about what you want to update.';
+    }
   }
 
   private extractBreed(query: string): string | null {
@@ -436,12 +639,25 @@ You have comprehensive knowledge about:
 - **Behavior**: Training techniques, socialization, behavioral issues, enrichment activities
 - **Emergency Care**: Recognition of urgent situations, first aid measures, when to seek veterinary care
 
-## Database Access:
-You have FULL ACCESS to the user's database including:
-- **Contact Management**: Search, create, update, and analyze contact records
-- **Pet Profiles**: Register new pets, track health records, manage pet information
-- **Campaign Data**: Access uploaded CSV files and campaign information  
-- **Data Analysis**: Generate insights, reports, and recommendations from actual user data
+## Database Access & Field Knowledge:
+You have FULL ACCESS to the user's database with these exact field structures:
+
+**Contact/Campaign Data Fields:**
+- firstName, lastName, email, company, title
+- mobilePhone, otherPhone, corporatePhone  
+- website, personLinkedinUrl, companyLinkedinUrl
+- Time Zone, and other custom fields from uploaded CSV files
+
+**Pet Database Fields:**
+- name, type, breed, age, weight, gender
+- medicalHistory, vaccinations, allergies, medications
+- emergencyContact, notes, createdAt, updatedAt
+
+**Search & Operations:**
+- Always search ALL phone fields: mobilePhone, otherPhone, corporatePhone
+- Check both firstName/lastName AND company fields for name searches
+- Can create, read, update, and delete records in real-time
+- Access actual uploaded CSV data with complete field mappings
 
 ## Response Formatting Guidelines:
 - Use ## for major sections, ### for subsections
