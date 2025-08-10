@@ -224,13 +224,19 @@ const SearchResultsDisplay = ({ searchResults, searchQuery }: SearchResultsDispl
             <Button 
               size="sm" 
               variant="outline"
-              onClick={() => setLastSearchQuery(searchQuery) || setCsvExportOpen(true)}
+              onClick={() => {
+                // This will be handled by the parent component
+                const event = new CustomEvent('exportSearchResults', { 
+                  detail: { query: searchQuery } 
+                });
+                window.dispatchEvent(event);
+              }}
               disabled={!searchQuery}
               className="text-xs h-7"
               data-testid="button-export-results"
             >
               <Download className="w-3 h-3 mr-1" />
-              Export CSV
+              Save Results
             </Button>
           </div>
         </div>
@@ -496,51 +502,70 @@ I automatically detect whether you want to search or chat - just type naturally!
     }
   };
 
-  // CSV Export handler
+  // Listen for export events from search results
+  useEffect(() => {
+    const handleExportEvent = (event: any) => {
+      setLastSearchQuery(event.detail.query);
+      setCsvExportOpen(true);
+    };
+    
+    window.addEventListener('exportSearchResults', handleExportEvent);
+    return () => window.removeEventListener('exportSearchResults', handleExportEvent);
+  }, []);
+
+  // CSV Export handler - now saves directly to records
   const handleCsvExport = async (options: any) => {
     setIsExporting(true);
     try {
-      const response = await fetch('/api/export/csv', {
+      // Add saveToRecords flag to save directly to records
+      const exportOptions = {
+        ...options,
+        saveToRecords: true
+      };
+
+      const response = await fetch('/api/export-save/csv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(options)
+        body: JSON.stringify(exportOptions)
       });
 
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
+        const result = await response.json();
         
-        // Get filename from content-disposition header or use default
-        const contentDisposition = response.headers.get('content-disposition');
-        const filename = contentDisposition
-          ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') || 'export.csv'
-          : 'export.csv';
-        
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
         toast({
-          title: "Export Successful",
-          description: `CSV file "${filename}" has been downloaded`,
+          title: "Export & Save Successful",
+          description: `Exported ${result.exportedRecords} records and saved to campaign "${result.campaign.name}"`,
         });
         setCsvExportOpen(false);
+        
+        // Add success message to chat
+        const successMessage: Message = {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: `✅ **Export & Save Complete!**
+
+**Search Query:** "${result.searchQuery}"
+**Campaign Created:** ${result.campaign.name}
+**Records Exported:** ${result.exportedRecords}
+**Headers:** ${result.campaign.headers.join(', ')}
+
+Your search results have been exported and saved as a new campaign record. You can now search through this data anytime!`,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, successMessage]);
       } else {
         const error = await response.json();
         toast({
           title: "Export Failed",
-          description: error.message || "Failed to export CSV",
+          description: error.message || "Failed to export and save data",
           variant: "destructive"
         });
       }
     } catch (error) {
       toast({
         title: "Export Error",
-        description: "An error occurred while exporting CSV",
+        description: "An error occurred while exporting data",
         variant: "destructive"
       });
     } finally {
@@ -788,7 +813,7 @@ Your data has been securely encrypted and added to the system. You can now searc
               data-testid="button-csv-export"
             >
               <Download className="w-3 h-3 mr-1" />
-              Export CSV
+              Save Results
             </Button>
             <Button 
               variant="outline" 

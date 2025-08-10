@@ -64,10 +64,10 @@ export function CsvExportModal({ isOpen, onClose, searchQuery, onExport, isExpor
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Export Search Results
+            Export & Save Search Results
           </DialogTitle>
           <DialogDescription>
-            Export your search results as a CSV file with custom options.
+            Export your search results and save them directly to records with a custom campaign name.
           </DialogDescription>
         </DialogHeader>
 
@@ -103,11 +103,11 @@ export function CsvExportModal({ isOpen, onClose, searchQuery, onExport, isExpor
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="custom-filename" className="text-right">
-              File Name
+              Campaign Name
             </Label>
             <Input
               id="custom-filename"
-              placeholder="Optional custom filename"
+              placeholder="Optional custom campaign name"
               value={customFileName}
               onChange={(e) => setCustomFileName(e.target.value)}
               className="col-span-3"
@@ -122,7 +122,7 @@ export function CsvExportModal({ isOpen, onClose, searchQuery, onExport, isExpor
               onCheckedChange={(checked) => setIncludeHeaders(Boolean(checked))}
               data-testid="checkbox-include-headers"
             />
-            <Label htmlFor="include-headers">Include column headers in CSV</Label>
+            <Label htmlFor="include-headers">Include column headers in saved data</Label>
           </div>
         </div>
 
@@ -145,12 +145,12 @@ export function CsvExportModal({ isOpen, onClose, searchQuery, onExport, isExpor
             {isExporting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Exporting...
+                Saving...
               </>
             ) : (
               <>
                 <Download className="mr-2 h-4 w-4" />
-                Export CSV
+                Save to Records
               </>
             )}
           </Button>

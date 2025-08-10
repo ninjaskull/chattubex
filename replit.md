@@ -101,6 +101,8 @@ This is a full-stack web application for campaign management with secure data ha
 
 ### Advanced CSV Export/Import Module Implementation (August 10, 2025)
 - ✓ Built comprehensive CSV export system with customizable file naming and headers
+- ✓ **UPDATED:** Implemented direct save-to-records functionality instead of file downloads
+- ✓ **NEW:** Created `/api/export-save/csv` endpoint that saves search results as new campaigns
 - ✓ Integrated smart search-to-CSV export directly from chat search results
 - ✓ Created advanced CSV import module with file validation and campaign creation
 - ✓ Implemented drag-and-drop file upload with 10MB size limit and type validation
@@ -108,6 +110,7 @@ This is a full-stack web application for campaign management with secure data ha
 - ✓ Built secure data encryption for all imported CSV data with base64 encoding
 - ✓ Created real-time progress indicators and comprehensive error handling
 - ✓ Integrated CSV operations into Duggu chat interface with dedicated buttons
+- ✓ **UPDATED:** Changed "Export CSV" buttons to "Save Results" for clarity
 - ✓ Added automatic success notifications and chat feedback for completed operations
 - ✓ Implemented backend API endpoints with proper validation and error responses
 
