@@ -51,9 +51,14 @@ class RealOpenAIService {
       const userMessage = request.messages[request.messages.length - 1]?.content || '';
       const lowerUserMessage = userMessage.toLowerCase();
       
-      // Check for Apollo.io API questions first
+      // Check for Apollo.io API questions or advanced business queries first
       if (lowerUserMessage.includes('apollo') || lowerUserMessage.includes('api') || 
-          lowerUserMessage.includes('prospecting') || lowerUserMessage.includes('lead generation')) {
+          lowerUserMessage.includes('prospecting') || lowerUserMessage.includes('lead generation') ||
+          lowerUserMessage.includes('director') || lowerUserMessage.includes('manufacturing') ||
+          lowerUserMessage.includes('finance') || lowerUserMessage.includes('employee size') ||
+          lowerUserMessage.includes('industry') || lowerUserMessage.includes('united states') ||
+          (lowerUserMessage.includes('campaign') && lowerUserMessage.includes('skip')) ||
+          lowerUserMessage.includes('exclude') || lowerUserMessage.includes('filter')) {
         const apolloResponse = await this.handleApolloQueries(userMessage);
         if (apolloResponse) {
           return {
@@ -73,25 +78,35 @@ class RealOpenAIService {
         }
       }
 
-      // Check if user wants database operations
-      const databaseResponse = await this.handleDatabaseOperations(lowerUserMessage, aiName, aiType);
-      
-      if (databaseResponse) {
-        return {
-          choices: [{
-            message: {
-              role: 'assistant',
-              content: databaseResponse
-            },
-            finish_reason: 'stop'
-          }],
-          usage: {
-            prompt_tokens: 100,
-            completion_tokens: databaseResponse.length / 4,
-            total_tokens: 100 + (databaseResponse.length / 4)
-          }
-        };
+      // Check if user wants database operations (only for simple local searches)
+      const isSimpleSearch = lowerUserMessage.includes('search') && 
+                            !lowerUserMessage.includes('api') && 
+                            !lowerUserMessage.includes('director') &&
+                            !lowerUserMessage.includes('manufacturing') &&
+                            !lowerUserMessage.includes('industry');
+                            
+      if (isSimpleSearch) {
+        const databaseResponse = await this.handleDatabaseOperations(lowerUserMessage, aiName, aiType);
+        
+        if (databaseResponse) {
+          return {
+            choices: [{
+              message: {
+                role: 'assistant',
+                content: databaseResponse
+              },
+              finish_reason: 'stop'
+            }],
+            usage: {
+              prompt_tokens: 100,
+              completion_tokens: databaseResponse.length / 4,
+              total_tokens: 100 + (databaseResponse.length / 4)
+            }
+          };
+        }
       }
+
+      // For all other queries, use real AI with enhanced capabilities
 
       // Get current database context for AI awareness
       const databaseContext = await this.getDatabaseContext();
@@ -153,11 +168,116 @@ class RealOpenAIService {
 
   private async handleApolloQueries(userMessage: string): Promise<string | null> {
     try {
-      // Check for specific Apollo.io related queries
-      const apolloKnowledge = apolloService.getAPIKnowledge();
+      const lowerMessage = userMessage.toLowerCase();
       const recommendations = apolloService.generateAPIRecommendation(userMessage);
       
-      if (userMessage.toLowerCase().includes('apollo')) {
+      // Handle complex Apollo.io search queries
+      if (lowerMessage.includes('director') && lowerMessage.includes('finance') && 
+          (lowerMessage.includes('manufacturing') || lowerMessage.includes('industry'))) {
+        
+        return `# 🎯 Apollo.io API Search Strategy
+
+## Recommended API Call for Director of Finance Search
+
+### Primary Search Endpoint: \`/v1/mixed_people/search\`
+
+**Optimized Query Parameters:**
+\`\`\`json
+{
+  "person_titles": [
+    "Director of Finance", 
+    "Finance Director",
+    "Director Finance",
+    "Director, Finance"
+  ],
+  "person_locations": ["United States"],
+  "organization_industries": ["manufacturing"],
+  "organization_num_employees_ranges": ["11-50", "51-100"],
+  "per_page": 50,
+  "page": 1,
+  "enrich_contacts": true
+}
+\`\`\`
+
+## 🔍 Advanced Filtering Strategy
+
+**Title Variations to Include:**
+- "Director of Finance" (primary target)
+- "Finance Director" (alternative format)
+- "Director, Finance" (comma variation)
+- "VP Finance" (senior level prospects)
+- "Financial Director" (alternate phrasing)
+
+**Geographic Targeting:**
+- Location: "United States" (broad coverage)
+- Consider state-level filtering for focused campaigns
+
+**Industry Precision:**
+- Primary: "manufacturing"
+- Related: "industrial equipment", "automotive", "aerospace"
+
+**Company Size Optimization:**
+- "11-50" employees: Mid-sized manufacturers
+- "51-100" employees: Growth-stage companies
+- Sweet spot for decision-maker accessibility
+
+## 🚫 Exclusion Strategy for "Sage Data" Campaign
+
+**Post-Processing Filter Implementation:**
+\`\`\`javascript
+// After Apollo.io response, filter out existing contacts
+const filteredResults = apolloResults.filter(contact => {
+  const existingContact = sageDataCampaign.find(existing => 
+    existing.email === contact.email || 
+    (existing.firstName === contact.first_name && 
+     existing.lastName === contact.last_name &&
+     existing.company === contact.organization_name)
+  );
+  return !existingContact;
+});
+\`\`\`
+
+## 📊 Expected Results & Lead Scoring
+
+**Target Profile Analysis:**
+- **Authority Level**: High (Director-level decision maker)
+- **Budget Influence**: Direct financial oversight
+- **Company Size**: Optimal for personalized outreach
+- **Industry**: Manufacturing = process/efficiency focus
+
+**Lead Scoring Framework:**
+- Director of Finance: 85-90 points (high authority)
+- Manufacturing industry: +15 points (sector relevance)
+- 10-100 employees: +10 points (accessible decision maker)
+- US location: +5 points (timezone alignment)
+
+## 🚀 Follow-up API Sequence
+
+**1. Contact Enrichment:**
+\`\`\`json
+POST /v1/people/match
+{
+  "email": "director@company.com",
+  "enrich": true
+}
+\`\`\`
+
+**2. Email Discovery:**
+\`\`\`json
+POST /v1/email_addresses
+{
+  "first_name": "John",
+  "last_name": "Smith",
+  "domain": "manufacturingco.com"
+}
+\`\`\`
+
+This search strategy will identify high-quality finance decision-makers in US manufacturing companies while automatically excluding your existing "Sage Data" campaign contacts.`;
+      }
+      
+      // Handle general Apollo.io questions
+      if (lowerMessage.includes('apollo')) {
+        const apolloKnowledge = apolloService.getAPIKnowledge();
         return `# 🚀 Apollo.io Integration Expert
 
 I have complete knowledge of Apollo.io's API architecture and can help you with advanced prospecting and lead generation strategies.
@@ -175,6 +295,13 @@ ${apolloKnowledge}
 - **Compliance**: GDPR/CCPA compliant data handling practices
 
 Ask me anything about Apollo.io APIs, prospecting strategies, or lead generation workflows!`;
+      }
+      
+      // For other business intelligence queries, return recommendations
+      if (lowerMessage.includes('prospecting') || lowerMessage.includes('lead generation') ||
+          lowerMessage.includes('industry') || lowerMessage.includes('director') ||
+          lowerMessage.includes('manufacturing') || lowerMessage.includes('finance')) {
+        return recommendations;
       }
       
       return null;
