@@ -858,8 +858,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           rows: exportData
         };
 
-        // Simple encryption for demo purposes
-        const encryptedData = Buffer.from(JSON.stringify(campaignDataToStore)).toString('base64');
+        // Use proper encryption compatible with existing system
+        const { encrypt } = await import('./utils/encryption');
+        const encryptedData = encrypt(JSON.stringify(campaignDataToStore));
 
         const campaignInput = {
           name: finalCampaignName,

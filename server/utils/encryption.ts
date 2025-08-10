@@ -21,6 +21,15 @@ export function encrypt(text: string): string {
 }
 
 export function decrypt(encryptedData: string): string {
+  // First check if it's base64 encoded (legacy format)
+  try {
+    const decoded = Buffer.from(encryptedData, 'base64').toString('utf8');
+    JSON.parse(decoded); // Test if it's valid JSON
+    return decoded;
+  } catch (e) {
+    // Not base64 or not valid JSON, continue with other methods
+  }
+  
   const parts = encryptedData.split(':');
   if (parts.length !== 2) {
     throw new Error('Invalid encrypted data format');

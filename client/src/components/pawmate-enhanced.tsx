@@ -554,6 +554,13 @@ Your search results have been exported and saved as a new campaign record. You c
         };
         
         setMessages(prev => [...prev, successMessage]);
+        
+        // Invalidate campaigns cache to refresh the list
+        setTimeout(() => {
+          import('@/lib/queryClient').then(({ queryClient }) => {
+            queryClient.invalidateQueries({ queryKey: ['/api/campaigns'] });
+          });
+        }, 1000);
       } else {
         const error = await response.json();
         toast({
