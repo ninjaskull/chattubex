@@ -2,19 +2,21 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Brain, Cpu, Database, Globe, Network, Zap, ArrowRight, CheckCircle, Star, Users, Award, Layers, Shield, Rocket, Target } from "lucide-react";
+import { Brain, Cpu, Database, Globe, Network, Zap, ArrowRight, CheckCircle, Star, Users, Award, Layers, Shield, Rocket, Target, X } from "lucide-react";
 import { setAuthenticated } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import UnifiedChatbot from "@/components/unified-chatbot";
+import PawMate from "@/components/pawmate";
 
 export default function Landing() {
   const [clickCount, setClickCount] = useState(0);
   const [showAdminAccess, setShowAdminAccess] = useState(false);
   const [password, setPassword] = useState("");
   const [showChatbot, setShowChatbot] = useState(false);
+  const [showPawMate, setShowPawMate] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -164,18 +166,19 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button 
                 size="lg" 
-                onClick={() => setShowChatbot(true)}
+                onClick={() => setShowPawMate(true)}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-2xl shadow-blue-500/25 text-lg group"
               >
-                Start Your Journey
+                Try Duggu Chat
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
+                onClick={() => setShowChatbot(true)}
                 className="px-8 py-4 bg-transparent border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 text-lg"
               >
-                Watch Demo
+                Advanced AI Search
               </Button>
             </div>
           </div>
@@ -324,7 +327,26 @@ export default function Landing() {
         </div>
       </footer>
       
-      {/* Enhanced Chatbot Component */}
+      {/* Original PawMate Chatbot */}
+      {showPawMate && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-4xl h-[80vh] bg-white rounded-lg overflow-hidden">
+            <div className="h-full">
+              <PawMate />
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowPawMate(false)}
+              className="absolute top-4 right-4 bg-white/80 hover:bg-white"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Unified Chatbot */}
       <UnifiedChatbot 
         isOpen={showChatbot} 
         onClose={() => setShowChatbot(false)} 

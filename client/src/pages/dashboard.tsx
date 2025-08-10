@@ -17,6 +17,7 @@ import { clearAuth } from "@/lib/auth";
 import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
 import UnifiedChatbot from "@/components/unified-chatbot";
+import PawMate from "@/components/pawmate";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -69,7 +70,7 @@ export default function Dashboard() {
       {/* Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Campaigns</span>
@@ -78,9 +79,13 @@ export default function Dashboard() {
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Documents</span>
             </TabsTrigger>
-            <TabsTrigger value="search" className="flex items-center gap-2">
+            <TabsTrigger value="pawmate" className="flex items-center gap-2">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Duggu AI</span>
+              <span className="hidden sm:inline">Duggu Chat</span>
+            </TabsTrigger>
+            <TabsTrigger value="search" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              <span className="hidden sm:inline">AI Search</span>
             </TabsTrigger>
           </TabsList>
 
@@ -96,16 +101,21 @@ export default function Dashboard() {
             <NotesDocuments />
           </TabsContent>
 
-          {/* Duggu AI Search Tab */}
+          {/* Duggu Chat Tab - Original UI */}
+          <TabsContent value="pawmate" className="mt-6">
+            <PawMate />
+          </TabsContent>
+
+          {/* Advanced AI Search Tab */}
           <TabsContent value="search" className="mt-6">
             <Card className="p-6">
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
-                  <Target className="w-6 h-6 text-blue-600" />
-                  Duggu AI - Lead Intelligence Assistant
+                  <Database className="w-6 h-6 text-blue-600" />
+                  Advanced AI Search Assistant
                 </CardTitle>
                 <CardDescription>
-                  AI-powered chatbot with database search capabilities
+                  Unified chatbot with OpenAI conversation and database search
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
@@ -113,7 +123,7 @@ export default function Dashboard() {
                   onClick={() => setShowChatbot(true)}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
-                  Open AI Assistant
+                  Open Advanced Assistant
                 </Button>
               </CardContent>
             </Card>
