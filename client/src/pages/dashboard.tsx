@@ -47,16 +47,16 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Database className="text-white h-5 w-5" />
+              <Dog className="text-white h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-              <p className="text-sm text-slate-600">Trust me its made by Me</p>
+              <h1 className="text-2xl font-bold text-slate-900">Pet Management Dashboard</h1>
+              <p className="text-sm text-slate-600">Comprehensive care for your beloved pets</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-              {totalCampaigns} Campaigns
+              {totalCampaigns} Pet Records
             </Badge>
             <Button variant="ghost" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
               <LogOut className="mr-2 h-4 w-4" />
@@ -71,7 +71,7 @@ export default function Dashboard() {
           <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Files</span>
+              <span className="hidden sm:inline">Records</span>
             </TabsTrigger>
             <TabsTrigger value="notes" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
@@ -85,7 +85,7 @@ export default function Dashboard() {
 
 
 
-          {/* Files Tab */}
+          {/* Pet Records Tab */}
           <TabsContent value="files" className="mt-6">
             <CampaignList />
           </TabsContent>

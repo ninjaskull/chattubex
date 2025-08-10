@@ -60,32 +60,32 @@ export default function Landing() {
     },
     {
       icon: Cpu,
-      title: "Real-time Collaboration",
-      description: "Work together seamlessly with live document editing, instant messaging, and real-time notifications.",
+      title: "Real-time Health Monitoring",
+      description: "Track your pet's vital signs, activity levels, and health metrics with live updates and smart notifications.",
       gradient: "from-blue-500 to-cyan-500"
     },
     {
       icon: Database,
-      title: "Secure Document Storage",
-      description: "Enterprise-grade security with encrypted storage, version control, and automatic backups for all your files.",
+      title: "Secure Pet Records",
+      description: "Enterprise-grade security with encrypted storage for medical records, vaccination history, and health data.",
       gradient: "from-green-500 to-emerald-500"
     },
     {
       icon: Network,
-      title: "Campaign Management",
-      description: "Organize and manage marketing campaigns with CSV imports, field mapping, and contact management tools.",
+      title: "Veterinary Network",
+      description: "Connect with certified veterinarians, schedule appointments, and manage pet care communications seamlessly.",
       gradient: "from-orange-500 to-red-500"
     },
     {
       icon: Shield,
-      title: "Data Encryption",
-      description: "Advanced encryption protocols protect your sensitive documents and personal information at all times.",
+      title: "Privacy Protection",
+      description: "Advanced encryption protocols protect your pet's sensitive health information and personal data at all times.",
       gradient: "from-indigo-500 to-purple-500"
     },
     {
       icon: Globe,
-      title: "Cloud Synchronization",
-      description: "Access your documents anywhere with automatic cloud sync and offline capabilities.",
+      title: "Multi-device Access",
+      description: "Access your pet's information anywhere with automatic cloud sync and offline capabilities across all devices.",
       gradient: "from-teal-500 to-blue-500"
     }
   ];
@@ -113,10 +113,10 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <Brain className="text-white text-lg" />
+                <PawPrint className="text-white text-lg" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                CollabSpace Pro
+                PawMate Pro
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -149,16 +149,16 @@ export default function Landing() {
             </div>
             
             <h1 className="text-5xl sm:text-7xl font-bold mb-6 leading-tight">
-              Collaborative
+              Comprehensive
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                Document Management
+                Pet Management
               </span>
             </h1>
             
             <p className="text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Seamless document collaboration with real-time communication, secure file management, 
-              and intelligent note-taking powered by AI assistance.
+              Advanced technology combined with engaging user experience for pet owners. 
+              AI-powered pet care assistance, health tracking, and real-time insights for your beloved companions.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -199,10 +199,10 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Powerful Collaboration Features
+              Advanced Pet Care Features
             </h2>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Everything you need for seamless team collaboration and document management
+              Everything you need for comprehensive pet management and AI-powered care assistance
             </p>
           </div>
           
@@ -231,10 +231,10 @@ export default function Landing() {
           <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-3xl p-12 border border-slate-800 backdrop-blur-xl">
             <Rocket className="w-16 h-16 mx-auto mb-6 text-blue-400" />
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Ready to Transform Your Business?
+              Ready to Transform Pet Care?
             </h2>
             <p className="text-xl text-slate-400 mb-8">
-              Join thousands of forward-thinking companies already using our platform
+              Join thousands of pet owners already using our AI-powered platform for better pet health management
             </p>
             <Button 
               size="lg" 
@@ -253,24 +253,24 @@ export default function Landing() {
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <Brain className="text-white text-lg" />
+                  <PawPrint className="text-white text-lg" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  CollabSpace Pro
+                  PawMate Pro
                 </span>
               </div>
               <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
-                The ultimate collaborative platform for document management, team communication, and AI-powered assistance.
+                The ultimate pet management platform combining advanced technology with engaging user experience for comprehensive pet care.
               </p>
             </div>
             
             <div>
               <h4 className="font-semibold text-white mb-4">Platform</h4>
               <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Document Management</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Campaign Tools</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Pet Health Records</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">AI Care Assistant</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">PawMate AI</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Real-time Chat</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Veterinary Network</a></li>
               </ul>
             </div>
             
@@ -292,7 +292,7 @@ export default function Landing() {
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 2025
-              </span> CollabSpace Pro. All rights reserved.
+              </span> PawMate Pro. All rights reserved.
             </p>
             
             {showAdminAccess && (
