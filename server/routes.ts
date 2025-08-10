@@ -8,7 +8,7 @@ import { storage } from "./storage.js";
 import { encrypt, decrypt } from "./utils/encryption.js";
 import { deriveTimezone } from "./utils/timezone.js";
 import { sendContactFormEmail } from "./utils/email.js";
-import { mockOpenAI } from "./services/mockOpenAI.js";
+// Removed mock OpenAI import - using real OpenAI exclusively
 import { createRealOpenAIService } from "./services/realOpenAI.js";
 import { databaseService } from "./services/databaseService.js";
 
@@ -717,32 +717,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Check if we have OpenAI API key, if yes, use real OpenAI, otherwise use mock
-      const hasOpenAIKey = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '';
-      
-      let response;
-      if (hasOpenAIKey) {
-        // Use real OpenAI service
-        const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY!);
-        response = await realOpenAI.generateChatCompletion({
-          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 500
-        }, petName, petType);
-        
-        response.isRealAI = true;
-      } else {
-        // Use mock OpenAI service
-        response = await mockOpenAI.generateChatCompletion({
-          model: "gpt-4o-mock", // Indicate this is mock
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 500
-        }, petName, petType);
-        
-        response.isRealAI = false;
+      // Use real OpenAI service exclusively
+      if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.trim() === '') {
+        return res.status(500).json({ message: 'OpenAI API key is required for pet care assistance' });
       }
+
+      const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
+      const response = await realOpenAI.generateChatCompletion({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1500
+      }, petName, petType);
+      
+      response.isRealAI = true;
 
       // Save the AI response to history
       if (response.choices && response.choices[0] && response.choices[0].message) {
@@ -751,7 +739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: 'assistant',
           content: response.choices[0].message.content,
           metadata: { 
-            model: response.isRealAI ? 'gpt-4o' : 'gpt-4o-mock',
+            model: 'gpt-4o',
             tokens: response.usage,
             petName, 
             petType 
