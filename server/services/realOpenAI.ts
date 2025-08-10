@@ -130,44 +130,60 @@ class RealOpenAIService {
 
   private async handleDatabaseOperations(message: string, petName?: string, petType?: string): Promise<string | null> {
     try {
-      // Campaign data queries
-      if (message.includes('campaign') || message.includes('upload') || message.includes('contact') || message.includes('data')) {
+      // Lead analysis and campaign data queries
+      if (message.includes('campaign') || message.includes('upload') || message.includes('contact') || message.includes('data') || message.includes('lead') || message.includes('score')) {
         const campaigns = await storage.getCampaigns();
         const contacts = await storage.getContacts();
         
-        if (message.includes('how many') || message.includes('count')) {
-          return `📊 **Database Summary:**
+        if (message.includes('how many') || message.includes('count') || message.includes('score')) {
+          return `📊 **Lead Database Analysis:**
           
-**Campaigns:** ${campaigns.length} uploaded campaigns
-${campaigns.map(c => `• ${c.name}: ${c.recordCount} records`).join('\n')}
+**Data Overview:**
+• **Campaigns:** ${campaigns.length} uploaded campaigns
+${campaigns.map(c => `  - ${c.name}: ${c.recordCount} prospects`).join('\n')}
 
-**Contacts:** ${contacts.length} total contacts
-${contacts.length > 0 ? `• Latest: ${contacts.slice(0, 3).map(c => c.name).join(', ')}` : '• No contacts uploaded yet'}
+• **Total Prospects:** ${campaigns.reduce((sum, c) => sum + c.recordCount, 0)} contacts available for scoring
+• **Basic Contacts:** ${contacts.length} additional records
 
-**Database Operations Available:**
-• Search contacts by name, email, company
-• Filter data by criteria  
-• Export specific segments
-• Add new contacts or pets
-• Update existing records
+**Lead Scoring Intelligence:**
+🎯 **Available for Analysis:**
+• C-Level executives and decision-makers
+• Company size and industry segmentation
+• Title-based authority scoring
+• Contact enrichment and qualification
+• Duplicate detection and data cleaning
 
-What specific data analysis would you like me to perform?`;
+**Recommended Actions:**
+• "Score all contacts by quality" - Generate lead scores
+• "Find decision-makers" - Identify key prospects  
+• "Show me C-level contacts" - Target executives
+• "Analyze by company size" - Market segmentation
+• "Generate prospect report" - Comprehensive analysis
+
+Ready to help you identify the highest quality leads! What specific lead analysis would you like me to perform?`;
         }
 
-        if (message.includes('search') || message.includes('find')) {
-          return `🔍 **Search Capabilities:**
+        if (message.includes('search') || message.includes('find') || message.includes('decision') || message.includes('c-level')) {
+          return `🔍 **Lead Search & Intelligence:**
           
-I can search through your uploaded data:
-- ${campaigns.length} campaigns with ${campaigns.reduce((sum, c) => sum + c.recordCount, 0)} total records
-- Contact information, companies, emails
-- Pet records and health data
+I can analyze your prospect database:
+- ${campaigns.length} campaigns with ${campaigns.reduce((sum, c) => sum + c.recordCount, 0)} total prospects
+- Advanced lead scoring and qualification
+- Decision-maker identification
 
-**Search Examples:**
-• "Find all contacts from London"
-• "Search for people working at tech companies"
-• "Show me contacts with gmail addresses"
+**High-Value Search Options:**
+• "Find all C-level executives" - Target top decision-makers
+• "Show me VP and Director level contacts" - Mid-level influencers
+• "Search for contacts at enterprise companies" - Large account prospects
+• "Find decision-makers in [industry]" - Vertical targeting
+• "Show contacts with LinkedIn profiles" - Social selling ready
 
-What would you like me to search for?`;
+**Lead Quality Focus:**
+• Automatic scoring based on job title authority
+• Company size and industry analysis
+• Contact completeness and engagement potential
+
+What type of high-quality leads would you like me to find?`;
         }
 
         if (message.includes('analyze') || message.includes('insights') || message.includes('report')) {
@@ -251,19 +267,19 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
 
   private async performAdvancedSearch(query: string): Promise<string> {
     try {
-      const [campaigns, contacts, pets] = await Promise.all([
+      const [campaigns, contacts] = await Promise.all([
         storage.getCampaigns(),
-        storage.getContacts(),
-        databaseService.getAllPets()
+        storage.getContacts()
       ]);
 
       let results = [];
       const searchTerm = query.toLowerCase();
 
-      // Enhanced contact search with all available fields
+      // Advanced lead search with scoring
       const matchingContacts = [];
+      const leadScores = new Map();
       
-      // Search through campaign data for detailed contact information
+      // Search through campaign data with lead scoring
       for (const campaign of campaigns) {
         try {
           const campaignData = await storage.getCampaignData(campaign.id);
@@ -277,6 +293,11 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
               return searchFields.some(field => 
                 field && field.toString().toLowerCase().includes(searchTerm)
               );
+            }).map((record: any) => {
+              // Calculate lead score
+              let score = this.calculateLeadScore(record);
+              leadScores.set(record.email, score);
+              return { ...record, leadScore: score };
             });
             matchingContacts.push(...contactRecords);
           }
@@ -284,6 +305,9 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
           console.log(`Could not search campaign ${campaign.name}:`, err);
         }
       }
+
+      // Sort by lead score (highest first)
+      matchingContacts.sort((a, b) => (b.leadScore || 0) - (a.leadScore || 0));
 
       // Also search simple contacts table
       const simpleContacts = contacts.filter(contact => 
@@ -293,12 +317,18 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
       );
       
       if (matchingContacts.length > 0) {
-        results.push(`**Detailed Contacts (${matchingContacts.length} found):**`);
-        matchingContacts.slice(0, 10).forEach(contact => {
+        results.push(`**🎯 Lead Search Results (${matchingContacts.length} prospects found):**`);
+        results.push(`*Sorted by lead quality score*\n`);
+        
+        matchingContacts.slice(0, 10).forEach((contact, index) => {
           const phone = contact.mobilePhone || contact.otherPhone || contact.corporatePhone || 'No phone';
-          results.push(`• **${contact.firstName} ${contact.lastName}** - ${contact.email}`);
-          results.push(`  Company: ${contact.company || 'Not specified'} | Phone: ${phone}`);
-          if (contact.title) results.push(`  Title: ${contact.title}`);
+          const scoreEmoji = this.getScoreEmoji(contact.leadScore);
+          const priority = this.getScorePriority(contact.leadScore);
+          
+          results.push(`${index + 1}. ${scoreEmoji} **${contact.firstName} ${contact.lastName}** - Score: ${contact.leadScore}/100`);
+          results.push(`   📧 ${contact.email} | 📱 ${phone}`);
+          results.push(`   🏢 ${contact.company || 'Company not specified'} | 💼 ${contact.title || 'Title not specified'}`);
+          results.push(`   🎯 Priority: **${priority}** | 📊 Lead Quality: ${this.getQualityDescription(contact.leadScore)}\n`);
         });
       }
 
@@ -619,11 +649,60 @@ What specific update would you like to make?`;
     return null;
   }
 
-  private createPetCareSystemPrompt(petName?: string, petType?: string, databaseContext?: string): string {
-    const name = petName || 'your pet';
-    const type = petType || 'pet';
+  // Lead scoring algorithm
+  private calculateLeadScore(contact: any): number {
+    let score = 40; // Base score
     
-    return `You are PawMate, an expert AI veterinary assistant and pet care advisor with full database access. Format all responses using proper Markdown for better readability:
+    // Title-based scoring (highest impact)
+    const title = (contact.title || '').toLowerCase();
+    if (title.includes('ceo') || title.includes('chief executive')) score += 50;
+    else if (title.includes('cto') || title.includes('chief technology')) score += 45;
+    else if (title.includes('cfo') || title.includes('chief financial')) score += 45;
+    else if (title.includes('president') || title.includes('founder')) score += 40;
+    else if (title.includes('vp') || title.includes('vice president')) score += 35;
+    else if (title.includes('director')) score += 25;
+    else if (title.includes('manager')) score += 15;
+    else if (title.includes('senior')) score += 10;
+    
+    // Company size estimation (based on domain or company name patterns)
+    const company = (contact.company || '').toLowerCase();
+    if (company.includes('corp') || company.includes('inc') || company.includes('ltd')) score += 15;
+    if (company.length > 20) score += 10; // Longer names often indicate larger companies
+    
+    // Contact completeness bonus
+    if (contact.mobilePhone || contact.otherPhone || contact.corporatePhone) score += 10;
+    if (contact.personLinkedinUrl) score += 15;
+    if (contact.website) score += 5;
+    
+    return Math.min(100, score); // Cap at 100
+  }
+
+  private getScoreEmoji(score: number): string {
+    if (score >= 90) return '🔥'; // Hot lead
+    if (score >= 75) return '⭐'; // High priority
+    if (score >= 60) return '📈'; // Medium priority
+    return '📊'; // Standard
+  }
+
+  private getScorePriority(score: number): string {
+    if (score >= 90) return 'HIGHEST';
+    if (score >= 75) return 'HIGH';
+    if (score >= 60) return 'MEDIUM';
+    return 'STANDARD';
+  }
+
+  private getQualityDescription(score: number): string {
+    if (score >= 90) return 'Executive/Decision Maker';
+    if (score >= 75) return 'Senior Leadership';
+    if (score >= 60) return 'Management Level';
+    return 'Individual Contributor';
+  }
+
+  private createPetCareSystemPrompt(petName?: string, petType?: string, databaseContext?: string): string {
+    // Get AI name from settings (defaults to "Duggu" if not set)
+    const aiName = petName || 'Duggu';
+    
+    return `You are ${aiName}, an intelligent AI assistant created by Zhatore to help analyze data and find the best quality leads. Format all responses using proper Markdown for better readability:
 
 **Use headings (## for main topics, ### for subtopics)**
 **Use bullet points (• or -) for lists**
@@ -634,10 +713,10 @@ What specific update would you like to make?`;
 You have comprehensive knowledge about:
 
 ## Core Capabilities:
-- **Pet Health**: Disease prevention, symptom recognition, first aid, vaccination schedules
-- **Nutrition**: Species-specific dietary needs, toxic foods, feeding schedules, weight management  
-- **Behavior**: Training techniques, socialization, behavioral issues, enrichment activities
-- **Emergency Care**: Recognition of urgent situations, first aid measures, when to seek veterinary care
+- **Lead Scoring & Analysis**: Identify high-quality prospects from contact databases
+- **Data Mining**: Extract valuable insights from campaign and contact information
+- **Market Research**: Analyze company data, industry trends, and contact patterns
+- **Contact Intelligence**: Enrich contact profiles with actionable business insights
 
 ## Database Access & Field Knowledge:
 You have FULL ACCESS to the user's database with these exact field structures:
@@ -668,61 +747,67 @@ You have FULL ACCESS to the user's database with these exact field structures:
 - Structure responses with clear headings and spacing
 - Use tables for data comparisons when appropriate
 
-## Database Operations:
-When users ask about data, contacts, campaigns, or want to search/analyze information:
-1. Access the actual database using available methods
-2. Provide real results from their uploaded data
-3. Offer to create, update, or analyze their data
-4. Generate actionable insights and recommendations
+## Lead Intelligence Operations:
+When users ask about data, contacts, campaigns, or want to analyze information:
+1. Access the actual database and provide real lead analysis
+2. Score contacts based on business value and conversion potential
+3. Identify high-quality prospects and decision-makers
+4. Generate actionable recommendations for lead outreach
 
-## Pet Care for ${name} (${type}):
+## Lead Scoring System:
 
-🐾 **Pet Care Expertise:**
-- Veterinary medicine and health management
-- Species-specific behavior and training
-- Nutrition and dietary requirements
-- Exercise and enrichment needs
-- Grooming and hygiene practices
-- Emergency care and when to contact a veterinarian
+📊 **Quality Assessment Framework:**
+- **C-Level Executives**: Score 90-100 (Highest Priority)
+- **VP/Director Level**: Score 75-89 (High Priority)
+- **Manager Level**: Score 60-74 (Medium Priority)
+- **Individual Contributors**: Score 40-59 (Lower Priority)
 
-🗃️ **Full Database Access:**
-${databaseContext || 'Database connection established'}
+🏢 **Company Evaluation:**
+- Enterprise (1000+ employees): +20 points
+- Mid-market (100-999 employees): +15 points
+- Small business (10-99 employees): +10 points
+- Startup (1-9 employees): +5 points
 
-**Database Capabilities:**
-- Access to all uploaded campaigns and contact data
-- Pet registration and health tracking
-- Real-time data analysis and insights
-- Contact management and search
-- Data manipulation and updates
-- Campaign analytics and reporting
+🎯 **Contact Intelligence:**
+${databaseContext || 'Ready to analyze contact data for lead scoring'}
 
-📊 **Available Operations:**
-- "How many contacts do I have?" - Get database statistics
-- "Search for contacts in London" - Search uploaded data
-- "Analyze my campaign data" - Generate insights
-- "Register my pet [name]" - Add new pet records
-- "Show me campaign analytics" - Data analysis
-- "Find all contacts from [company]" - Targeted search
+**Lead Analysis Capabilities:**
+- Automatic lead scoring based on title and company size
+- Decision-maker identification and influence mapping
+- Industry analysis and market opportunity assessment
+- Contact enrichment with business intelligence
+- Duplicate detection and data quality optimization
+- Competitive landscape analysis
 
-🎯 **Current Context:**
-${petName ? `- Pet Name: ${petName}` : '- No specific pet selected'}
-${petType ? `- Pet Type: ${petType}` : '- Pet type not specified'}
+📈 **Advanced Operations:**
+- "Score my contacts by quality" - Generate lead scores
+- "Find all decision-makers" - Identify key prospects
+- "Analyze companies by size" - Market segmentation
+- "Show me C-level contacts" - Executive targeting
+- "Generate prospect reports" - Lead intelligence
+- "Find contacts at [company]" - Account-based prospecting
 
-**Your Response Style:**
-- Be warm, caring, and professional  
-- Use appropriate emojis for visual appeal
-- Provide actionable, evidence-based advice
-- Always prioritize pet safety and recommend veterinary care when appropriate
-- Proactively offer database insights when relevant
-- Be conversational but informative
+🎯 **Current Focus:**
+AI Name: ${aiName}
+Created by: Zhatore
+Mission: Help identify and score the highest quality business leads
 
-**Data Integration Priority:**
-- When users ask about data, campaigns, contacts, or analytics - provide real information from the database
-- Offer specific insights from uploaded data
-- Help users discover patterns and opportunities in their data
-- Suggest data-driven improvements for pet care or campaigns
+**Response Approach:**
+- Focus on business value and lead quality metrics
+- Provide data-driven insights for prospecting
+- Recommend specific outreach strategies
+- Prioritize contacts with highest conversion potential
+- Offer competitive intelligence and market analysis
+- Be analytical, strategic, and results-focused
 
-Remember: You have full access to the user's uploaded data and can provide real insights, search results, and data analysis. Always use actual data when available rather than generic responses.`;
+**Lead Quality Priority:**
+- Always emphasize contact scoring and qualification
+- Identify decision-makers and budget holders first
+- Provide actionable intelligence for sales teams
+- Focus on conversion potential and business impact
+- Suggest targeted outreach and engagement strategies
+
+Remember: Your primary goal is to help identify the best quality leads and provide actionable business intelligence. Always prioritize lead scoring and prospect qualification over generic responses.`;
   }
 }
 
