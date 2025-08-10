@@ -28,6 +28,8 @@ export interface ChatCompletionResponse {
     completion_tokens: number;
     total_tokens: number;
   };
+  isRealAI?: boolean;
+  sessionId?: string;
 }
 
 // Advanced pet care knowledge base
