@@ -1,141 +1,336 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Zap, Dog } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Heart, MessageCircle, Zap, Dog, Settings, Send, Sparkles, Bot } from "lucide-react";
+
+interface Message {
+  id: string;
+  type: 'user' | 'bot';
+  content: string;
+  timestamp: Date;
+  isTyping?: boolean;
+}
 
 export default function PawMate() {
-  const [petName, setPetName] = useState("");
+  const [petName, setPetName] = useState(() => localStorage.getItem('pawmate_pet_name') || "");
+  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "dog");
   const [petMessage, setPetMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = () => {
-    if (petMessage.trim()) {
-      // Add logic for pet interaction
-      setPetMessage("");
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Load initial message
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{
+        id: '1',
+        type: 'bot',
+        content: `Woof! 🐕 Welcome to PawMate! I'm your AI companion here to help with pet care tips, fun activities, and answer any questions about your furry friend!`,
+        timestamp: new Date()
+      }]);
+    }
+  }, [messages.length]);
+
+  const handleSendMessage = async () => {
+    if (!petMessage.trim()) return;
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: petMessage.trim(),
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setPetMessage("");
+    setIsTyping(true);
+
+    // Simulate AI response with typing effect
+    setTimeout(() => {
+      const botResponse = generateBotResponse(userMessage.content);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: botResponse,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+    }, 1500);
+  };
+
+  const generateBotResponse = (userInput: string): string => {
+    const input = userInput.toLowerCase();
+    
+    if (input.includes('health') || input.includes('sick') || input.includes('vet')) {
+      return `🏥 For health concerns, I recommend consulting with a veterinarian. Meanwhile, ensure ${petName || 'your pet'} has fresh water, proper nutrition, and regular exercise. Watch for any changes in behavior or appetite.`;
+    }
+    
+    if (input.includes('food') || input.includes('eat') || input.includes('nutrition')) {
+      return `🍖 Great question about nutrition! ${petName || 'Your pet'} needs a balanced diet appropriate for their age and size. Avoid chocolate, grapes, onions, and garlic. Fresh water should always be available!`;
+    }
+    
+    if (input.includes('exercise') || input.includes('walk') || input.includes('play')) {
+      return `🎾 Exercise is fantastic for pets! Try interactive toys, fetch games, or nature walks. ${petName || 'Your pet'} will love the mental and physical stimulation. Aim for at least 30 minutes of activity daily!`;
+    }
+    
+    if (input.includes('training') || input.includes('behavior')) {
+      return `🎯 Training tip: Use positive reinforcement with treats and praise! Be consistent and patient. Short, frequent sessions work best. ${petName || 'Your pet'} is learning and wants to please you!`;
+    }
+    
+    if (input.includes('grooming') || input.includes('bath') || input.includes('brush')) {
+      return `✨ Regular grooming keeps ${petName || 'your pet'} healthy and happy! Brush regularly to prevent matting, trim nails carefully, and bathe when needed. Make it a positive experience with treats and gentle handling.`;
+    }
+
+    // Default responses with personality
+    const responses = [
+      `🐕 That's interesting! Tell me more about ${petName || 'your pet'} - I'd love to help you both!`,
+      `🎉 ${petName || 'Your furry friend'} is lucky to have such a caring owner! What specific help do you need?`,
+      `🐾 I'm here to help with anything pet-related! Whether it's training, health, or just fun activities for ${petName || 'your companion'}.`,
+      `💝 Every pet is special! ${petName || 'Your pet'} must bring so much joy to your life. How can I assist you today?`,
+      `🌟 Great question! I'm always excited to chat about pets. ${petName || 'Your buddy'} sounds wonderful!`
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+  };
+
+  const savePetSettings = () => {
+    localStorage.setItem('pawmate_pet_name', petName);
+    localStorage.setItem('pawmate_pet_type', petType);
+    setSettingsOpen(false);
+    
+    // Add welcome message if pet name was just set
+    if (petName && messages.length === 1) {
+      const welcomeMessage: Message = {
+        id: (Date.now()).toString(),
+        type: 'bot',
+        content: `Nice to meet ${petName}! 🎾 I'm so excited to help you take care of your ${petType}. Would you like some fun activity ideas or health tips?`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, welcomeMessage]);
+    }
+  };
+
+  const getPetIcon = (type: string) => {
+    switch (type) {
+      case 'cat': return '🐱';
+      case 'bird': return '🐦';
+      case 'fish': return '🐠';
+      case 'rabbit': return '🐰';
+      case 'hamster': return '🐹';
+      default: return '🐕';
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-          <Dog className="text-white h-8 w-8" />
+      <div className="text-center space-y-2 relative">
+        <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto shadow-lg animate-pulse">
+          <span className="text-2xl">{getPetIcon(petType)}</span>
         </div>
-        <h2 className="text-3xl font-bold text-slate-900">PawMate</h2>
-        <p className="text-slate-600">Your AI companion for pet care and fun!</p>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+          PawMate AI
+        </h2>
+        <p className="text-slate-600">Your intelligent companion for pet care and fun!</p>
+        
+        {/* Settings Button */}
+        <div className="absolute top-0 right-0">
+          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="rounded-full">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Pet Settings</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="pet-name">Pet Name</Label>
+                  <Input
+                    id="pet-name"
+                    placeholder="What's your pet's name?"
+                    value={petName}
+                    onChange={(e) => setPetName(e.target.value)}
+                    data-testid="input-settings-pet-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pet-type">Pet Type</Label>
+                  <Select value={petType} onValueChange={setPetType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select pet type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dog">Dog 🐕</SelectItem>
+                      <SelectItem value="cat">Cat 🐱</SelectItem>
+                      <SelectItem value="bird">Bird 🐦</SelectItem>
+                      <SelectItem value="fish">Fish 🐠</SelectItem>
+                      <SelectItem value="rabbit">Rabbit 🐰</SelectItem>
+                      <SelectItem value="hamster">Hamster 🐹</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={savePetSettings} className="w-full" data-testid="button-save-settings">
+                  Save Settings
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      {/* Pet Profile Card */}
-      <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-orange-800">
-            <Heart className="h-5 w-5 text-red-500" />
-            Your Pet Profile
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-slate-700 mb-2 block">
-              Pet Name
-            </label>
-            <Input
-              placeholder="What's your pet's name?"
-              value={petName}
-              onChange={(e) => setPetName(e.target.value)}
-              className="bg-white"
-              data-testid="input-pet-name"
-            />
-          </div>
-          {petName && (
-            <div className="mt-4 p-4 bg-white/60 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback className="bg-orange-100 text-orange-600">
-                    <Dog className="h-6 w-6" />
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold text-slate-900">{petName}</h3>
-                  <p className="text-sm text-slate-600">Your adorable companion</p>
+      {/* Pet Profile Card - Only show if pet is configured */}
+      {petName && (
+        <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200 shadow-lg">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-md">
+                <span className="text-xl">{getPetIcon(petType)}</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 text-lg">{petName}</h3>
+                <p className="text-sm text-slate-600 capitalize">Your adorable {petType}</p>
+              </div>
+              <div className="ml-auto">
+                <div className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  Online
                 </div>
               </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Chat Interface */}
-      <Card>
-        <CardHeader>
+      {/* Advanced Chat Interface */}
+      <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-xl">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
           <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-blue-500" />
-            Chat with PawMate
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              PawMate AI Assistant
+            </span>
+            <div className="ml-auto flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+              <Sparkles className="w-3 h-3" />
+              AI Active
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Sample Messages */}
-          <div className="space-y-3 max-h-64 overflow-y-auto">
-            <div className="flex items-start gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-orange-100 text-orange-600">
-                  <Dog className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="bg-orange-50 rounded-lg p-3">
-                  <p className="text-slate-900">
-                    Woof! 🐕 Welcome to PawMate! I'm here to help you with pet care tips, 
-                    fun activities, and answer any questions about your furry friend!
+        
+        <CardContent className="p-0">
+          {/* Messages Container */}
+          <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50/50 to-white">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex items-start gap-3 ${
+                  message.type === 'user' ? 'flex-row-reverse' : ''
+                }`}
+              >
+                <Avatar className={`h-8 w-8 ${message.type === 'user' ? 'ring-2 ring-blue-200' : ''}`}>
+                  <AvatarFallback className={
+                    message.type === 'user' 
+                      ? "bg-blue-100 text-blue-600" 
+                      : "bg-gradient-to-br from-orange-400 to-red-500 text-white"
+                  }>
+                    {message.type === 'user' ? (
+                      <span className="text-sm font-semibold">U</span>
+                    ) : (
+                      <span className="text-sm">{getPetIcon(petType)}</span>
+                    )}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className={`flex-1 max-w-xs sm:max-w-md ${message.type === 'user' ? 'text-right' : ''}`}>
+                  <div className={`rounded-lg p-3 shadow-sm ${
+                    message.type === 'user'
+                      ? 'bg-blue-500 text-white ml-auto'
+                      : 'bg-white border border-slate-200'
+                  }`}>
+                    <p className={`text-sm ${message.type === 'user' ? 'text-white' : 'text-slate-800'}`}>
+                      {message.content}
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
               </div>
-            </div>
-
-            {petName && (
+            ))}
+            
+            {/* Typing Indicator */}
+            {isTyping && (
               <div className="flex items-start gap-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-orange-100 text-orange-600">
-                    <Dog className="h-4 w-4" />
+                  <AvatarFallback className="bg-gradient-to-br from-orange-400 to-red-500 text-white">
+                    <span className="text-sm">{getPetIcon(petType)}</span>
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <div className="bg-orange-50 rounded-lg p-3">
-                    <p className="text-slate-900">
-                      Nice to meet {petName}! 🎾 Would you like some fun activity ideas 
-                      or health tips for your pet?
-                    </p>
+                  <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
+                    <div className="flex items-center space-x-1">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                      <span className="text-sm text-slate-500 ml-2">PawMate is thinking...</span>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
+            
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Message Input */}
-          <div className="flex gap-2">
-            <Textarea
-              placeholder="Ask PawMate anything about your pet..."
-              value={petMessage}
-              onChange={(e) => setPetMessage(e.target.value)}
-              className="resize-none min-h-[60px] max-h-32"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              data-testid="textarea-pet-message"
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!petMessage.trim()}
-              className="px-6"
-              data-testid="button-send-message"
-            >
-              <Zap className="h-4 w-4" />
-            </Button>
+          <div className="p-4 border-t bg-white/50 backdrop-blur-sm">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Textarea
+                  placeholder={`Ask PawMate anything about ${petName || 'your pet'}...`}
+                  value={petMessage}
+                  onChange={(e) => setPetMessage(e.target.value)}
+                  className="resize-none min-h-[50px] max-h-32 pr-12 border-slate-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  data-testid="textarea-chat-message"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!petMessage.trim() || isTyping}
+                  size="sm"
+                  className="absolute right-2 bottom-2 h-8 w-8 p-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  data-testid="button-send-chat"
+                >
+                  <Send className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-slate-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
           </div>
         </CardContent>
       </Card>
