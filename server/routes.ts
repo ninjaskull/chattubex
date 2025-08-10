@@ -688,8 +688,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { query, searchType = 'all', limit = 50 } = req.body;
       
-      if (!query || query.trim().length < 2) {
-        return res.status(400).json({ message: 'Search query must be at least 2 characters' });
+      if (!query || typeof query !== 'string' || query.trim().length < 1) {
+        return res.status(400).json({ message: 'Search query is required' });
       }
 
       const searchQuery = query.toLowerCase().trim();
