@@ -335,38 +335,7 @@ export default function PawMate() {
         </CardContent>
       </Card>
 
-      {/* Quick Tips */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Heart className="h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="font-semibold text-blue-800 mb-2">Health Tips</h3>
-            <p className="text-sm text-blue-700">Get personalized health advice for your pet</p>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-green-50 border-green-200">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Zap className="h-6 w-6 text-green-600" />
-            </div>
-            <h3 className="font-semibold text-green-800 mb-2">Activities</h3>
-            <p className="text-sm text-green-700">Fun games and exercises to try</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-purple-50 border-purple-200">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <MessageCircle className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="font-semibold text-purple-800 mb-2">Ask Anything</h3>
-            <p className="text-sm text-purple-700">Chat about pet care and behavior</p>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
