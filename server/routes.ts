@@ -683,6 +683,217 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search endpoint for database queries
+  app.post('/api/search', async (req, res) => {
+    try {
+      const { query, searchType = 'all', limit = 50 } = req.body;
+      
+      if (!query || query.trim().length < 2) {
+        return res.status(400).json({ message: 'Search query must be at least 2 characters' });
+      }
+
+      const searchQuery = query.toLowerCase().trim();
+      const results = {
+        contacts: [],
+        campaigns: [],
+        campaignData: [],
+        total: 0
+      };
+
+      // Search direct contacts table
+      if (searchType === 'all' || searchType === 'contacts') {
+        const contacts = await storage.getContacts();
+        results.contacts = contacts.filter(contact => 
+          contact.name.toLowerCase().includes(searchQuery) ||
+          contact.email.toLowerCase().includes(searchQuery) ||
+          contact.mobile.includes(searchQuery)
+        ).slice(0, limit);
+      }
+
+      // Search campaigns
+      if (searchType === 'all' || searchType === 'campaigns') {
+        const campaigns = await storage.getCampaigns();
+        results.campaigns = campaigns.filter(campaign =>
+          campaign.name.toLowerCase().includes(searchQuery)
+        ).slice(0, limit);
+      }
+
+      // Search within campaign data (decrypted contact records)
+      if (searchType === 'all' || searchType === 'campaign-data') {
+        const campaigns = await storage.getCampaigns();
+        for (const campaign of campaigns) {
+          try {
+            const campaignData = await storage.getCampaignData(campaign.id);
+            if (campaignData && campaignData.rows) {
+              const matchingRows = campaignData.rows.filter((row: any) => {
+                return Object.values(row).some((value: any) => 
+                  String(value).toLowerCase().includes(searchQuery)
+                );
+              });
+              
+              if (matchingRows.length > 0) {
+                results.campaignData.push({
+                  campaignId: campaign.id,
+                  campaignName: campaign.name,
+                  headers: campaignData.headers,
+                  matches: matchingRows.slice(0, limit),
+                  totalMatches: matchingRows.length
+                });
+              }
+            }
+          } catch (error) {
+            console.error(`Error searching campaign ${campaign.id}:`, error);
+          }
+        }
+      }
+
+      results.total = results.contacts.length + results.campaigns.length + 
+                     results.campaignData.reduce((sum, c) => sum + c.matches.length, 0);
+
+      res.json(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      res.status(500).json({ message: 'Failed to perform search' });
+    }
+  });
+
+  // Advanced search with filters
+  app.post('/api/search/advanced', async (req, res) => {
+    try {
+      const { 
+        query, 
+        filters = {}, 
+        sortBy = 'relevance',
+        limit = 100,
+        offset = 0
+      } = req.body;
+      
+      const searchQuery = query?.toLowerCase().trim() || '';
+      const results = [];
+
+      // Get all campaigns and search through their data
+      const campaigns = await storage.getCampaigns();
+      
+      for (const campaign of campaigns) {
+        try {
+          const campaignData = await storage.getCampaignData(campaign.id);
+          if (campaignData && campaignData.rows) {
+            let filteredRows = campaignData.rows;
+
+            // Apply text search if query provided
+            if (searchQuery) {
+              filteredRows = filteredRows.filter((row: any) => {
+                return Object.values(row).some((value: any) => 
+                  String(value).toLowerCase().includes(searchQuery)
+                );
+              });
+            }
+
+            // Apply field-specific filters
+            Object.entries(filters).forEach(([field, filterValue]: [string, any]) => {
+              if (filterValue && campaignData.headers.includes(field)) {
+                filteredRows = filteredRows.filter((row: any) => {
+                  const fieldValue = String(row[field] || '').toLowerCase();
+                  const filter = String(filterValue).toLowerCase();
+                  return fieldValue.includes(filter);
+                });
+              }
+            });
+
+            // Add campaign context to each row
+            filteredRows.forEach((row: any) => {
+              results.push({
+                ...row,
+                _campaignId: campaign.id,
+                _campaignName: campaign.name,
+                _headers: campaignData.headers
+              });
+            });
+          }
+        } catch (error) {
+          console.error(`Error searching campaign ${campaign.id}:`, error);
+        }
+      }
+
+      // Sort results
+      if (sortBy === 'name' && results.length > 0) {
+        results.sort((a, b) => {
+          const nameA = String(a.Name || a.name || '').toLowerCase();
+          const nameB = String(b.Name || b.name || '').toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      } else if (sortBy === 'email' && results.length > 0) {
+        results.sort((a, b) => {
+          const emailA = String(a.Email || a.email || '').toLowerCase();
+          const emailB = String(b.Email || b.email || '').toLowerCase();
+          return emailA.localeCompare(emailB);
+        });
+      }
+
+      // Apply pagination
+      const paginatedResults = results.slice(offset, offset + limit);
+
+      res.json({
+        results: paginatedResults,
+        total: results.length,
+        limit,
+        offset,
+        hasMore: results.length > offset + limit
+      });
+    } catch (error) {
+      console.error('Advanced search error:', error);
+      res.status(500).json({ message: 'Failed to perform advanced search' });
+    }
+  });
+
+  // Get search suggestions/autocomplete
+  app.post('/api/search/suggestions', async (req, res) => {
+    try {
+      const { query, field } = req.body;
+      
+      if (!query || query.length < 2) {
+        return res.json({ suggestions: [] });
+      }
+
+      const searchQuery = query.toLowerCase();
+      const suggestions = new Set();
+      const campaigns = await storage.getCampaigns();
+
+      for (const campaign of campaigns) {
+        try {
+          const campaignData = await storage.getCampaignData(campaign.id);
+          if (campaignData && campaignData.rows) {
+            campaignData.rows.forEach((row: any) => {
+              if (field && row[field]) {
+                const value = String(row[field]).toLowerCase();
+                if (value.includes(searchQuery)) {
+                  suggestions.add(row[field]);
+                }
+              } else {
+                // Search all fields
+                Object.values(row).forEach((value: any) => {
+                  const strValue = String(value).toLowerCase();
+                  if (strValue.includes(searchQuery) && strValue.length < 100) {
+                    suggestions.add(value);
+                  }
+                });
+              }
+            });
+          }
+        } catch (error) {
+          console.error(`Error getting suggestions from campaign ${campaign.id}:`, error);
+        }
+      }
+
+      res.json({ 
+        suggestions: Array.from(suggestions).slice(0, 10)
+      });
+    } catch (error) {
+      console.error('Suggestions error:', error);
+      res.status(500).json({ message: 'Failed to get suggestions' });
+    }
+  });
+
   // PawMate Chatbot endpoint with persistent history
   app.post('/api/pawmate/chat', async (req, res) => {
     try {
