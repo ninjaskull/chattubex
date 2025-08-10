@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
@@ -83,6 +84,61 @@ function parseCSVLine(line: string): string[] {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const httpServer = createServer(app);
+
+  // Create WebSocket server for real-time notes updates
+  const wss = new WebSocketServer({ 
+    server: httpServer, 
+    path: '/ws' 
+  });
+
+  // Store connected WebSocket clients
+  const wsClients = new Set<WebSocket>();
+
+  wss.on('connection', (ws) => {
+    console.log('New WebSocket connection established');
+    wsClients.add(ws);
+
+    // Send initial notes data to newly connected client
+    storage.getNotes().then(notes => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'notes_init',
+          data: notes.map(note => ({
+            id: note.id,
+            content: decrypt(note.encryptedContent),
+            createdAt: note.createdAt
+          }))
+        }));
+      }
+    }).catch(console.error);
+
+    ws.on('close', () => {
+      console.log('WebSocket connection closed');
+      wsClients.delete(ws);
+    });
+
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      wsClients.delete(ws);
+    });
+  });
+
+  // Function to broadcast notes updates to all connected clients
+  function broadcastNotesUpdate(type: 'created' | 'updated' | 'deleted', noteData: any) {
+    const message = JSON.stringify({
+      type: `note_${type}`,
+      data: noteData
+    });
+
+    wsClients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      } else {
+        wsClients.delete(client);
+      }
+    });
+  }
   
   // Health check endpoint
   app.get('/api/health', (req, res) => {
@@ -322,11 +378,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         encryptedContent
       });
 
-      res.json({
+      const noteData = {
         id: note.id,
-        content: note.content,
+        content: decrypt(note.encryptedContent),
         createdAt: note.createdAt
-      });
+      };
+
+      // Broadcast the new note to all connected WebSocket clients
+      broadcastNotesUpdate('created', noteData);
+
+      res.json(noteData);
     } catch (error) {
       console.error('Create note error:', error);
       res.status(500).json({ message: 'Failed to create note' });
@@ -345,6 +406,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Get notes error:', error);
       res.status(500).json({ message: 'Failed to fetch notes' });
+    }
+  });
+
+  // Delete note
+  app.delete('/api/notes/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const note = await storage.getNote(id);
+      
+      if (!note) {
+        return res.status(404).json({ message: 'Note not found' });
+      }
+
+      await storage.deleteNote(id);
+      
+      // Broadcast the deletion to all connected WebSocket clients
+      broadcastNotesUpdate('deleted', { id });
+      
+      res.json({ message: 'Note deleted successfully' });
+    } catch (error) {
+      console.error('Delete note error:', error);
+      res.status(500).json({ message: 'Failed to delete note' });
     }
   });
 
@@ -477,6 +560,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
   return httpServer;
 }

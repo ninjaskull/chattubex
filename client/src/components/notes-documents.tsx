@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { FileText, Paperclip, Download, Send, Plus, User, File, MessageSquare } from "lucide-react";
+import { FileText, Paperclip, Download, Send, Plus, User, File, MessageSquare, Wifi, WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useWebSocket } from "@/hooks/use-websocket";
 
 export default function NotesDocuments() {
   const [noteContent, setNoteContent] = useState("");
@@ -15,6 +16,7 @@ export default function NotesDocuments() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isConnected } = useWebSocket();
 
   const { data: notes = [] } = useQuery({
     queryKey: ['/api/notes'],
@@ -46,7 +48,7 @@ export default function NotesDocuments() {
         description: "Your note has been saved securely",
       });
       setNoteContent("");
-      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
+      // No need to invalidate queries - WebSocket will handle real-time updates
     },
     onError: (error) => {
       toast({
@@ -178,6 +180,19 @@ export default function NotesDocuments() {
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 text-xs">
+            {isConnected ? (
+              <>
+                <Wifi className="h-3 w-3 text-green-500" />
+                <span className="text-green-600">Live</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-3 w-3 text-red-500" />
+                <span className="text-red-600">Offline</span>
+              </>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="sm"
