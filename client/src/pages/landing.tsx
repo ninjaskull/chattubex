@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import EnhancedChatbot from "@/components/enhanced-chatbot";
+import UnifiedChatbot from "@/components/unified-chatbot";
 
 export default function Landing() {
   const [clickCount, setClickCount] = useState(0);
@@ -325,7 +325,7 @@ export default function Landing() {
       </footer>
       
       {/* Enhanced Chatbot Component */}
-      <EnhancedChatbot 
+      <UnifiedChatbot 
         isOpen={showChatbot} 
         onClose={() => setShowChatbot(false)} 
       />

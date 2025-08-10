@@ -16,7 +16,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearAuth } from "@/lib/auth";
 import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
-import EnhancedChatbot from "@/components/enhanced-chatbot";
+import UnifiedChatbot from "@/components/unified-chatbot";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -105,7 +105,7 @@ export default function Dashboard() {
                   Duggu AI - Lead Intelligence Assistant
                 </CardTitle>
                 <CardDescription>
-                  Search through all your contact data and campaign records instantly
+                  AI-powered chatbot with database search capabilities
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
@@ -113,7 +113,7 @@ export default function Dashboard() {
                   onClick={() => setShowChatbot(true)}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
-                  Open Search Assistant
+                  Open AI Assistant
                 </Button>
               </CardContent>
             </Card>
@@ -122,8 +122,8 @@ export default function Dashboard() {
         </Tabs>
       </div>
 
-      {/* Enhanced Chatbot */}
-      <EnhancedChatbot 
+      {/* Unified AI Chatbot */}
+      <UnifiedChatbot 
         isOpen={showChatbot} 
         onClose={() => setShowChatbot(false)} 
       />
