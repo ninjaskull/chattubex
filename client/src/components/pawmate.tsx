@@ -279,7 +279,7 @@ export default function PawMate() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-                OpenAI GPT-4o
+                WizardLM-2 8x22B
               </span>
               <div className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

@@ -724,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
       const response = await realOpenAI.generateChatCompletion({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "microsoft/wizardlm-2-8x22b", // Using OpenRouter model as requested
         messages: messages,
         temperature: 0.7,
         max_tokens: 1500
@@ -739,7 +739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: 'assistant',
           content: response.choices[0].message.content,
           metadata: { 
-            model: 'gpt-4o',
+            model: 'microsoft/wizardlm-2-8x22b',
             tokens: response.usage,
             petName, 
             petType 

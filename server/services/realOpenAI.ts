@@ -34,7 +34,12 @@ class RealOpenAIService {
 
   constructor(apiKey: string) {
     this.openai = new OpenAI({
-      apiKey: apiKey
+      apiKey: apiKey,
+      baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer": "https://pawmate.replit.app", // Your site URL
+        "X-Title": "PawMate Pro", // Your site name
+      }
     });
   }
 
@@ -49,9 +54,9 @@ class RealOpenAIService {
         ...request.messages
       ];
 
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      // Using OpenRouter with gpt-oss-20b model as requested by user
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "microsoft/wizardlm-2-8x22b",
         messages: enhancedMessages,
         temperature: request.temperature || 0.7,
         max_tokens: request.max_tokens || 1000, // Increased for comprehensive responses
