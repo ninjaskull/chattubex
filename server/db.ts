@@ -16,7 +16,6 @@ export const pool = new Pool({
   min: 2,  // Keep minimum connections alive
   idleTimeoutMillis: 60000,
   connectionTimeoutMillis: 5000, // Increased timeout
-  acquireTimeoutMillis: 8000,
   allowExitOnIdle: false, // Keep pool alive
 });
 
