@@ -555,12 +555,12 @@ Your search results have been exported and saved as a new campaign record. You c
         
         setMessages(prev => [...prev, successMessage]);
         
-        // Invalidate campaigns cache to refresh the list
-        setTimeout(() => {
-          import('@/lib/queryClient').then(({ queryClient }) => {
-            queryClient.invalidateQueries({ queryKey: ['/api/campaigns'] });
-          });
-        }, 1000);
+        // Invalidate campaigns cache to refresh the list immediately
+        import('@/lib/queryClient').then(({ queryClient }) => {
+          queryClient.invalidateQueries({ queryKey: ['/api/campaigns'] });
+          // Force refetch to update immediately
+          queryClient.refetchQueries({ queryKey: ['/api/campaigns'] });
+        });
       } else {
         const error = await response.json();
         toast({
@@ -620,6 +620,13 @@ Your data has been securely encrypted and added to the system. You can now searc
         };
         
         setMessages(prev => [...prev, successMessage]);
+        
+        // Invalidate campaigns cache to refresh the list immediately for CSV import
+        import('@/lib/queryClient').then(({ queryClient }) => {
+          queryClient.invalidateQueries({ queryKey: ['/api/campaigns'] });
+          // Force refetch to update immediately
+          queryClient.refetchQueries({ queryKey: ['/api/campaigns'] });
+        });
       } else {
         if (response.status === 409) {
           toast({

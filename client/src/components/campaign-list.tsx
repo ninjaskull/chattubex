@@ -44,6 +44,8 @@ export default function CampaignList() {
         description: "Campaign has been successfully deleted",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/campaigns'] });
+      // Force refetch to update immediately
+      queryClient.refetchQueries({ queryKey: ['/api/campaigns'] });
     },
     onError: (error) => {
       toast({
