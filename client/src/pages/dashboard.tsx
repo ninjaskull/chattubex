@@ -9,20 +9,21 @@ import {
   LogOut, 
   FolderOpen, 
   MessageSquare,
-  Dog
+  Target
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearAuth } from "@/lib/auth";
 import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
-import PawMate from "@/components/pawmate";
+import EnhancedChatbot from "@/components/enhanced-chatbot";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("files");
+  const [showChatbot, setShowChatbot] = useState(false);
 
   const { data: campaigns = [] } = useQuery<any[]>({
     queryKey: ['/api/campaigns'],
@@ -47,16 +48,16 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Dog className="text-white h-5 w-5" />
+              <Target className="text-white h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Pet Management Dashboard</h1>
-              <p className="text-sm text-slate-600">Comprehensive care for your beloved pets</p>
+              <h1 className="text-2xl font-bold text-slate-900">LeadIQ Pro Dashboard</h1>
+              <p className="text-sm text-slate-600">AI-powered lead scoring and business intelligence</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-              {totalCampaigns} Pet Records
+              {totalCampaigns} Lead Campaigns
             </Badge>
             <Button variant="ghost" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
               <LogOut className="mr-2 h-4 w-4" />
@@ -71,37 +72,61 @@ export default function Dashboard() {
           <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Records</span>
+              <span className="hidden sm:inline">Campaigns</span>
             </TabsTrigger>
             <TabsTrigger value="notes" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Notes</span>
+              <span className="hidden sm:inline">Documents</span>
             </TabsTrigger>
-            <TabsTrigger value="pawmate" className="flex items-center gap-2">
-              <Dog className="h-4 w-4" />
-              <span className="hidden sm:inline">PawMate</span>
+            <TabsTrigger value="search" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              <span className="hidden sm:inline">Duggu AI</span>
             </TabsTrigger>
           </TabsList>
 
 
 
-          {/* Pet Records Tab */}
+          {/* Lead Campaigns Tab */}
           <TabsContent value="files" className="mt-6">
             <CampaignList />
           </TabsContent>
 
-          {/* Notes & Documents Tab */}
+          {/* Documents Tab */}
           <TabsContent value="notes" className="mt-6">
             <NotesDocuments />
           </TabsContent>
 
-          {/* PawMate Tab */}
-          <TabsContent value="pawmate" className="mt-6">
-            <PawMate />
+          {/* Duggu AI Search Tab */}
+          <TabsContent value="search" className="mt-6">
+            <Card className="p-6">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
+                  <Target className="w-6 h-6 text-blue-600" />
+                  Duggu AI - Lead Intelligence Assistant
+                </CardTitle>
+                <CardDescription>
+                  Search through all your contact data and campaign records instantly
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <Button 
+                  onClick={() => setShowChatbot(true)}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  Open Search Assistant
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
         </Tabs>
       </div>
+
+      {/* Enhanced Chatbot */}
+      <EnhancedChatbot 
+        isOpen={showChatbot} 
+        onClose={() => setShowChatbot(false)} 
+      />
     </div>
   );
 }
