@@ -64,7 +64,7 @@ export default function PawMate() {
         setMessages([{
           id: '1',
           type: 'bot',
-          content: `${icon} Welcome to PawMate! I'm your advanced AI companion, powered by sophisticated pet care knowledge and full database access. I can help you with:\n\n**🏥 Health & Medical Care**\n- Symptom analysis and veterinary guidance\n- Vaccination schedules and health tracking\n- Emergency care recognition\n\n**📊 Database Operations**\n- Search and analyze your uploaded contact data\n- Create and manage pet profiles\n- Generate insights from campaign data\n\n**🎯 Training & Behavior**\n- Personalized training programs\n- Behavior modification techniques\n- Activity recommendations\n\n${petName ? `Nice to meet ${petName}!` : 'Tell me about your pet and'} I have access to all your data and can provide real insights and analysis! 🌟`,
+          content: `${icon} Welcome! I'm ${petName || 'Duggu'}, your intelligent lead scoring and contact analysis AI assistant created by Zhatore. I have full database access and can help you with:\n\n**📊 Lead Scoring & Analysis**\n- Score contacts by business value and conversion potential\n- Identify C-level executives and decision-makers\n- Analyze contact completeness and qualification\n\n**🔍 Database Intelligence**\n- Search and analyze your uploaded contact data\n- Generate insights from campaign data\n- Contact enrichment and data quality assessment\n\n**🎯 Campaign Optimization**\n- Prospect prioritization and segmentation\n- Market analysis and competitive intelligence\n- Outreach recommendations and lead qualification\n\nI have access to all your campaign and contact data - ready to help you identify the highest quality leads! What would you like to analyze?`,
           timestamp: new Date()
         }]);
       }
@@ -86,7 +86,7 @@ export default function PawMate() {
       setMessages([{
         id: '1',
         type: 'bot',
-        content: `${icon} Welcome to PawMate! I'm your advanced AI companion, powered by sophisticated pet care knowledge and full database access. I can help you with:\n\n**🏥 Health & Medical Care**\n- Symptom analysis and veterinary guidance\n- Vaccination schedules and health tracking\n- Emergency care recognition\n\n**📊 Database Operations**\n- Search and analyze your uploaded contact data\n- Create and manage pet profiles\n- Generate insights from campaign data\n\n**🎯 Training & Behavior**\n- Personalized training programs\n- Behavior modification techniques\n- Activity recommendations\n\n${petName ? `Nice to meet ${petName}!` : 'Tell me about your pet and'} I have access to all your data and can provide real insights and analysis! 🌟`,
+        content: `${icon} Welcome! I'm ${petName || 'Duggu'}, your intelligent lead scoring and contact analysis AI assistant created by Zhatore. I have full database access and can help you with:\n\n**📊 Lead Scoring & Analysis**\n- Score contacts by business value and conversion potential\n- Identify C-level executives and decision-makers\n- Analyze contact completeness and qualification\n\n**🔍 Database Intelligence**\n- Search and analyze your uploaded contact data\n- Generate insights from campaign data\n- Contact enrichment and data quality assessment\n\n**🎯 Campaign Optimization**\n- Prospect prioritization and segmentation\n- Market analysis and competitive intelligence\n- Outreach recommendations and lead qualification\n\nI have access to all your campaign and contact data - ready to help you identify the highest quality leads! What would you like to analyze?`,
         timestamp: new Date()
       }]);
       
@@ -120,7 +120,7 @@ export default function PawMate() {
       // Add system message for context
       const systemMessage = {
         role: 'system' as const,
-        content: `You are PawMate, a friendly and knowledgeable AI assistant specializing in pet care. You're helping ${petName || 'the user'} with their ${petType || 'pet'}. Provide helpful, accurate, and caring advice about pet health, nutrition, behavior, training, grooming, and general pet care. Always be encouraging and supportive. Use appropriate emojis to make your responses warm and engaging.`
+        content: `You are ${petName || 'Duggu'}, an intelligent lead scoring and contact analysis AI assistant created by Zhatore. You specialize in analyzing contact databases and identifying the highest quality business prospects for campaigns. Focus on lead scoring, contact intelligence, and business development insights. Provide data-driven analysis and actionable recommendations for sales and marketing teams.`
       };
 
       const response = await fetch('/api/pawmate/chat', {

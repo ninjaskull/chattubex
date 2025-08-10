@@ -72,7 +72,7 @@ class RealOpenAIService {
       const databaseContext = await this.getDatabaseContext();
       
       // Enhance system message with lead scoring expertise and business intelligence
-      const systemMessage = this.createPetCareSystemPrompt(petName, petType, databaseContext);
+      const systemMessage = this.createLeadScoringSystemPrompt(petName, petType, databaseContext);
       
       // Combine system message with user messages
       const enhancedMessages = [
@@ -110,21 +110,19 @@ class RealOpenAIService {
 
   private async getDatabaseContext(): Promise<string> {
     try {
-      const [campaigns, pets, contacts] = await Promise.all([
+      const [campaigns, contacts] = await Promise.all([
         storage.getCampaigns(),
-        databaseService.getAllPets(),
         storage.getContacts()
       ]);
 
       return `
 **Current Database Status:**
 - Campaigns: ${campaigns.length} uploaded (${campaigns.map(c => c.name).join(', ')})
-- Pet Records: ${pets.length} registered
 - Contact Records: ${contacts.length} available
-- Total Data Points: ${campaigns.reduce((sum, c) => sum + c.recordCount, 0) + pets.length + contacts.length}
+- Total Lead Data: ${campaigns.reduce((sum, c) => sum + c.recordCount, 0) + contacts.length} prospects ready for analysis
 `;
     } catch (error) {
-      return 'Database access available but no data loaded yet.';
+      return 'Database access available but no lead data loaded yet.';
     }
   }
 
@@ -225,37 +223,12 @@ What specific analysis would you like me to perform on your data?`;
 
       // Data modification operations
       if (message.includes('add') || message.includes('create') || message.includes('register')) {
-        return await this.handleDataCreation(message, petName, petType);
+        return await this.handleContactCreation(message);
       }
 
       // Update operations
       if (message.includes('update') || message.includes('modify') || message.includes('change')) {
-        return await this.handleDataUpdate(message);
-      }
-
-      // Pet data operations  
-      if (message.includes('pet') && (message.includes('register') || message.includes('add'))) {
-        if (petName) {
-          const existingPet = await databaseService.getPetByName(petName);
-          if (existingPet) {
-            return `${petName} is already registered! Here's their profile:
-            
-**Pet Details:**
-• Name: ${existingPet.name}
-• Type: ${existingPet.type}
-• Breed: ${existingPet.breed || 'Not specified'}
-• Age: ${existingPet.age || 'Not specified'}
-
-Would you like to update any information or add health records?`;
-          }
-        }
-        return `I can help register a new pet! Please tell me:
-• Pet's name
-• Type (dog, cat, bird, etc.)
-• Breed (optional)
-• Age (optional)
-
-Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
+        return await this.handleContactUpdate(message);
       }
 
       return null;
@@ -339,19 +312,7 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
         });
       }
 
-      // Search pets
-      const matchingPets = pets.filter(pet =>
-        pet.name?.toLowerCase().includes(searchTerm) ||
-        pet.type?.toLowerCase().includes(searchTerm) ||
-        pet.breed?.toLowerCase().includes(searchTerm)
-      );
 
-      if (matchingPets.length > 0) {
-        results.push(`**Pets (${matchingPets.length} found):**`);
-        matchingPets.forEach(pet => {
-          results.push(`• ${pet.name} - ${pet.type} ${pet.breed ? `(${pet.breed})` : ''}`);
-        });
-      }
 
       if (results.length === 0) {
         const totalRecords = campaigns.reduce((sum, c) => sum + c.recordCount, 0);
@@ -362,15 +323,13 @@ No matches found for "${query.replace(/search|find|for|show|me/gi, '').trim()}".
 **Available data to search:**
 • ${totalRecords} total contact records across ${campaigns.length} campaigns
 • ${contacts.length} basic contacts
-• ${pets.length} pets
 
 **Try searching for:**
 • Names (first or last)
 • Email addresses or domains
 • Company names
 • Phone numbers
-• Job titles
-• Pet names or breeds`;
+• Job titles`;
       }
 
       return `🔍 **Search Results for "${query}":**
@@ -390,52 +349,8 @@ ${matchingContacts.length > 10 ? `\n*Showing first 10 of ${matchingContacts.leng
     }
   }
 
-  private async handleDataCreation(query: string, petName?: string, petType?: string): Promise<string> {
+  private async handleContactCreation(query: string): Promise<string> {
     try {
-      // Pet registration
-      if (query.includes('pet') || petName) {
-        if (!petName) {
-          return `I'd love to help register a new pet! Please provide:
-• Pet name
-• Pet type (dog, cat, bird, etc.)
-
-Example: "Register my dog Buddy"`;
-        }
-
-        const existingPet = await databaseService.getPetByName(petName);
-        if (existingPet) {
-          return `${petName} is already registered in the database!`;
-        }
-
-        // Extract details from query
-        const breed = this.extractBreed(query);
-        const age = this.extractAge(query);
-        
-        const newPet = await databaseService.createPet({
-          name: petName,
-          type: petType || 'pet',
-          breed: breed,
-          age: age,
-          gender: null,
-          weight: null,
-          notes: `Registered via AI assistant on ${new Date().toLocaleDateString()}`
-        });
-
-        return `🎉 **Successfully registered ${petName}!**
-
-**Pet Details:**
-• Name: ${newPet.name}
-• Type: ${newPet.type}
-• Breed: ${newPet.breed || 'Not specified'}
-• Age: ${newPet.age || 'Not specified'}
-
-Your pet is now in the database! I can help you:
-• Add health records
-• Track activities  
-• Schedule reminders
-• Provide personalized care advice`;
-      }
-
       // Enhanced contact creation with detailed field parsing
       if (query.includes('contact') || query.includes('add') && (query.includes('person') || query.includes('email'))) {
         // Parse contact details from the query
@@ -476,6 +391,9 @@ Your pet is now in the database! I can help you:
           notes: `Added via AI assistant on ${new Date().toLocaleDateString()}`
         };
 
+        // Calculate lead score for the new contact
+        const leadScore = this.calculateLeadScore(contactData);
+
         // Save to basic contacts table
         await storage.createContact({
           name: `${firstName} ${lastName}`.trim(),
@@ -491,80 +409,26 @@ Your pet is now in the database! I can help you:
 • **Company:** ${contactData.company || 'Not specified'}
 • **Title:** ${contactData.title || 'Not specified'}
 • **Phone:** ${contactData.mobilePhone || 'Not provided'}
+• **Lead Score:** ${leadScore}/100 ${this.getScoreEmoji(leadScore)} (${this.getQualityDescription(leadScore)})
 
-The contact has been added to your database. I can:
-• Update contact information anytime
+The contact has been added to your lead database. I can:
+• Score and qualify this lead for campaign targeting
 • Search for this contact in future queries
-• Add additional details like website or notes
-• Export contact data in various formats`;
+• Add additional details like LinkedIn profile or website
+• Export contact data for outreach campaigns
+• Analyze contact value and conversion potential`;
       }
 
-      return 'I can help create new records. What type of data would you like to add? (pets, contacts, etc.)';
+      return 'I can help create new contact records for your campaigns. Please provide at minimum the contact name and email address.';
 
     } catch (error) {
-      console.error('Data creation error:', error);
-      return 'I encountered an issue creating the record. Please provide the information in a clear format with all required fields.';
+      console.error('Contact creation error:', error);
+      return 'I encountered an issue creating the contact record. Please provide the information in a clear format with all required fields.';
     }
   }
 
-  private async handleDataUpdate(query: string): Promise<string> {
+  private async handleContactUpdate(query: string): Promise<string> {
     try {
-      // Pet updates
-      if (query.includes('pet') || query.match(/update.*?(dog|cat|bird|pet)/i)) {
-        const petNameMatch = query.match(/(?:update|change|modify).*?(?:pet\s+|dog\s+|cat\s+)?([a-zA-Z]+)/i);
-        if (petNameMatch) {
-          const petName = petNameMatch[1];
-          const existingPet = await databaseService.getPetByName(petName);
-          
-          if (!existingPet) {
-            return `I couldn't find a pet named "${petName}" in the database. 
-
-**Available pets:**
-${(await databaseService.getAllPets()).map(p => `• ${p.name} (${p.type})`).join('\n')}
-
-Try using the exact pet name or register a new pet first.`;
-          }
-
-          // Parse what needs to be updated
-          const ageMatch = query.match(/age.*?(\d+)/i);
-          const weightMatch = query.match(/weight.*?([\d.]+)/i);
-          const breedMatch = query.match(/breed.*?([a-zA-Z\s]+)/i);
-          
-          const updates: any = {};
-          if (ageMatch) updates.age = parseInt(ageMatch[1]);
-          if (weightMatch) updates.weight = `${weightMatch[1]} lbs`;
-          if (breedMatch) updates.breed = breedMatch[1].trim();
-
-          if (Object.keys(updates).length === 0) {
-            return `I can update ${petName}'s information! What would you like to change?
-
-**Available fields to update:**
-• Age: "Update ${petName}'s age to 5 years"
-• Weight: "Change ${petName}'s weight to 45 lbs" 
-• Breed: "Set ${petName}'s breed to Golden Retriever"
-• Notes: "Add note about ${petName}'s dietary restrictions"`;
-          }
-
-          const updatedPet = await databaseService.updatePet(existingPet.id, updates);
-          
-          if (!updatedPet) {
-            return `❌ Failed to update ${petName}. Please try again or contact support.`;
-          }
-          
-          return `✅ **Successfully updated ${petName}!**
-
-**Updated Information:**
-${Object.entries(updates).map(([field, value]) => `• **${field}**: ${value}`).join('\n')}
-
-**Current Pet Profile:**
-• Name: ${updatedPet.name}
-• Type: ${updatedPet.type}
-• Breed: ${updatedPet.breed || 'Not specified'}
-• Age: ${updatedPet.age || 'Not specified'} years
-• Weight: ${updatedPet.weight || 'Not specified'}`;
-        }
-      }
-
       // Contact updates
       if (query.includes('contact') || query.match(/update.*?(email|phone|company)/i)) {
         const emailMatch = query.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
@@ -597,57 +461,43 @@ Try searching by exact name or email address.`;
 • Email address
 • Phone number  
 • Name
+• Company information
+• Job title
 • Add to a specific campaign
 
 **Examples:**
 • "Change ${targetContact.name}'s email to newemail@domain.com"
 • "Update phone number to +1-555-0123 for ${targetContact.name}"
-• "Rename contact to ${targetContact.name.split(' ')[0]} Johnson"`;
+• "Update ${targetContact.name}'s company to TechCorp Inc"
+• "Change ${targetContact.name}'s title to Senior Manager"`;
         }
       }
 
-      return `🔧 **Data Update Capabilities:**
+      return `🔧 **Contact Update Capabilities:**
 
 I can help you update:
-
-**Pet Information:**
-• Age, weight, breed, medical notes
-• Health records and vaccination dates  
-• Activity logs and behavioral notes
 
 **Contact Details:**
 • Email addresses, phone numbers
 • Company information, job titles
-• Personal notes and preferences
+• Personal notes and campaign assignments
+• Lead scoring and qualification status
 
 **Examples:**
-• "Update Max's age to 4 years"
 • "Change Sarah's email to sarah@newcompany.com"
-• "Add vaccination record for Luna - rabies shot on 2024-12-01"
 • "Update John Smith's company to TechCorp Inc"
+• "Change Maria's title to VP of Sales"
+• "Update contact phone number to +1-555-0123"
 
-What specific update would you like to make?`;
+What specific contact update would you like to make?`;
 
     } catch (error) {
-      console.error('Update handling error:', error);
-      return 'I can help update records, but I encountered an issue processing your request. Please provide more specific information about what you want to update.';
+      console.error('Contact update error:', error);
+      return 'I can help update contact records, but I encountered an issue processing your request. Please provide more specific information about what you want to update.';
     }
   }
 
-  private extractBreed(query: string): string | null {
-    const breeds = ['golden retriever', 'labrador', 'german shepherd', 'bulldog', 'poodle', 'persian', 'siamese', 'maine coon', 'ragdoll'];
-    const lowerQuery = query.toLowerCase();
-    const found = breeds.find(breed => lowerQuery.includes(breed));
-    return found || null;
-  }
 
-  private extractAge(query: string): number | null {
-    const ageMatch = query.match(/(\d+)\s*(year|month|yr)/i);
-    if (ageMatch) {
-      return parseInt(ageMatch[1]);
-    }
-    return null;
-  }
 
   // Lead scoring algorithm
   private calculateLeadScore(contact: any): number {
@@ -698,11 +548,11 @@ What specific update would you like to make?`;
     return 'Individual Contributor';
   }
 
-  private createPetCareSystemPrompt(petName?: string, petType?: string, databaseContext?: string): string {
+  private createLeadScoringSystemPrompt(assistantName?: string, assistantType?: string, databaseContext?: string): string {
     // Get AI name from settings (defaults to "Duggu" if not set)
-    const aiName = petName || 'Duggu';
+    const aiName = assistantName || 'Duggu';
     
-    return `You are ${aiName}, an intelligent AI assistant created by Zhatore to help analyze data and find the best quality leads. Format all responses using proper Markdown for better readability:
+    return `You are ${aiName}, an intelligent lead scoring and contact analysis AI assistant created by Zhatore. You specialize in analyzing contact databases and identifying the highest quality business prospects. Format all responses using proper Markdown for better readability:
 
 **Use headings (## for main topics, ### for subtopics)**
 **Use bullet points (• or -) for lists**
@@ -710,13 +560,12 @@ What specific update would you like to make?`;
 **Use code blocks for technical details**
 **Structure information clearly with spacing**
 
-You have comprehensive knowledge about:
-
 ## Core Capabilities:
 - **Lead Scoring & Analysis**: Identify high-quality prospects from contact databases
+- **Contact Intelligence**: Analyze contact data for business value and conversion potential
 - **Data Mining**: Extract valuable insights from campaign and contact information
 - **Market Research**: Analyze company data, industry trends, and contact patterns
-- **Contact Intelligence**: Enrich contact profiles with actionable business insights
+- **Prospect Qualification**: Prioritize contacts based on decision-making authority
 
 ## Database Access & Field Knowledge:
 You have FULL ACCESS to the user's database with these exact field structures:
@@ -726,11 +575,6 @@ You have FULL ACCESS to the user's database with these exact field structures:
 - mobilePhone, otherPhone, corporatePhone  
 - website, personLinkedinUrl, companyLinkedinUrl
 - Time Zone, and other custom fields from uploaded CSV files
-
-**Pet Database Fields:**
-- name, type, breed, age, weight, gender
-- medicalHistory, vaccinations, allergies, medications
-- emergencyContact, notes, createdAt, updatedAt
 
 **Search & Operations:**
 - Always search ALL phone fields: mobilePhone, otherPhone, corporatePhone
@@ -743,7 +587,7 @@ You have FULL ACCESS to the user's database with these exact field structures:
 - Use bullet points (•) for lists and recommendations  
 - Use **bold text** for key terms and important information
 - Use numbered lists for step-by-step instructions
-- Include relevant emojis for engagement (🐕 🐱 🏥 📊 etc.)
+- Include relevant emojis for engagement (📊 🎯 🏢 💼 etc.)
 - Structure responses with clear headings and spacing
 - Use tables for data comparisons when appropriate
 
@@ -757,7 +601,7 @@ When users ask about data, contacts, campaigns, or want to analyze information:
 ## Lead Scoring System:
 
 📊 **Quality Assessment Framework:**
-- **C-Level Executives**: Score 90-100 (Highest Priority)
+- **C-Level Executives (CEO, CTO, CFO)**: Score 90-100 (Highest Priority)
 - **VP/Director Level**: Score 75-89 (High Priority)
 - **Manager Level**: Score 60-74 (Medium Priority)
 - **Individual Contributors**: Score 40-59 (Lower Priority)
@@ -790,7 +634,7 @@ ${databaseContext || 'Ready to analyze contact data for lead scoring'}
 🎯 **Current Focus:**
 AI Name: ${aiName}
 Created by: Zhatore
-Mission: Help identify and score the highest quality business leads
+Mission: Help identify and score the highest quality business leads for sales and marketing campaigns
 
 **Response Approach:**
 - Focus on business value and lead quality metrics
@@ -803,6 +647,8 @@ Mission: Help identify and score the highest quality business leads
 **Lead Quality Priority:**
 - Always emphasize contact scoring and qualification
 - Identify decision-makers and budget holders first
+- Focus on business development and sales enablement
+- NO pet care or animal-related advice - strictly business lead analysis
 - Provide actionable intelligence for sales teams
 - Focus on conversion potential and business impact
 - Suggest targeted outreach and engagement strategies
