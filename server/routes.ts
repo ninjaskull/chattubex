@@ -10,6 +10,7 @@ import { deriveTimezone } from "./utils/timezone.js";
 import { sendContactFormEmail } from "./utils/email.js";
 import { mockOpenAI } from "./services/mockOpenAI.js";
 import { createRealOpenAIService } from "./services/realOpenAI.js";
+import { databaseService } from "./services/databaseService.js";
 
 // Configure multer for file uploads with increased limits
 const upload = multer({ 
@@ -719,6 +720,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('PawMate chat error:', error);
       res.status(500).json({ message: 'Failed to generate response' });
+    }
+  });
+
+  // Pet Database Management Routes
+  app.post('/api/pets', async (req, res) => {
+    try {
+      const pet = await databaseService.createPet(req.body);
+      res.json(pet);
+    } catch (error) {
+      console.error('Create pet error:', error);
+      res.status(500).json({ message: 'Failed to create pet' });
+    }
+  });
+
+  app.get('/api/pets/:name', async (req, res) => {
+    try {
+      const pet = await databaseService.getPetByName(req.params.name);
+      if (!pet) {
+        return res.status(404).json({ message: 'Pet not found' });
+      }
+      res.json(pet);
+    } catch (error) {
+      console.error('Get pet error:', error);
+      res.status(500).json({ message: 'Failed to fetch pet' });
+    }
+  });
+
+  app.post('/api/pets/:id/health', async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      const healthRecord = await databaseService.addHealthRecord({
+        ...req.body,
+        petId
+      });
+      res.json(healthRecord);
+    } catch (error) {
+      console.error('Add health record error:', error);
+      res.status(500).json({ message: 'Failed to add health record' });
+    }
+  });
+
+  app.post('/api/pets/:id/activities', async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      const activity = await databaseService.logActivity({
+        ...req.body,
+        petId
+      });
+      res.json(activity);
+    } catch (error) {
+      console.error('Log activity error:', error);
+      res.status(500).json({ message: 'Failed to log activity' });
+    }
+  });
+
+  app.get('/api/pets/:id/insights', async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      const insights = await databaseService.getPetInsights(petId);
+      res.json(insights);
+    } catch (error) {
+      console.error('Get insights error:', error);
+      res.status(500).json({ message: 'Failed to get insights' });
+    }
+  });
+
+  app.get('/api/search/:query', async (req, res) => {
+    try {
+      const results = await databaseService.searchAllTables(req.params.query);
+      res.json(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      res.status(500).json({ message: 'Failed to search database' });
+    }
+  });
+
+  app.get('/api/pets/:id/export', async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      const exportData = await databaseService.exportPetData(petId);
+      res.json(exportData);
+    } catch (error) {
+      console.error('Export data error:', error);
+      res.status(500).json({ message: 'Failed to export data' });
     }
   });
 

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { databaseService } from "./databaseService";
+import { InsertPet, InsertPetHealthRecord, InsertPetActivity, InsertPetDocument } from "@shared/schema";
 
 // Mock OpenAI API structures
 export interface ChatMessage {
@@ -69,15 +71,318 @@ const petKnowledge = {
 };
 
 class MockOpenAIService {
-  private getContextualResponse(messages: ChatMessage[], petName: string = '', petType: string = 'pet'): string {
+  private async getContextualResponse(messages: ChatMessage[], petName: string = '', petType: string = 'pet'): Promise<string> {
     const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
     const conversationContext = messages.slice(-5).map(m => m.content).join(' ').toLowerCase();
     
+    // Check if user wants to perform database operations
+    if (await this.handleDatabaseOperations(lastUserMessage, petName, petType)) {
+      return await this.handleDatabaseOperations(lastUserMessage, petName, petType) || this.getStandardResponse(lastUserMessage, conversationContext, petName, petType);
+    }
+    
+    return this.getStandardResponse(lastUserMessage, conversationContext, petName, petType);
+  }
+
+  private async handleDatabaseOperations(message: string, petName: string, petType: string): Promise<string | null> {
+    try {
+      // Create/Register Pet
+      if (message.includes('register') || message.includes('create pet') || message.includes('add pet')) {
+        const pet = await databaseService.getPetByName(petName);
+        if (!pet && petName) {
+          const newPet: InsertPet = {
+            name: petName,
+            type: petType,
+            breed: this.extractBreed(message),
+            age: this.extractAge(message),
+            weight: this.extractWeight(message),
+            gender: this.extractGender(message),
+            notes: `Pet registered via PawMate AI on ${new Date().toLocaleDateString()}`
+          };
+          
+          const createdPet = await databaseService.createPet(newPet);
+          return `🎉 Great! I've successfully registered ${petName} in our database! Here's what I recorded:
+          
+**Pet Details:**
+- Name: ${createdPet.name}
+- Type: ${createdPet.type}
+- Breed: ${createdPet.breed || 'Not specified'}
+- Age: ${createdPet.age || 'Not specified'}
+- Weight: ${createdPet.weight || 'Not specified'}
+- Gender: ${createdPet.gender || 'Not specified'}
+
+Now I can help track ${petName}'s health records, activities, and provide personalized care advice! Would you like to add any health information or schedule reminders?`;
+        } else if (pet) {
+          return `${petName} is already registered in our database! I have all their information saved. Would you like me to show you their profile or add any new information?`;
+        }
+      }
+
+      // Search database
+      if (message.includes('search') || message.includes('find') || message.includes('look up')) {
+        const searchTerm = this.extractSearchTerm(message);
+        if (searchTerm) {
+          const results = await databaseService.searchAllTables(searchTerm);
+          const totalResults = results.pets.length + results.healthRecords.length + results.activities.length;
+          
+          if (totalResults > 0) {
+            let response = `🔍 Found ${totalResults} results for "${searchTerm}":
+
+`;
+            if (results.pets.length > 0) {
+              response += `**Pets (${results.pets.length}):**
+`;
+              results.pets.forEach(pet => {
+                response += `- ${pet.name} (${pet.type}${pet.breed ? `, ${pet.breed}` : ''})
+`;
+              });
+              response += `
+`;
+            }
+
+            if (results.healthRecords.length > 0) {
+              response += `**Health Records (${results.healthRecords.length}):**
+`;
+              results.healthRecords.slice(0, 3).forEach(record => {
+                response += `- ${record.title} (${record.date?.toLocaleDateString() || 'No date'})
+`;
+              });
+              response += `
+`;
+            }
+
+            if (results.activities.length > 0) {
+              response += `**Recent Activities (${results.activities.length}):**
+`;
+              results.activities.slice(0, 3).forEach(activity => {
+                response += `- ${activity.activityType} (${activity.date?.toLocaleDateString() || 'No date'})
+`;
+              });
+            }
+
+            return response;
+          } else {
+            return `No records found for "${searchTerm}". Would you like me to help you add some information to the database?`;
+          }
+        }
+      }
+
+      // Add health record
+      if (message.includes('health record') || message.includes('vaccination') || message.includes('vet visit') || message.includes('checkup')) {
+        const pet = await databaseService.getPetByName(petName);
+        if (pet) {
+          const healthRecord: InsertPetHealthRecord = {
+            petId: pet.id,
+            recordType: this.extractHealthRecordType(message),
+            title: this.extractHealthTitle(message),
+            description: message,
+            date: new Date(),
+            aiAnalysis: `AI-generated health record based on user input: "${message}"`
+          };
+          
+          const record = await databaseService.addHealthRecord(healthRecord);
+          return `✅ Health record added for ${petName}!
+
+**Record Details:**
+- Type: ${record.recordType}
+- Title: ${record.title}
+- Date: ${record.date.toLocaleDateString()}
+- Notes: ${record.description}
+
+I've saved this information and will use it to provide better health advice in the future!`;
+        }
+      }
+
+      // Log activity
+      if (message.includes('walked') || message.includes('played') || message.includes('exercise') || message.includes('activity')) {
+        const pet = await databaseService.getPetByName(petName);
+        if (pet) {
+          const activity: InsertPetActivity = {
+            petId: pet.id,
+            activityType: this.extractActivityType(message),
+            duration: this.extractDuration(message),
+            intensity: this.extractIntensity(message),
+            notes: message,
+            aiRecommendations: this.generateActivityRecommendations(message, petType)
+          };
+          
+          const loggedActivity = await databaseService.logActivity(activity);
+          return `🏃 Activity logged for ${petName}!
+
+**Activity Details:**
+- Type: ${loggedActivity.activityType}
+- Duration: ${loggedActivity.duration ? `${loggedActivity.duration} minutes` : 'Not specified'}
+- Intensity: ${loggedActivity.intensity || 'Not specified'}
+- Date: ${loggedActivity.date?.toLocaleDateString() || 'Today'}
+
+**AI Recommendations:**
+${loggedActivity.aiRecommendations}
+
+Great job keeping ${petName} active! Regular exercise is key to their health and happiness.`;
+        }
+      }
+
+      // Show pet insights
+      if (message.includes('insights') || message.includes('summary') || message.includes('report') || message.includes('analytics')) {
+        const pet = await databaseService.getPetByName(petName);
+        if (pet) {
+          const insights = await databaseService.getPetInsights(pet.id);
+          return `📊 Here's ${petName}'s comprehensive health and activity report:
+
+**Interaction Statistics:**
+- Total AI conversations: ${insights.totalInteractions}
+- Top discussion topics: ${insights.commonTopics.map(t => t.intent).join(', ') || 'None yet'}
+
+**Health Summary:**
+- Total health records: ${insights.healthSummary.totalRecords}
+- Last checkup: ${insights.healthSummary.lastCheckup?.toLocaleDateString() || 'None recorded'}
+- Next vaccination: ${insights.healthSummary.nextVaccination?.toLocaleDateString() || 'None scheduled'}
+
+**Recent Activity:**
+- Activities logged in last 7 days: ${insights.recentActivity.length}
+${insights.recentActivity.slice(0, 3).map(a => `- ${a.activityType} (${a.date?.toLocaleDateString() || 'No date'})`).join('\n')}
+
+**Upcoming Events:**
+${insights.upcomingHealthEvents.length > 0 
+  ? insights.upcomingHealthEvents.slice(0, 3).map(e => `- ${e.title} (${e.nextDueDate?.toLocaleDateString()})`).join('\n') 
+  : '- No upcoming events scheduled'}
+
+Would you like me to elaborate on any of these areas or help schedule new activities?`;
+        }
+      }
+
+      // Export data
+      if (message.includes('export') || message.includes('backup') || message.includes('download data')) {
+        const pet = await databaseService.getPetByName(petName);
+        if (pet) {
+          const exportData = await databaseService.exportPetData(pet.id);
+          return `📋 Complete data export for ${petName}:
+
+**Pet Profile:** ✅ Exported
+**Health Records:** ${exportData.healthRecords.length} records
+**Activities:** ${exportData.activities.length} activities  
+**Documents:** ${exportData.documents.length} documents
+**AI Interactions:** ${exportData.interactions.length} conversations
+
+All data has been compiled successfully! This includes:
+- Complete pet profile and medical history
+- All health records and vaccination schedules
+- Activity logs and exercise patterns
+- Document uploads and analyses
+- Full conversation history with AI insights
+
+Your pet's data is safely stored and easily accessible for veterinarian visits or record keeping.`;
+        }
+      }
+
+    } catch (error) {
+      console.error('Database operation error:', error);
+      return `I encountered an issue while accessing the database. Let me provide you with general pet care advice instead, and we can try the database operation again later.`;
+    }
+
+    return null;
+  }
+
+  // Helper methods for extracting information from messages
+  private extractBreed(message: string): string | undefined {
+    const breeds = ['labrador', 'golden retriever', 'german shepherd', 'bulldog', 'beagle', 'poodle', 'siamese', 'persian', 'maine coon', 'british shorthair'];
+    const found = breeds.find(breed => message.toLowerCase().includes(breed));
+    return found;
+  }
+
+  private extractAge(message: string): number | undefined {
+    const ageMatch = message.match(/(\d+)\s*(year|month|week)/i);
+    return ageMatch ? parseInt(ageMatch[1]) : undefined;
+  }
+
+  private extractWeight(message: string): string | undefined {
+    const weightMatch = message.match(/(\d+(?:\.\d+)?)\s*(kg|lb|pound)/i);
+    return weightMatch ? `${weightMatch[1]} ${weightMatch[2]}` : undefined;
+  }
+
+  private extractGender(message: string): string | undefined {
+    if (message.toLowerCase().includes('male')) return 'male';
+    if (message.toLowerCase().includes('female')) return 'female';
+    return undefined;
+  }
+
+  private extractSearchTerm(message: string): string | undefined {
+    const patterns = [
+      /search\s+(?:for\s+)?(.+)/i,
+      /find\s+(.+)/i,
+      /look\s+up\s+(.+)/i
+    ];
+    
+    for (const pattern of patterns) {
+      const match = message.match(pattern);
+      if (match) return match[1].trim();
+    }
+    return undefined;
+  }
+
+  private extractHealthRecordType(message: string): string {
+    if (message.includes('vaccination') || message.includes('vaccine')) return 'vaccination';
+    if (message.includes('checkup') || message.includes('visit')) return 'checkup';
+    if (message.includes('medication') || message.includes('medicine')) return 'medication';
+    if (message.includes('symptom') || message.includes('sick')) return 'symptom';
+    if (message.includes('injury') || message.includes('hurt')) return 'injury';
+    return 'general';
+  }
+
+  private extractHealthTitle(message: string): string {
+    if (message.includes('vaccination')) return 'Vaccination Record';
+    if (message.includes('checkup')) return 'Veterinary Checkup';
+    if (message.includes('medication')) return 'Medication Record';
+    return 'Health Record';
+  }
+
+  private extractActivityType(message: string): string {
+    if (message.includes('walk')) return 'walk';
+    if (message.includes('run')) return 'run';
+    if (message.includes('play')) return 'play';
+    if (message.includes('swim')) return 'swimming';
+    if (message.includes('train')) return 'training';
+    if (message.includes('exercise')) return 'exercise';
+    return 'activity';
+  }
+
+  private extractDuration(message: string): number | undefined {
+    const durationMatch = message.match(/(\d+)\s*(minute|min|hour)/i);
+    if (durationMatch) {
+      const value = parseInt(durationMatch[1]);
+      const unit = durationMatch[2].toLowerCase();
+      return unit.includes('hour') ? value * 60 : value;
+    }
+    return undefined;
+  }
+
+  private extractIntensity(message: string): string {
+    if (message.includes('high') || message.includes('intense') || message.includes('vigorous')) return 'high';
+    if (message.includes('medium') || message.includes('moderate')) return 'medium';
+    if (message.includes('low') || message.includes('light') || message.includes('gentle')) return 'low';
+    return 'medium';
+  }
+
+  private generateActivityRecommendations(message: string, petType: string): string {
+    const activityType = this.extractActivityType(message);
+    
+    switch (activityType) {
+      case 'walk':
+        return `Great choice! Walking is excellent for ${petType}s. Try to maintain a consistent daily schedule and gradually increase distance for better fitness.`;
+      case 'play':
+        return `Playtime is crucial for mental stimulation! Consider rotating toys and games to keep your ${petType} engaged and prevent boredom.`;
+      case 'training':
+        return `Training sessions are fantastic for bonding and mental exercise. Keep sessions short (5-10 minutes) and always end on a positive note.`;
+      default:
+        return `Regular exercise is essential for your ${petType}'s physical and mental health. Try to maintain consistency in timing and duration.`;
+    }
+  }
+
+  private getStandardResponse(message: string, context: string, petName: string, petType: string): string {
+    
     // Advanced intent recognition
-    const intents = this.analyzeIntent(lastUserMessage, conversationContext);
+    const intents = this.analyzeIntent(message, context);
     
     // Generate personalized response based on intents and context
-    return this.generateResponse(intents, lastUserMessage, petName, petType, conversationContext);
+    return this.generateResponse(intents, message, petName, petType, context);
   }
   
   private analyzeIntent(userMessage: string, context: string): string[] {
@@ -304,7 +609,7 @@ class MockOpenAIService {
   
   // Main method to generate chat completion
   async generateChatCompletion(request: ChatCompletionRequest, petName?: string, petType?: string): Promise<ChatCompletionResponse> {
-    const response = this.getContextualResponse(request.messages, petName, petType || 'pet');
+    const response = await this.getContextualResponse(request.messages, petName, petType || 'pet');
     
     // Simulate some processing time
     await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
@@ -318,9 +623,9 @@ class MockOpenAIService {
         finish_reason: 'stop'
       }],
       usage: {
-        prompt_tokens: request.messages.reduce((acc, msg) => acc + msg.content.length / 4, 0),
-        completion_tokens: response.length / 4,
-        total_tokens: (request.messages.reduce((acc, msg) => acc + msg.content.length, 0) + response.length) / 4
+        prompt_tokens: Math.round(request.messages.reduce((acc, msg) => acc + msg.content.length / 4, 0)),
+        completion_tokens: Math.round(response.length / 4),
+        total_tokens: Math.round((request.messages.reduce((acc, msg) => acc + msg.content.length, 0) + response.length) / 4)
       }
     };
   }
