@@ -683,40 +683,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PawMate Chatbot endpoint
+  // PawMate Chatbot endpoint with persistent history
   app.post('/api/pawmate/chat', async (req, res) => {
     try {
-      const { messages, petName, petType } = req.body;
+      const { messages, petName, petType, sessionId } = req.body;
       
       if (!messages || !Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({ message: 'Messages array is required' });
       }
 
+      let currentSessionId = sessionId;
+
+      // Create or get session
+      if (!currentSessionId) {
+        currentSessionId = `pawmate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        await databaseService.createChatSession({
+          sessionId: currentSessionId,
+          petName: petName || null,
+          petType: petType || 'pet',
+          title: null,
+          isActive: true
+        });
+      }
+
+      // Save the latest user message to history
+      const latestUserMessage = messages[messages.length - 1];
+      if (latestUserMessage && latestUserMessage.role === 'user') {
+        await databaseService.saveChatMessage({
+          sessionId: currentSessionId,
+          role: 'user',
+          content: latestUserMessage.content,
+          metadata: { petName, petType }
+        });
+      }
+
       // Check if we have OpenAI API key, if yes, use real OpenAI, otherwise use mock
       const hasOpenAIKey = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '';
       
+      let response;
       if (hasOpenAIKey) {
         // Use real OpenAI service
         const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY!);
-        const response = await realOpenAI.generateChatCompletion({
+        response = await realOpenAI.generateChatCompletion({
           model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
           messages: messages,
           temperature: 0.7,
           max_tokens: 500
         }, petName, petType);
         
-        res.json({ ...response, isRealAI: true });
+        response.isRealAI = true;
       } else {
         // Use mock OpenAI service
-        const response = await mockOpenAI.generateChatCompletion({
+        response = await mockOpenAI.generateChatCompletion({
           model: "gpt-4o-mock", // Indicate this is mock
           messages: messages,
           temperature: 0.7,
           max_tokens: 500
         }, petName, petType);
         
-        res.json({ ...response, isRealAI: false });
+        response.isRealAI = false;
       }
+
+      // Save the AI response to history
+      if (response.choices && response.choices[0] && response.choices[0].message) {
+        await databaseService.saveChatMessage({
+          sessionId: currentSessionId,
+          role: 'assistant',
+          content: response.choices[0].message.content,
+          metadata: { 
+            model: response.isRealAI ? 'gpt-4o' : 'gpt-4o-mock',
+            tokens: response.usage,
+            petName, 
+            petType 
+          }
+        });
+
+        // Auto-generate title if this is a new conversation
+        const session = await databaseService.getChatSession(currentSessionId);
+        if (session && !session.title) {
+          const title = await databaseService.generateSessionTitle(currentSessionId);
+          await databaseService.updateChatSession(currentSessionId, { title });
+        }
+      }
+
+      // Include sessionId in response
+      response.sessionId = currentSessionId;
+      
+      res.json(response);
     } catch (error) {
       console.error('PawMate chat error:', error);
       res.status(500).json({ message: 'Failed to generate response' });
@@ -804,6 +857,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Export data error:', error);
       res.status(500).json({ message: 'Failed to export data' });
+    }
+  });
+
+  // Chat History Management Routes
+  app.get('/api/pawmate/sessions', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const sessions = await databaseService.getChatSessions(limit);
+      res.json(sessions);
+    } catch (error) {
+      console.error('Get chat sessions error:', error);
+      res.status(500).json({ message: 'Failed to fetch chat sessions' });
+    }
+  });
+
+  app.get('/api/pawmate/sessions/:sessionId/history', async (req, res) => {
+    try {
+      const sessionId = req.params.sessionId;
+      const limit = parseInt(req.query.limit as string) || 100;
+      const history = await databaseService.getChatHistory(sessionId, limit);
+      res.json(history);
+    } catch (error) {
+      console.error('Get chat history error:', error);
+      res.status(500).json({ message: 'Failed to fetch chat history' });
+    }
+  });
+
+  app.delete('/api/pawmate/sessions/:sessionId', async (req, res) => {
+    try {
+      const sessionId = req.params.sessionId;
+      const deleted = await databaseService.deleteChatSession(sessionId);
+      if (deleted) {
+        res.json({ message: 'Chat session deleted successfully' });
+      } else {
+        res.status(404).json({ message: 'Chat session not found' });
+      }
+    } catch (error) {
+      console.error('Delete chat session error:', error);
+      res.status(500).json({ message: 'Failed to delete chat session' });
+    }
+  });
+
+  app.get('/api/pawmate/search/:query', async (req, res) => {
+    try {
+      const searchTerm = req.params.query;
+      const sessionId = req.query.sessionId as string;
+      const results = await databaseService.searchChatHistory(searchTerm, sessionId);
+      res.json(results);
+    } catch (error) {
+      console.error('Search chat history error:', error);
+      res.status(500).json({ message: 'Failed to search chat history' });
     }
   });
 

@@ -4,7 +4,10 @@ import {
   campaigns, notes, documents, contacts, users,
   InsertPet, InsertAiInteraction, InsertPetHealthRecord, 
   InsertPetActivity, InsertPetDocument, Pet, AiInteraction,
-  PetHealthRecord, PetActivity, PetDocument
+  PetHealthRecord, PetActivity, PetDocument,
+  chatSessions, chatMessages,
+  InsertChatSession, InsertChatMessage,
+  ChatSession, ChatMessage
 } from "@shared/schema";
 import { eq, desc, asc, like, and, or, gte, lte, sql } from "drizzle-orm";
 
@@ -384,6 +387,87 @@ export class DatabaseService {
       interactions
     };
   }
+  // Chat History Management
+  async createChatSession(sessionData: InsertChatSession): Promise<ChatSession> {
+    const [session] = await db.insert(chatSessions).values(sessionData).returning();
+    return session;
+  }
+
+  async getChatSession(sessionId: string): Promise<ChatSession | null> {
+    const [session] = await db.select().from(chatSessions).where(eq(chatSessions.sessionId, sessionId));
+    return session || null;
+  }
+
+  async updateChatSession(sessionId: string, updates: Partial<InsertChatSession>): Promise<ChatSession | null> {
+    const [updatedSession] = await db
+      .update(chatSessions)
+      .set({ ...updates, lastMessageAt: new Date() })
+      .where(eq(chatSessions.sessionId, sessionId))
+      .returning();
+    return updatedSession || null;
+  }
+
+  async getChatSessions(limit: number = 50): Promise<ChatSession[]> {
+    return await db.select()
+      .from(chatSessions)
+      .orderBy(desc(chatSessions.lastMessageAt))
+      .limit(limit);
+  }
+
+  async saveChatMessage(messageData: InsertChatMessage): Promise<ChatMessage> {
+    // Update session's last message time
+    await db
+      .update(chatSessions)
+      .set({ lastMessageAt: new Date() })
+      .where(eq(chatSessions.sessionId, messageData.sessionId));
+
+    const [message] = await db.insert(chatMessages).values(messageData).returning();
+    return message;
+  }
+
+  async getChatHistory(sessionId: string, limit: number = 100): Promise<ChatMessage[]> {
+    return await db.select()
+      .from(chatMessages)
+      .where(eq(chatMessages.sessionId, sessionId))
+      .orderBy(asc(chatMessages.createdAt))
+      .limit(limit);
+  }
+
+  async searchChatHistory(searchTerm: string, sessionId?: string): Promise<ChatMessage[]> {
+    const baseCondition = like(chatMessages.content, `%${searchTerm}%`);
+    const condition = sessionId 
+      ? and(baseCondition, eq(chatMessages.sessionId, sessionId))
+      : baseCondition;
+
+    return await db.select()
+      .from(chatMessages)
+      .where(condition)
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(50);
+  }
+
+  async deleteChatSession(sessionId: string): Promise<boolean> {
+    // Delete messages first (referential integrity)
+    await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId));
+    
+    // Then delete session
+    const result = await db.delete(chatSessions).where(eq(chatSessions.sessionId, sessionId));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async generateSessionTitle(sessionId: string): Promise<string> {
+    const messages = await this.getChatHistory(sessionId, 5);
+    if (messages.length === 0) return "New Conversation";
+
+    const userMessages = messages.filter(m => m.role === 'user');
+    if (userMessages.length === 0) return "New Conversation";
+
+    // Extract key topics from first user message for title
+    const firstMessage = userMessages[0].content;
+    const words = firstMessage.split(' ').slice(0, 6);
+    return words.join(' ') + (firstMessage.split(' ').length > 6 ? '...' : '');
+  }
+
 }
 
 export const databaseService = new DatabaseService();

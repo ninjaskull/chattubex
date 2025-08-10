@@ -25,6 +25,7 @@ export default function PawMate() {
   const [isTyping, setIsTyping] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isUsingRealAI, setIsUsingRealAI] = useState<boolean | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(() => localStorage.getItem('pawmate_session_id'));
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -81,7 +82,8 @@ export default function PawMate() {
         body: JSON.stringify({
           messages: [systemMessage, ...conversationHistory],
           petName: petName || '',
-          petType: petType || 'pet'
+          petType: petType || 'pet',
+          sessionId: sessionId
         })
       });
 
@@ -94,6 +96,12 @@ export default function PawMate() {
       
       // Update AI status indicator
       setIsUsingRealAI(data.isRealAI);
+      
+      // Save session ID for persistent chat history
+      if (data.sessionId && data.sessionId !== sessionId) {
+        setSessionId(data.sessionId);
+        localStorage.setItem('pawmate_session_id', data.sessionId);
+      }
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
