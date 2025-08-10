@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, MessageCircle, Zap, Dog, Settings, Send, Sparkles, Bot } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -319,9 +320,28 @@ export default function PawMate() {
                       ? 'bg-blue-500 text-white ml-auto'
                       : 'bg-white border border-slate-200'
                   }`}>
-                    <p className={`text-sm ${message.type === 'user' ? 'text-white' : 'text-slate-800'}`}>
-                      {message.content}
-                    </p>
+                    {message.type === 'user' ? (
+                      <p className="text-sm text-white whitespace-pre-wrap">
+                        {message.content}
+                      </p>
+                    ) : (
+                      <div className="text-sm text-slate-800 prose prose-sm max-w-none">
+                        <ReactMarkdown 
+                          components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                            li: ({ children }) => <li className="text-sm">{children}</li>,
+                            strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
+                            h1: ({ children }) => <h1 className="text-base font-bold mb-2 text-slate-900">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-sm font-bold mb-1 text-slate-900">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-sm font-semibold mb-1 text-slate-800">{children}</h3>,
+                            code: ({ children }) => <code className="bg-slate-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                   <p className="text-xs text-slate-500 mt-1">
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
