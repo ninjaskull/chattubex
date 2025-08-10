@@ -9,9 +9,13 @@ import { encrypt, decrypt } from "./utils/encryption.js";
 import { deriveTimezone } from "./utils/timezone.js";
 import { sendContactFormEmail } from "./utils/email.js";
 
-// Configure multer for file uploads
+// Configure multer for file uploads with increased limits
 const upload = multer({ 
   dest: 'uploads/',
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+    files: 10 // Maximum 10 files per upload
+  },
   fileFilter: (req, file, cb) => {
     console.log('File filter - fieldname:', file.fieldname, 'mimetype:', file.mimetype, 'originalname:', file.originalname);
     
@@ -23,24 +27,79 @@ const upload = multer({
         cb(new Error('Only CSV files are allowed for CSV uploads'));
       }
     } else if (file.fieldname === 'document') {
-      // Allow various document types
+      // Allow wide variety of file types
       const allowedTypes = [
+        // Documents
         'application/pdf',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/msword',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-powerpoint',
+        'text/plain',
+        'text/csv',
+        'application/rtf',
+        
+        // Images
         'image/jpeg',
+        'image/jpg',
         'image/png',
         'image/gif',
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain'
+        'image/bmp',
+        'image/webp',
+        'image/svg+xml',
+        'image/tiff',
+        
+        // Videos
+        'video/mp4',
+        'video/mpeg',
+        'video/quicktime',
+        'video/x-msvideo',
+        'video/webm',
+        'video/ogg',
+        'video/3gpp',
+        
+        // Audio
+        'audio/mpeg',
+        'audio/mp3',
+        'audio/wav',
+        'audio/ogg',
+        'audio/aac',
+        'audio/webm',
+        
+        // Archives
+        'application/zip',
+        'application/x-rar-compressed',
+        'application/x-7z-compressed',
+        'application/x-tar',
+        'application/gzip',
+        
+        // Code and data
+        'application/json',
+        'text/javascript',
+        'text/html',
+        'text/css',
+        'application/xml',
+        'text/xml'
       ];
       
-      if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith('.csv') || file.originalname.endsWith('.txt')) {
+      // Check by MIME type or file extension for broader compatibility
+      const fileExtension = file.originalname.toLowerCase().split('.').pop();
+      const allowedExtensions = [
+        'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'rtf',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'tiff', 'tif',
+        'mp4', 'mpeg', 'mpg', 'mov', 'avi', 'webm', 'ogg', '3gp',
+        'mp3', 'wav', 'ogg', 'aac', 'webm',
+        'zip', 'rar', '7z', 'tar', 'gz',
+        'json', 'js', 'html', 'css', 'xml'
+      ];
+      
+      if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(fileExtension || '')) {
         cb(null, true);
       } else {
-        cb(new Error('File type not allowed'));
+        console.log('File type not allowed:', file.mimetype, 'Extension:', fileExtension);
+        cb(new Error(`File type not allowed: ${file.originalname}`));
       }
     } else {
       cb(new Error('Invalid file field'));
