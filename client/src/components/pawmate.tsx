@@ -64,7 +64,7 @@ export default function PawMate() {
         setMessages([{
           id: '1',
           type: 'bot',
-          content: `${icon} Welcome! I'm ${petName || 'Duggu'}, your intelligent lead scoring and contact analysis AI assistant created by Zhatore. I have full database access and can help you with:\n\n**📊 Lead Scoring & Analysis**\n- Score contacts by business value and conversion potential\n- Identify C-level executives and decision-makers\n- Analyze contact completeness and qualification\n\n**🔍 Database Intelligence**\n- Search and analyze your uploaded contact data\n- Generate insights from campaign data\n- Contact enrichment and data quality assessment\n\n**🎯 Campaign Optimization**\n- Prospect prioritization and segmentation\n- Market analysis and competitive intelligence\n- Outreach recommendations and lead qualification\n\nI have access to all your campaign and contact data - ready to help you identify the highest quality leads! What would you like to analyze?`,
+          content: `Welcome to Duggu AI! I'm your lead intelligence assistant with direct database access. I can search through your 263+ contact records instantly.\n\n**🔍 Database Search Capabilities:**\n- Search by name, email, phone, company, title\n- Find complete contact details with phone numbers\n- Filter by any field in your campaign data\n- Real-time search through encrypted records\n\n**Try searching for:**\n- "delonza" - Find specific contacts\n- "@company.com" - Find all employees at a company\n- "CEO" or "Manager" - Search by job titles\n- Phone numbers to find contact details\n\nType your search query and I'll return the exact contact information with phone numbers instantly!`,
           timestamp: new Date()
         }]);
       }
@@ -106,21 +106,85 @@ export default function PawMate() {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const currentMessage = petMessage.trim();
+    const query = petMessage.trim();
     setPetMessage("");
     setIsTyping(true);
 
+    // Try database search first for direct contact results
     try {
-      // Prepare messages for OpenAI format
+      const searchResponse = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          query, 
+          searchType: 'all', 
+          limit: 10 
+        })
+      });
+      
+      if (searchResponse.ok) {
+        const searchResults = await searchResponse.json();
+        
+        if (searchResults.total > 0) {
+          let responseContent = `Found ${searchResults.total} results for "${query}":\n\n`;
+          
+          // Display campaign data results with phone numbers
+          if (searchResults.campaignData && searchResults.campaignData.length > 0) {
+            searchResults.campaignData.forEach((campaign: any) => {
+              responseContent += `**${campaign.campaignName} Campaign (${campaign.totalMatches} matches):**\n\n`;
+              campaign.matches.slice(0, 5).forEach((contact: any) => {
+                responseContent += `📋 **${contact['First Name']} ${contact['Last Name']}**\n`;
+                responseContent += `🏢 ${contact.Company || 'N/A'}\n`;
+                responseContent += `💼 ${contact.Title || 'N/A'}\n`;
+                responseContent += `📧 ${contact.Email || 'N/A'}\n`;
+                responseContent += `📱 Mobile: ${contact['Mobile Phone'] || 'Not Available'}\n`;
+                responseContent += `☎️ Other: ${contact['Other Phone'] || 'Not Available'}\n`;
+                responseContent += `🏢 Corporate: ${contact['Corporate Phone'] || 'Not Available'}\n`;
+                responseContent += `🌐 Website: ${contact.Website || 'N/A'}\n`;
+                if (contact['Person Linkedin Url']) {
+                  responseContent += `🔗 LinkedIn: ${contact['Person Linkedin Url']}\n`;
+                }
+                responseContent += `\n`;
+              });
+            });
+          }
+          
+          // Display direct contacts
+          if (searchResults.contacts && searchResults.contacts.length > 0) {
+            responseContent += `**Direct Contacts:**\n\n`;
+            searchResults.contacts.forEach((contact: any) => {
+              responseContent += `📋 **${contact.name}**\n`;
+              responseContent += `📧 ${contact.email}\n`;
+              responseContent += `📱 ${contact.mobile}\n\n`;
+            });
+          }
+          
+          const botMessage: Message = {
+            id: Date.now().toString(),
+            type: 'bot',
+            content: responseContent,
+            timestamp: new Date()
+          };
+          
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+    }
+
+    // Fallback to AI assistant for general queries
+    try {
       const conversationHistory = [...messages, userMessage].map(msg => ({
         role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
         content: msg.content
       }));
 
-      // Add system message for context
       const systemMessage = {
         role: 'system' as const,
-        content: `You are ${petName || 'Duggu'}, an intelligent lead scoring and contact analysis AI assistant created by Zhatore. You specialize in analyzing contact databases and identifying the highest quality business prospects for campaigns. Focus on lead scoring, contact intelligence, and business development insights. Provide data-driven analysis and actionable recommendations for sales and marketing teams.`
+        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Zhatore. Focus exclusively on lead analysis, contact intelligence, and campaign optimization. Provide direct, actionable business insights without generic recommendations.`
       };
 
       const response = await fetch('/api/pawmate/chat', {
@@ -130,8 +194,8 @@ export default function PawMate() {
         },
         body: JSON.stringify({
           messages: [systemMessage, ...conversationHistory],
-          petName: petName || '',
-          petType: petType || 'pet',
+          petName: petName || 'Duggu',
+          petType: petType || 'assistant',
           sessionId: sessionId
         })
       });
@@ -141,12 +205,21 @@ export default function PawMate() {
       }
 
       const data = await response.json();
-      const botResponse = data.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response right now. Please try again!";
+      let botResponse = data.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response right now. Please try again!";
       
-      // Update AI status indicator
+      // Remove all recommendation sections
+      botResponse = botResponse.replace(/Recommendations?:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Next Steps?:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Please remember to respect[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Outreach:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Engagement Strategy:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Data Completion:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Email Engagement:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Data Enrichment:[\s\S]*?(?=\n\n|$)/gi, '');
+      botResponse = botResponse.replace(/Follow-Up:[\s\S]*?(?=\n\n|$)/gi, '');
+      
       setIsUsingRealAI(data.isRealAI);
       
-      // Save session ID for persistent chat history
       if (data.sessionId && data.sessionId !== sessionId) {
         setSessionId(data.sessionId);
         localStorage.setItem('pawmate_session_id', data.sessionId);

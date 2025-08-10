@@ -724,11 +724,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const campaign of campaigns) {
           try {
             const campaignData = await storage.getCampaignData(campaign.id);
-            if (campaignData && campaignData.rows) {
+            
+            if (campaignData && campaignData.rows && Array.isArray(campaignData.rows)) {
               const matchingRows = campaignData.rows.filter((row: any) => {
-                return Object.values(row).some((value: any) => 
-                  String(value).toLowerCase().includes(searchQuery)
-                );
+                if (!row || typeof row !== 'object') return false;
+                
+                return Object.values(row).some((value: any) => {
+                  if (value === null || value === undefined) return false;
+                  const stringValue = String(value).toLowerCase();
+                  return stringValue.includes(searchQuery);
+                });
               });
               
               if (matchingRows.length > 0) {
