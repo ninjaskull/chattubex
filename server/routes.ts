@@ -8,6 +8,8 @@ import { storage } from "./storage.js";
 import { encrypt, decrypt } from "./utils/encryption.js";
 import { deriveTimezone } from "./utils/timezone.js";
 import { sendContactFormEmail } from "./utils/email.js";
+import { mockOpenAI } from "./services/mockOpenAI.js";
+import { createRealOpenAIService } from "./services/realOpenAI.js";
 
 // Configure multer for file uploads with increased limits
 const upload = multer({ 
@@ -677,6 +679,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Get contacts error:', error);
       res.status(500).json({ message: 'Failed to fetch contacts' });
+    }
+  });
+
+  // PawMate Chatbot endpoint
+  app.post('/api/pawmate/chat', async (req, res) => {
+    try {
+      const { messages, petName, petType } = req.body;
+      
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ message: 'Messages array is required' });
+      }
+
+      // Check if we have OpenAI API key, if yes, use real OpenAI, otherwise use mock
+      const hasOpenAIKey = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim() !== '';
+      
+      if (hasOpenAIKey) {
+        // Use real OpenAI service
+        const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY!);
+        const response = await realOpenAI.generateChatCompletion({
+          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 500
+        }, petName, petType);
+        
+        res.json({ ...response, isRealAI: true });
+      } else {
+        // Use mock OpenAI service
+        const response = await mockOpenAI.generateChatCompletion({
+          model: "gpt-4o-mock", // Indicate this is mock
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 500
+        }, petName, petType);
+        
+        res.json({ ...response, isRealAI: false });
+      }
+    } catch (error) {
+      console.error('PawMate chat error:', error);
+      res.status(500).json({ message: 'Failed to generate response' });
     }
   });
 

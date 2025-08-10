@@ -24,6 +24,7 @@ export default function PawMate() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isUsingRealAI, setIsUsingRealAI] = useState<boolean | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -34,14 +35,15 @@ export default function PawMate() {
   // Load initial message
   useEffect(() => {
     if (messages.length === 0) {
+      const icon = getPetIcon(petType);
       setMessages([{
         id: '1',
         type: 'bot',
-        content: `Woof! 🐕 Welcome to PawMate! I'm your AI companion here to help with pet care tips, fun activities, and answer any questions about your furry friend!`,
+        content: `${icon} Welcome to PawMate! I'm your advanced AI companion, powered by sophisticated pet care knowledge. I can help you with health concerns, nutrition advice, training tips, behavioral insights, grooming guidance, and so much more!\n\n${petName ? `Nice to meet ${petName}!` : 'Tell me about your pet and'} let's make sure they live their happiest, healthiest life together! 🌟`,
         timestamp: new Date()
       }]);
     }
-  }, [messages.length]);
+  }, [messages.length, petType, petName]);
 
   const handleSendMessage = async () => {
     if (!petMessage.trim()) return;
@@ -54,12 +56,45 @@ export default function PawMate() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = petMessage.trim();
     setPetMessage("");
     setIsTyping(true);
 
-    // Simulate AI response with typing effect
-    setTimeout(() => {
-      const botResponse = generateBotResponse(userMessage.content);
+    try {
+      // Prepare messages for OpenAI format
+      const conversationHistory = [...messages, userMessage].map(msg => ({
+        role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
+        content: msg.content
+      }));
+
+      // Add system message for context
+      const systemMessage = {
+        role: 'system' as const,
+        content: `You are PawMate, a friendly and knowledgeable AI assistant specializing in pet care. You're helping ${petName || 'the user'} with their ${petType || 'pet'}. Provide helpful, accurate, and caring advice about pet health, nutrition, behavior, training, grooming, and general pet care. Always be encouraging and supportive. Use appropriate emojis to make your responses warm and engaging.`
+      };
+
+      const response = await fetch('/api/pawmate/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [systemMessage, ...conversationHistory],
+          petName: petName || '',
+          petType: petType || 'pet'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
+      const botResponse = data.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response right now. Please try again!";
+      
+      // Update AI status indicator
+      setIsUsingRealAI(data.isRealAI);
+      
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
@@ -68,8 +103,21 @@ export default function PawMate() {
       };
       
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      // Fallback to simple response
+      const fallbackResponse = generateBotResponse(currentMessage);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: fallbackResponse,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const generateBotResponse = (userInput: string): string => {
@@ -145,7 +193,18 @@ export default function PawMate() {
         <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
           PawMate AI
         </h2>
-        <p className="text-slate-600">Your intelligent companion for pet care and fun!</p>
+        <div className="flex items-center justify-center gap-2">
+          <p className="text-slate-600">Your intelligent companion for pet care and fun!</p>
+          {isUsingRealAI !== null && (
+            <span className={`text-xs px-2 py-1 rounded-full ${
+              isUsingRealAI 
+                ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200' 
+                : 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200'
+            }`}>
+              {isUsingRealAI ? 'OpenAI Powered' : 'Demo Mode'}
+            </span>
+          )}
+        </div>
         
         {/* Settings Button */}
         <div className="absolute top-0 right-0">

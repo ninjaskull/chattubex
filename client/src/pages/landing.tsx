@@ -54,38 +54,38 @@ export default function Landing() {
   const features = [
     {
       icon: Brain,
-      title: "AI-Powered Analytics",
-      description: "Advanced machine learning algorithms provide deep insights into your data patterns and user behavior.",
+      title: "AI Pet Assistant",
+      description: "PawMate AI provides expert pet care advice, health insights, and personalized recommendations for your furry friends.",
       gradient: "from-purple-500 to-pink-500"
     },
     {
       icon: Cpu,
-      title: "Quantum Processing",
-      description: "Next-generation computing power enabling real-time processing of complex datasets at unprecedented speeds.",
+      title: "Real-time Collaboration",
+      description: "Work together seamlessly with live document editing, instant messaging, and real-time notifications.",
       gradient: "from-blue-500 to-cyan-500"
     },
     {
       icon: Database,
-      title: "Distributed Architecture",
-      description: "Scalable cloud infrastructure that grows with your business, ensuring 99.99% uptime and reliability.",
+      title: "Secure Document Storage",
+      description: "Enterprise-grade security with encrypted storage, version control, and automatic backups for all your files.",
       gradient: "from-green-500 to-emerald-500"
     },
     {
       icon: Network,
-      title: "Neural Networks",
-      description: "Deep learning capabilities that continuously optimize performance and predict future trends.",
+      title: "Campaign Management",
+      description: "Organize and manage marketing campaigns with CSV imports, field mapping, and contact management tools.",
       gradient: "from-orange-500 to-red-500"
     },
     {
       icon: Shield,
-      title: "Quantum Encryption",
-      description: "Military-grade security protocols protecting your data with quantum-resistant cryptography.",
+      title: "Data Encryption",
+      description: "Advanced encryption protocols protect your sensitive documents and personal information at all times.",
       gradient: "from-indigo-500 to-purple-500"
     },
     {
       icon: Globe,
-      title: "Global Edge Network",
-      description: "Worldwide CDN deployment ensuring lightning-fast performance across all geographical locations.",
+      title: "Cloud Synchronization",
+      description: "Access your documents anywhere with automatic cloud sync and offline capabilities.",
       gradient: "from-teal-500 to-blue-500"
     }
   ];
@@ -116,7 +116,7 @@ export default function Landing() {
                 <Brain className="text-white text-lg" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                NeuralTech Solutions
+                CollabSpace Pro
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -149,16 +149,16 @@ export default function Landing() {
             </div>
             
             <h1 className="text-5xl sm:text-7xl font-bold mb-6 leading-tight">
-              The Future of
+              Collaborative
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                Digital Intelligence
+                Document Management
               </span>
             </h1>
             
             <p className="text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Harness the power of advanced AI and quantum computing to transform your business. 
-              Our revolutionary platform processes data at the speed of thought.
+              Seamless document collaboration with real-time communication, secure file management, 
+              and intelligent note-taking powered by AI assistance.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -199,10 +199,10 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Revolutionary Technology Stack
+              Powerful Collaboration Features
             </h2>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Built on cutting-edge technologies that push the boundaries of what's possible
+              Everything you need for seamless team collaboration and document management
             </p>
           </div>
           
@@ -256,21 +256,21 @@ export default function Landing() {
                   <Brain className="text-white text-lg" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  NeuralTech Solutions
+                  CollabSpace Pro
                 </span>
               </div>
               <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
-                Pioneering the future of artificial intelligence and quantum computing to solve tomorrow's challenges today.
+                The ultimate collaborative platform for document management, team communication, and AI-powered assistance.
               </p>
             </div>
             
             <div>
               <h4 className="font-semibold text-white mb-4">Platform</h4>
               <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">AI Analytics</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Quantum Computing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Neural Networks</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Edge Computing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Document Management</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Campaign Tools</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">PawMate AI</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Real-time Chat</a></li>
               </ul>
             </div>
             
@@ -292,7 +292,7 @@ export default function Landing() {
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 2025
-              </span> NeuralTech Solutions. All rights reserved.
+              </span> CollabSpace Pro. All rights reserved.
             </p>
             
             {showAdminAccess && (
