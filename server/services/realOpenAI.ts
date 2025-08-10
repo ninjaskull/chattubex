@@ -142,7 +142,7 @@ class RealOpenAIService {
 ${campaigns.map(c => `• ${c.name}: ${c.recordCount} records`).join('\n')}
 
 **Contacts:** ${contacts.length} total contacts
-${contacts.length > 0 ? `• Latest: ${contacts.slice(0, 3).map(c => c.firstName + ' ' + c.lastName).join(', ')}` : '• No contacts uploaded yet'}
+${contacts.length > 0 ? `• Latest: ${contacts.slice(0, 3).map(c => c.name).join(', ')}` : '• No contacts uploaded yet'}
 
 **Database Operations Available:**
 • Search contacts by name, email, company
@@ -182,9 +182,9 @@ What would you like me to search for?`;
 • Active Contacts: ${contacts.length}
 
 **Sample Data Structure:**
-${sampleContact ? `• Name: ${sampleContact.firstName} ${sampleContact.lastName}
-• Company: ${sampleContact.company || 'Not specified'}
+${sampleContact ? `• Name: ${sampleContact.name}
 • Email: ${sampleContact.email}
+• Mobile: ${sampleContact.mobile}
 • Location Data: Available` : '• No contact data to analyze yet'}
 
 **Available Analytics:**
@@ -262,16 +262,15 @@ Example: "Register my dog Max, he's a Golden Retriever, 3 years old"`;
 
       // Search contacts
       const matchingContacts = contacts.filter(contact => 
-        contact.firstName?.toLowerCase().includes(searchTerm) ||
-        contact.lastName?.toLowerCase().includes(searchTerm) ||
+        contact.name?.toLowerCase().includes(searchTerm) ||
         contact.email?.toLowerCase().includes(searchTerm) ||
-        contact.company?.toLowerCase().includes(searchTerm)
+        contact.mobile?.toLowerCase().includes(searchTerm)
       );
 
       if (matchingContacts.length > 0) {
         results.push(`**Contacts (${matchingContacts.length} found):**`);
         matchingContacts.slice(0, 10).forEach(contact => {
-          results.push(`• ${contact.firstName} ${contact.lastName} - ${contact.company || 'No company'} - ${contact.email}`);
+          results.push(`• ${contact.name} - ${contact.email} - ${contact.mobile}`);
         });
       }
 
@@ -421,7 +420,46 @@ What specific update would you like to make?`;
     const name = petName || 'your pet';
     const type = petType || 'pet';
     
-    return `You are PawMate, an expert AI veterinary assistant and pet care advisor with full database access. You have comprehensive knowledge about:
+    return `You are PawMate, an expert AI veterinary assistant and pet care advisor with full database access. Format all responses using proper Markdown for better readability:
+
+**Use headings (## for main topics, ### for subtopics)**
+**Use bullet points (• or -) for lists**
+**Use **bold** for important terms**
+**Use code blocks for technical details**
+**Structure information clearly with spacing**
+
+You have comprehensive knowledge about:
+
+## Core Capabilities:
+- **Pet Health**: Disease prevention, symptom recognition, first aid, vaccination schedules
+- **Nutrition**: Species-specific dietary needs, toxic foods, feeding schedules, weight management  
+- **Behavior**: Training techniques, socialization, behavioral issues, enrichment activities
+- **Emergency Care**: Recognition of urgent situations, first aid measures, when to seek veterinary care
+
+## Database Access:
+You have FULL ACCESS to the user's database including:
+- **Contact Management**: Search, create, update, and analyze contact records
+- **Pet Profiles**: Register new pets, track health records, manage pet information
+- **Campaign Data**: Access uploaded CSV files and campaign information  
+- **Data Analysis**: Generate insights, reports, and recommendations from actual user data
+
+## Response Formatting Guidelines:
+- Use ## for major sections, ### for subsections
+- Use bullet points (•) for lists and recommendations  
+- Use **bold text** for key terms and important information
+- Use numbered lists for step-by-step instructions
+- Include relevant emojis for engagement (🐕 🐱 🏥 📊 etc.)
+- Structure responses with clear headings and spacing
+- Use tables for data comparisons when appropriate
+
+## Database Operations:
+When users ask about data, contacts, campaigns, or want to search/analyze information:
+1. Access the actual database using available methods
+2. Provide real results from their uploaded data
+3. Offer to create, update, or analyze their data
+4. Generate actionable insights and recommendations
+
+## Pet Care for ${name} (${type}):
 
 🐾 **Pet Care Expertise:**
 - Veterinary medicine and health management
