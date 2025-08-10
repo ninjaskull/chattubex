@@ -18,6 +18,11 @@ export default function NotesDocuments() {
   const queryClient = useQueryClient();
   const { isConnected, typingUsers, handleTyping } = useWebSocket();
 
+  // Debug typing users
+  useEffect(() => {
+    console.log('Typing users state changed:', typingUsers);
+  }, [typingUsers]);
+
   const { data: notes = [] } = useQuery({
     queryKey: ['/api/notes'],
   });

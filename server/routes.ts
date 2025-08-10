@@ -127,15 +127,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data.toString());
+        console.log('WebSocket message received:', message);
         
         switch (message.type) {
           case 'typing':
+            console.log('Processing typing message for user:', message.data.userId);
             // Clear existing timeout for this user
             if (typingUsers.has(message.data.userId)) {
               clearTimeout(typingUsers.get(message.data.userId)!);
             }
             
             // Broadcast typing indicator to other clients
+            console.log('Broadcasting typing to other clients');
             broadcastToOthers(ws, {
               type: 'user_typing',
               data: message.data
@@ -143,6 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Set timeout to automatically stop typing after 3 seconds
             const timeout = setTimeout(() => {
+              console.log('Auto-stopping typing for user:', message.data.userId);
               broadcastToOthers(ws, {
                 type: 'user_stopped_typing',
                 data: message.data
@@ -154,6 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
             
           case 'stopped_typing':
+            console.log('Processing stop typing message for user:', message.data.userId);
             // Clear timeout and broadcast stop typing
             if (typingUsers.has(message.data.userId)) {
               clearTimeout(typingUsers.get(message.data.userId)!);

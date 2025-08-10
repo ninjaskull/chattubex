@@ -93,15 +93,23 @@ export function useWebSocket() {
 
         case 'user_typing':
           // User is typing
+          console.log('User typing received:', message.data);
           setTypingUsers(prev => {
             const filtered = prev.filter(user => user.userId !== message.data.userId);
-            return [...filtered, { userId: message.data.userId, timestamp: Date.now() }];
+            const newUsers = [...filtered, { userId: message.data.userId, timestamp: Date.now() }];
+            console.log('Updated typing users:', newUsers);
+            return newUsers;
           });
           break;
 
         case 'user_stopped_typing':
           // User stopped typing
-          setTypingUsers(prev => prev.filter(user => user.userId !== message.data.userId));
+          console.log('User stopped typing received:', message.data);
+          setTypingUsers(prev => {
+            const filtered = prev.filter(user => user.userId !== message.data.userId);
+            console.log('Removed typing user, remaining:', filtered);
+            return filtered;
+          });
           break;
           
         default:
@@ -129,6 +137,7 @@ export function useWebSocket() {
 
   const sendTyping = () => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
+      console.log('Sending typing indicator');
       wsRef.current.send(JSON.stringify({
         type: 'typing',
         data: { userId: 'current_user' }
