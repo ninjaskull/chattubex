@@ -11,7 +11,7 @@ if (!process.env.DATABASE_URL) {
 // Create pool with optimized settings for faster connections
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: false, // Replit internal PostgreSQL doesn't need SSL
+  ssl: process.env.DATABASE_URL?.includes('sslmode=require') ? { rejectUnauthorized: false } : false, // Handle both Replit and Neon databases
   max: 10, // Increased pool size
   min: 2,  // Keep minimum connections alive
   idleTimeoutMillis: 60000,
