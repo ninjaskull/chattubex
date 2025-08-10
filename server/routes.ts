@@ -729,15 +729,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Use lead-focused mock service for reliable responses  
-      const response = await mockOpenAIService.createChatCompletion({
-        model: "mock-lead-scoring-model",
+      // Use real OpenAI service with lead scoring system prompts
+      if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.trim() === '') {
+        return res.status(500).json({ message: 'OpenAI API key is required for lead analysis assistance' });
+      }
+
+      const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
+      const response = await realOpenAI.generateChatCompletion({
+        model: "microsoft/wizardlm-2-8x22b", // Using OpenRouter model as requested
         messages: messages,
         temperature: 0.7,
         max_tokens: 1500
       }, petName, petType);
       
-      response.isRealAI = false;
+      response.isRealAI = true;
 
       // Save the AI response to history
       if (response.choices && response.choices[0] && response.choices[0].message) {
