@@ -1,166 +1,61 @@
-# Campaign Management Application
+# Project Overview
 
-## Overview
+This is a full-stack web application for campaign management with secure data handling, built with React frontend and Express.js backend.
 
-This is a full-stack web application designed as a campaign data management system with a public-facing landing page and a secure dashboard for data management. The application features a modern web agency homepage with hidden access to a password-protected dashboard where users can upload and manage campaign CSV data, notes, and documents.
+## Architecture
 
-## System Architecture
-
-### Frontend Architecture
+### Frontend (React + TypeScript)
 - **Framework**: React with TypeScript
-- **Styling**: TailwindCSS with shadcn/ui component library
 - **Routing**: Wouter for client-side routing
-- **State Management**: TanStack Query for server state management
-- **Build Tool**: Vite for development and production builds
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: TanStack Query (React Query) for server state
+- **Forms**: React Hook Form with Zod validation
 
-### Backend Architecture
-- **Runtime**: Node.js with Express.js
+### Backend (Express.js + TypeScript)
+- **Framework**: Express.js with TypeScript
 - **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: Simple password-based authentication with bcrypt hashing
-- **File Handling**: Multer for file uploads with configurable storage
-- **Security**: AES encryption for sensitive data storage
+- **Authentication**: Session-based with dashboard password
+- **File Upload**: Multer for handling file uploads
+- **Security**: Data encryption utilities for sensitive information
 
-### Data Storage Solutions
-- **Primary Database**: PostgreSQL via Neon Database service
-- **ORM**: Drizzle with TypeScript schema definitions
-- **File Storage**: Local file system with encrypted paths
-- **Encryption**: AES-256-GCM for sensitive data protection
+### Database Schema
+- **Users**: User authentication
+- **Campaigns**: Campaign data with encrypted content
+- **Contacts**: Contact management for campaigns
+- **Documents**: File upload management
+- **Notes**: Encrypted note storage
 
-## Key Components
+## Recent Changes
 
-### Authentication and Authorization
-- Simple password-based access control for dashboard
-- JWT-like token storage in localStorage
-- Bcrypt password hashing for security
-- Hidden authentication trigger (5 clicks on footer year)
-
-### Campaign Data Management
-- CSV file upload and processing with drag-and-drop interface
-- Automatic field detection for campaign data
-- Manual field mapping when auto-detection fails
-- Timezone derivation based on state and country data
-- Encrypted storage of campaign data and field mappings
-- Read-only spreadsheet view of uploaded campaigns
-
-### Notes and Documents System
-- Rich text note creation with timestamps
-- Multi-format document upload support (PDF, DOCX, PPT, images)
-- Encrypted storage of both notes and document metadata
-- File preview and download capabilities
-
-### Security Features
-- AES encryption for all sensitive stored data
-- Input validation and sanitization
-- File type and size validation
-- CORS protection and secure headers
-
-## Data Flow
-
-1. **Public Access**: Users land on agency homepage with hidden dashboard access
-2. **Authentication**: 5 clicks on footer year reveals password modal
-3. **Dashboard Access**: Successful authentication redirects to protected dashboard
-4. **Campaign Upload**: CSV files processed, validated, and stored with encryption
-5. **Data Management**: View campaigns in read-only tables, manage notes and documents
-6. **Security Layer**: All sensitive data encrypted before database storage
-
-## External Dependencies
-
-### Core Dependencies
-- **@neondatabase/serverless**: PostgreSQL database connection
-- **drizzle-orm**: Type-safe ORM for database operations
-- **bcrypt**: Password hashing for authentication
-- **multer**: File upload handling
-- **crypto**: Built-in Node.js encryption utilities
-
-### Frontend Dependencies
-- **@tanstack/react-query**: Server state management and caching
-- **@radix-ui/***: Accessible UI primitives for components
-- **@hookform/resolvers**: Form validation integration
-- **wouter**: Lightweight client-side routing
-- **lucide-react**: Icon library
-
-### Development Dependencies
-- **vite**: Fast build tool and development server
-- **tailwindcss**: Utility-first CSS framework
-- **typescript**: Type safety and development experience
-- **tsx**: TypeScript execution for development
-
-## Deployment Strategy
-
-### Development Environment
-- Replit-based development with hot reload
-- PostgreSQL database provisioned via Replit modules
-- File uploads stored in local `uploads` directory
-- Environment variables for database connection and encryption keys
-
-### Production Configuration
-- Vite build process for optimized frontend bundle
-- ESBuild for server-side code compilation
-- Static file serving from `dist/public` directory
-- Database migrations via Drizzle Kit
-
-### Environment Variables
-- `DATABASE_URL`: PostgreSQL connection string
-- `DASHBOARD_PASSWORD`: Authentication password (defaults to 'admin123')
-- `ENCRYPTION_KEY`: AES encryption key for data protection
-
-## Changelog
-
-Changelog:
-- June 13, 2025. Initial setup
-- June 14, 2025. Fixed database connection issues and document upload functionality:
-  - Created PostgreSQL database to resolve DATABASE_URL errors
-  - Fixed API endpoint mismatch between frontend and backend for document uploads
-  - Updated file filter to accept CSV, Excel, and text files in document uploads
-  - Resolved data structure mismatch in document display interface
-  - Enhanced CSV field mapping interface with improved user experience:
-    * Added CSV columns preview section showing all detected headers
-    * Separated required and optional fields for better organization
-    * Improved visual feedback with color-coded status indicators
-    * Added better field mapping validation and user guidance
-    * Fixed display issues in dropdown selections
-  - Application now fully functional with working CSV campaign uploads and document management
-- June 14, 2025. Transformed dashboard into cute dog-themed interface (later removed):
-  - Complete UI redesign with dog lover aesthetic using pink, orange, and yellow color scheme
-  - Replaced all text with dog-themed terminology (campaigns = pups, files = treats, etc.)
-  - Added paw print icons and dog emojis throughout the interface
-  - Removed settings tab as requested by user
-  - Updated dashboard header with "Pawsome Campaign Hub" branding
-  - Redesigned navigation tabs: Home, Treats (Files), Diary (Notes)
-  - Enhanced campaign list with dog-themed language and cute interactions
-  - Updated CSV upload component with playful dog terminology
-  - Transformed notes/documents section into "Pup Diary & Memory Box"
-- June 14, 2025. Reverted dog theme back to professional interface:
-  - Restored clean, professional design with blue and slate color scheme
-  - Removed all dog-themed terminology and emojis
-  - Restored standard professional language throughout all components
-  - Maintained settings tab removal as originally requested
-  - Dashboard header back to "Campaign Manager" with professional branding
-  - Navigation tabs restored to: Overview, Files, Notes
-  - All components now feature clean, business-appropriate aesthetic while maintaining full functionality
-- June 14, 2025. Enhanced SPA routing implementation:
-  - Fixed CSV field mapping dropdown selection issues with z-index adjustments
-  - Replaced traditional anchor tags with smooth scrolling for landing page navigation
-  - Ensured all navigation uses wouter's setLocation for seamless SPA experience
-  - Added manual override tracking to prevent auto-detection conflicts in field mapping
-  - All page transitions now occur without reloads, maintaining application state
-- June 14, 2025. Implemented strict session-based authentication:
-  - Replaced persistent localStorage authentication with session-only access
-  - Dashboard access now requires fresh authentication via 5-click trigger
-  - Direct dashboard URLs automatically redirect to landing page
-  - Browser refresh clears authentication state, requiring re-authentication
-  - Added ProtectedRoute component to guard all dashboard and campaign routes
-- June 14, 2025. Made application extremely easy to deploy anywhere:
-  - Added comprehensive Docker support with multi-stage builds and health checks
-  - Created platform-specific deployment configurations (Railway, Heroku, Render, Vercel, Fly.io)
-  - Built universal installation scripts for Linux/macOS (install.sh) and Windows (install.bat)
-  - Added automated deployment scripts (deploy.sh, deploy.bat) with database setup
-  - Implemented health check endpoint (/api/health) for monitoring and deployment verification
-  - Made email service (Brevo) optional to prevent deployment failures
-  - Created comprehensive deployment documentation with one-click deployment options
-  - Added environment variable templates (.env.example) with secure defaults
-  - Optimized for cloud platforms with automatic database migrations and configuration
+### Migration to Replit Environment (August 10, 2025)
+- ✓ Updated database configuration from Neon to standard PostgreSQL
+- ✓ Installed required PostgreSQL dependencies (`pg` package)
+- ✓ Successfully pushed database schema with `drizzle-kit push`
+- ✓ Verified application startup and database connectivity
+- ✓ Confirmed all core functionality is working
 
 ## User Preferences
 
-Preferred communication style: Simple, everyday language.
+*(None specified yet)*
+
+## Key Features
+
+1. **Secure Authentication**: Dashboard access with configurable password
+2. **Campaign Management**: Create and manage campaigns with encrypted data
+3. **File Upload**: Support for CSV and document uploads
+4. **Contact Management**: Handle contact information and email tracking
+5. **Data Encryption**: Built-in encryption for sensitive data
+6. **Responsive UI**: Modern interface with dark/light theme support
+
+## Environment Configuration
+
+- Default dashboard password: `admin123` (configurable via `DASHBOARD_PASSWORD`)
+- Database: PostgreSQL via `DATABASE_URL`
+- Development server runs on port 5000
+
+## Development Notes
+
+- Uses Vite for frontend development with HMR
+- TypeScript throughout the stack for type safety
+- Drizzle ORM for database operations
+- shadcn/ui component library for consistent UI
