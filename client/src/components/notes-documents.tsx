@@ -18,9 +18,9 @@ export default function NotesDocuments() {
   const queryClient = useQueryClient();
   const { isConnected, typingUsers, handleTyping } = useWebSocket();
 
-  // Debug typing users
+  // Auto-scroll when typing users change
   useEffect(() => {
-    console.log('Typing users state changed:', typingUsers);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [typingUsers]);
 
   const { data: notes = [] } = useQuery({

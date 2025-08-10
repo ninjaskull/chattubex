@@ -8,13 +8,15 @@ import {
   Database, 
   LogOut, 
   FolderOpen, 
-  MessageSquare
+  MessageSquare,
+  Dog
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearAuth } from "@/lib/auth";
 import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
+import PawMate from "@/components/pawmate";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -66,7 +68,7 @@ export default function Dashboard() {
       {/* Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:w-fit lg:grid-cols-2 bg-white/60 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Files</span>
@@ -74,6 +76,10 @@ export default function Dashboard() {
             <TabsTrigger value="notes" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Notes</span>
+            </TabsTrigger>
+            <TabsTrigger value="pawmate" className="flex items-center gap-2">
+              <Dog className="h-4 w-4" />
+              <span className="hidden sm:inline">PawMate</span>
             </TabsTrigger>
           </TabsList>
 
@@ -89,6 +95,10 @@ export default function Dashboard() {
             <NotesDocuments />
           </TabsContent>
 
+          {/* PawMate Tab */}
+          <TabsContent value="pawmate" className="mt-6">
+            <PawMate />
+          </TabsContent>
 
         </Tabs>
       </div>
