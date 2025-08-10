@@ -241,7 +241,7 @@ export default function PawMate() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4">
+    <div className="max-w-6xl mx-auto space-y-6">
       {/* Settings Dialog */}
       <div className="flex justify-end">
         <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -290,55 +290,34 @@ export default function PawMate() {
           </Dialog>
       </div>
 
-      {/* Pet Profile Card - Only show if pet is configured */}
-      {petName && (
-        <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-md">
-                <span className="text-xl">{getPetIcon(petType)}</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900 text-lg">{petName}</h3>
-                <p className="text-sm text-slate-600 capitalize">Your adorable {petType}</p>
-              </div>
-              <div className="ml-auto">
-                <div className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  Online
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Advanced Chat Interface */}
       <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-xl">
-        <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 border-b border-orange-100 py-4">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 border-b border-orange-100 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-md">
-                <span className="text-lg">{getPetIcon(petType)}</span>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-2xl">{getPetIcon(petType)}</span>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-orange-600">PawMate AI</h3>
-                <p className="text-xs text-slate-500">Your intelligent companion for pet care and fun!</p>
+                <h3 className="text-xl font-bold text-slate-900">{petName || 'Duggu'}</h3>
+                <p className="text-sm text-slate-600 capitalize">
+                  {petName ? `Your Adorable ${petType}` : 'Your Lead Scoring Assistant'}
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-                WizardLM-2 8x22B
+            <div className="flex items-center gap-3">
+              <span className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
+                Lead Scoring AI
               </span>
-              <div className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+              <div className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-3 py-1 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                Active
+                Online
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={clearChatHistory}
-                className="text-xs px-2 py-1 h-6 text-slate-500 hover:text-slate-700"
+                className="text-xs px-3 py-1 h-7 text-slate-500 hover:text-slate-700"
                 title="Start new conversation"
               >
                 New Chat
@@ -349,7 +328,7 @@ export default function PawMate() {
         
         <CardContent className="p-0">
           {/* Messages Container */}
-          <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50/50 to-white">
+          <div className="h-[600px] overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-slate-50/50 to-white">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -357,7 +336,7 @@ export default function PawMate() {
                   message.type === 'user' ? 'flex-row-reverse' : ''
                 }`}
               >
-                <Avatar className={`h-8 w-8 ${message.type === 'user' ? 'ring-2 ring-blue-200' : ''}`}>
+                <Avatar className={`h-10 w-10 ${message.type === 'user' ? 'ring-2 ring-blue-200' : ''}`}>
                   <AvatarFallback className={
                     message.type === 'user' 
                       ? "bg-blue-100 text-blue-600" 
@@ -371,7 +350,7 @@ export default function PawMate() {
                   </AvatarFallback>
                 </Avatar>
                 
-                <div className={`flex-1 max-w-xs sm:max-w-md ${message.type === 'user' ? 'text-right' : ''}`}>
+                <div className={`flex-1 max-w-sm sm:max-w-lg ${message.type === 'user' ? 'text-right' : ''}`}>
                   <div className={`rounded-lg p-3 shadow-sm ${
                     message.type === 'user'
                       ? 'bg-blue-500 text-white ml-auto'
@@ -446,14 +425,14 @@ export default function PawMate() {
           </div>
 
           {/* Message Input */}
-          <div className="p-4 border-t bg-white/50 backdrop-blur-sm">
-            <div className="flex gap-2">
+          <div className="p-6 border-t bg-white/50 backdrop-blur-sm">
+            <div className="flex gap-4">
               <div className="flex-1 relative">
                 <Textarea
-                  placeholder={`Ask PawMate anything about ${petName || 'your pet'}...`}
+                  placeholder="Ask about lead scoring, contact analysis, or campaign optimization..."
                   value={petMessage}
                   onChange={(e) => setPetMessage(e.target.value)}
-                  className="resize-none min-h-[50px] max-h-32 pr-12 border-slate-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                  className="resize-none min-h-[60px] max-h-32 pr-14 border-slate-300 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 text-base"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -466,14 +445,14 @@ export default function PawMate() {
                   onClick={handleSendMessage}
                   disabled={!petMessage.trim() || isTyping}
                   size="sm"
-                  className="absolute right-2 bottom-2 h-8 w-8 p-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  className="absolute right-3 bottom-3 h-10 w-10 p-0 rounded-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg"
                   data-testid="button-send-chat"
                 >
-                  <Send className="h-3 w-3" />
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
+            <p className="text-xs text-slate-500 mt-3">Press Enter to send, Shift+Enter for new line</p>
           </div>
         </CardContent>
       </Card>
