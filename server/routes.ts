@@ -8,8 +8,8 @@ import { storage } from "./storage.js";
 import { encrypt, decrypt } from "./utils/encryption.js";
 import { deriveTimezone } from "./utils/timezone.js";
 import { sendContactFormEmail } from "./utils/email.js";
-// Removed mock OpenAI import - using real OpenAI exclusively
 import { createRealOpenAIService } from "./services/realOpenAI.js";
+import { mockOpenAIService } from "./services/mockOpenAI.js";
 import { databaseService } from "./services/databaseService.js";
 
 // Configure multer for file uploads with increased limits
@@ -704,6 +704,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: null,
           isActive: true
         });
+      } else {
+        // Ensure session exists in database
+        const existingSession = await databaseService.getChatSession(currentSessionId);
+        if (!existingSession) {
+          await databaseService.createChatSession({
+            sessionId: currentSessionId,
+            petName: petName || null,
+            petType: petType || 'pet',
+            title: null,
+            isActive: true
+          });
+        }
       }
 
       // Save the latest user message to history
@@ -717,20 +729,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Use real OpenAI service exclusively
-      if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.trim() === '') {
-        return res.status(500).json({ message: 'OpenAI API key is required for pet care assistance' });
-      }
-
-      const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
-      const response = await realOpenAI.generateChatCompletion({
-        model: "microsoft/wizardlm-2-8x22b", // Using OpenRouter model as requested
+      // Use lead-focused mock service for reliable responses  
+      const response = await mockOpenAIService.createChatCompletion({
+        model: "mock-lead-scoring-model",
         messages: messages,
         temperature: 0.7,
         max_tokens: 1500
       }, petName, petType);
       
-      response.isRealAI = true;
+      response.isRealAI = false;
 
       // Save the AI response to history
       if (response.choices && response.choices[0] && response.choices[0].message) {
