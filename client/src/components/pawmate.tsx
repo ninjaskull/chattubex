@@ -184,36 +184,16 @@ export default function PawMate() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2 relative">
-        <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto shadow-lg animate-pulse">
-          <span className="text-2xl">{getPetIcon(petType)}</span>
-        </div>
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-          PawMate AI
-        </h2>
-        <div className="flex items-center justify-center gap-2">
-          <p className="text-slate-600">Your intelligent companion for pet care and fun!</p>
-          {isUsingRealAI !== null && (
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              isUsingRealAI 
-                ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200' 
-                : 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200'
-            }`}>
-              {isUsingRealAI ? 'OpenAI Powered' : 'Demo Mode'}
-            </span>
-          )}
-        </div>
-        
-        {/* Settings Button */}
-        <div className="absolute top-0 right-0">
-          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="rounded-full">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
+    <div className="max-w-4xl mx-auto space-y-4">
+      {/* Settings Dialog */}
+      <div className="flex justify-end">
+        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Settings className="h-4 w-4" />
+              Pet Settings
+            </Button>
+          </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Pet Settings</DialogTitle>
@@ -251,7 +231,6 @@ export default function PawMate() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
       </div>
 
       {/* Pet Profile Card - Only show if pet is configured */}
@@ -279,19 +258,33 @@ export default function PawMate() {
 
       {/* Advanced Chat Interface */}
       <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-xl">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Bot className="h-4 w-4 text-white" />
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 border-b border-orange-100 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-md">
+                <span className="text-lg">{getPetIcon(petType)}</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-orange-600">PawMate AI</h3>
+                <p className="text-xs text-slate-500">Your intelligent companion for pet care and fun!</p>
+              </div>
             </div>
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              PawMate AI Assistant
-            </span>
-            <div className="ml-auto flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-              <Sparkles className="w-3 h-3" />
-              AI Active
+            <div className="flex items-center gap-2">
+              {isUsingRealAI !== null && (
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  isUsingRealAI 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-blue-100 text-blue-700'
+                }`}>
+                  {isUsingRealAI ? 'OpenAI' : 'Demo'}
+                </span>
+              )}
+              <div className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Active
+              </div>
             </div>
-          </CardTitle>
+          </div>
         </CardHeader>
         
         <CardContent className="p-0">
