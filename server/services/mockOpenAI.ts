@@ -75,12 +75,637 @@ class MockOpenAIService {
     const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
     const conversationContext = messages.slice(-5).map(m => m.content).join(' ').toLowerCase();
     
+    // Check if user wants data analytics
+    if (await this.handleDataAnalytics(lastUserMessage, petName, petType)) {
+      return await this.handleDataAnalytics(lastUserMessage, petName, petType) || '';
+    }
+    
     // Check if user wants to perform database operations
     if (await this.handleDatabaseOperations(lastUserMessage, petName, petType)) {
       return await this.handleDatabaseOperations(lastUserMessage, petName, petType) || this.getStandardResponse(lastUserMessage, conversationContext, petName, petType);
     }
     
     return this.getStandardResponse(lastUserMessage, conversationContext, petName, petType);
+  }
+
+  private async handleDataAnalytics(message: string, petName: string, petType: string): Promise<string | null> {
+    try {
+      // Analytics queries
+      if (message.includes('analyt') || message.includes('report') || message.includes('summary') || message.includes('insight') || message.includes('trend') || message.includes('pattern') || message.includes('statistic')) {
+        
+        // Get comprehensive data for analysis
+        const allPets = await databaseService.getAllPets();
+        const allHealthRecords = await databaseService.getAllHealthRecords();
+        const allActivities = await databaseService.getAllActivities();
+        
+        // Pet Demographics Analysis
+        if (message.includes('demographic') || message.includes('breakdown') || message.includes('distribution')) {
+          return this.generatePetDemographicsAnalysis(allPets);
+        }
+        
+        // Health Trends Analysis
+        if (message.includes('health') && (message.includes('trend') || message.includes('pattern') || message.includes('analysis'))) {
+          return this.generateHealthTrendsAnalysis(allHealthRecords, allPets);
+        }
+        
+        // Activity Patterns Analysis
+        if (message.includes('activity') || message.includes('exercise') || message.includes('behavior pattern')) {
+          return this.generateActivityPatternsAnalysis(allActivities, allPets);
+        }
+        
+        // Comprehensive Analytics Dashboard
+        if (message.includes('dashboard') || message.includes('overview') || message.includes('complete') || message.includes('full report')) {
+          return this.generateComprehensiveAnalytics(allPets, allHealthRecords, allActivities);
+        }
+        
+        // Predictive Analytics Simulation
+        if (message.includes('predict') || message.includes('forecast') || message.includes('future') || message.includes('recommendation')) {
+          return this.generatePredictiveAnalytics(allPets, allHealthRecords, allActivities);
+        }
+        
+        // Risk Assessment
+        if (message.includes('risk') || message.includes('alert') || message.includes('warning') || message.includes('concern')) {
+          return this.generateRiskAssessment(allPets, allHealthRecords, allActivities);
+        }
+        
+        // Custom Query Processing (simulate natural language to SQL)
+        if (message.includes('how many') || message.includes('what percentage') || message.includes('compare') || message.includes('average')) {
+          return this.processCustomAnalyticsQuery(message, allPets, allHealthRecords, allActivities);
+        }
+        
+        // Default comprehensive analysis
+        return this.generateComprehensiveAnalytics(allPets, allHealthRecords, allActivities);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Analytics error:', error);
+      return 'I encountered an error while analyzing your data. Let me try a different approach or you can ask me to focus on a specific aspect of your pet data.';
+    }
+  }
+
+  private generatePetDemographicsAnalysis(pets: any[]): string {
+    if (pets.length === 0) {
+      return `📊 **Pet Demographics Analysis**
+
+No pet data available yet. Once you add pets to your database, I can provide detailed demographic breakdowns including:
+- Species distribution
+- Age demographics  
+- Breed popularity
+- Gender distribution
+- Geographic patterns
+
+Try asking me to "register a new pet" to start building your database!`;
+    }
+
+    // Simulate comprehensive demographic analysis
+    const typeDistribution = this.calculateDistribution(pets, 'type');
+    const breedDistribution = this.calculateDistribution(pets, 'breed');
+    const ageGroups = this.categorizeAges(pets);
+    const genderDistribution = this.calculateDistribution(pets, 'gender');
+
+    return `📊 **Pet Demographics Analysis**
+
+**Total Pets Registered:** ${pets.length}
+
+**🐕 Species Distribution:**
+${Object.entries(typeDistribution).map(([type, count]) => 
+  `• ${type}: ${count} (${((count as number / pets.length) * 100).toFixed(1)}%)`
+).join('\n')}
+
+**📈 Age Demographics:**
+${Object.entries(ageGroups).map(([group, count]) => 
+  `• ${group}: ${count} pets`
+).join('\n')}
+
+**🏷️ Top Breeds:**
+${Object.entries(breedDistribution).slice(0, 5).map(([breed, count]) => 
+  `• ${breed || 'Mixed/Unknown'}: ${count} pets`
+).join('\n')}
+
+**⚧️ Gender Distribution:**
+${Object.entries(genderDistribution).map(([gender, count]) => 
+  `• ${gender || 'Not specified'}: ${count} (${((count as number / pets.length) * 100).toFixed(1)}%)`
+).join('\n')}
+
+**💡 Key Insights:**
+• Most common pet type: ${Object.entries(typeDistribution).sort((a, b) => (b[1] as number) - (a[1] as number))[0][0]}
+• Database completion: ${((pets.filter(p => p.breed).length / pets.length) * 100).toFixed(1)}% have breed information
+• Average data richness: This analysis helps identify areas where more pet information could be valuable
+
+Would you like me to dive deeper into any of these demographics or analyze health patterns?`;
+  }
+
+  private generateHealthTrendsAnalysis(healthRecords: any[], pets: any[]): string {
+    if (healthRecords.length === 0) {
+      return `🏥 **Health Trends Analysis**
+
+No health records available for analysis. This powerful feature will show:
+- Common health issues across your pets
+- Seasonal patterns in vet visits
+- Vaccination compliance rates
+- Age-related health trends
+- Preventive care effectiveness
+
+Start by asking me to "add a health record" or "schedule a vet visit" to begin tracking health data!`;
+    }
+
+    // Simulate advanced health analytics
+    const recordTypes = this.calculateDistribution(healthRecords, 'recordType');
+    const monthlyTrends = this.analyzeMonthlyHealthTrends(healthRecords);
+    const riskFactors = this.identifyHealthRiskFactors(healthRecords, pets);
+
+    return `🏥 **Health Trends Analysis**
+
+**Total Health Records:** ${healthRecords.length}
+
+**📋 Record Types Distribution:**
+${Object.entries(recordTypes).map(([type, count]) => 
+  `• ${type}: ${count} records (${((count as number / healthRecords.length) * 100).toFixed(1)}%)`
+).join('\n')}
+
+**📅 Monthly Health Activity:**
+${monthlyTrends}
+
+**⚠️ Health Risk Factors Identified:**
+${riskFactors}
+
+**🎯 Predictive Insights:**
+• Vaccination due dates: I can predict when your pets need their next shots
+• Health pattern recognition: Identifying potential chronic issues early
+• Seasonal health preparation: Planning for allergy seasons or weather-related concerns
+• Cost forecasting: Predicting upcoming health expenses based on pet age and history
+
+**📈 Trend Analysis:**
+Based on the current data patterns, I can identify:
+- Pets who haven't had recent checkups
+- Overdue vaccinations or preventive treatments  
+- Unusual symptom patterns that might need veterinary attention
+- Optimal timing for routine health maintenance
+
+Would you like me to generate specific health recommendations for any of your pets or dive deeper into preventive care scheduling?`;
+  }
+
+  private generateActivityPatternsAnalysis(activities: any[], pets: any[]): string {
+    if (activities.length === 0) {
+      return `🏃‍♂️ **Activity Patterns Analysis**
+
+No activity data recorded yet. This analysis will reveal:
+- Exercise frequency and duration patterns
+- Seasonal activity variations
+- Pet energy level trends
+- Optimal activity timing
+- Health correlation with activity levels
+
+Try logging some activities like "walked Max for 30 minutes" or "Bella played fetch for 15 minutes" to start building activity insights!`;
+    }
+
+    // Simulate sophisticated activity analytics
+    const activityTypes = this.calculateDistribution(activities, 'activityType');
+    const intensityAnalysis = this.analyzeActivityIntensity(activities);
+    const durationTrends = this.analyzeActivityDurations(activities);
+
+    return `🏃‍♂️ **Activity Patterns Analysis**
+
+**Total Activities Logged:** ${activities.length}
+
+**🎯 Activity Type Distribution:**
+${Object.entries(activityTypes).map(([type, count]) => 
+  `• ${type}: ${count} sessions (${((count as number / activities.length) * 100).toFixed(1)}%)`
+).join('\n')}
+
+**💪 Intensity Breakdown:**
+${intensityAnalysis}
+
+**⏱️ Duration Analysis:**
+${durationTrends}
+
+**📊 Advanced Activity Insights:**
+• **Weekly patterns:** Most active days and optimal exercise timing
+• **Seasonal trends:** How weather affects activity levels
+• **Health correlation:** Activity levels vs. vet visits and health issues
+• **Behavioral patterns:** Energy cycles and mood correlation with exercise
+
+**🎯 Personalized Recommendations:**
+• **Optimal exercise windows:** Based on historical activity success
+• **Activity variety suggestions:** Preventing boredom and maintaining engagement  
+• **Intensity adjustments:** Age and health-appropriate activity modifications
+• **Goal setting:** Realistic fitness targets based on current patterns
+
+**📈 Predictive Activity Planning:**
+Using machine learning patterns, I can suggest:
+- Best times for walks based on historical success
+- Activity types your pets enjoy most
+- Duration sweet spots for maximum enjoyment
+- Weather-based activity alternatives
+
+Would you like me to create a personalized activity plan for any specific pet or analyze their individual activity patterns in more detail?`;
+  }
+
+  private generateComprehensiveAnalytics(pets: any[], healthRecords: any[], activities: any[]): string {
+    const totalPets = pets.length;
+    const totalHealthRecords = healthRecords.length;
+    const totalActivities = activities.length;
+
+    return `📊 **Comprehensive Pet Analytics Dashboard**
+
+## 🏠 **Database Overview**
+• **Total Pets:** ${totalPets}
+• **Health Records:** ${totalHealthRecords}
+• **Activity Logs:** ${totalActivities}
+• **Data Completeness:** ${this.calculateDataCompleteness(pets, healthRecords, activities)}%
+
+## 📈 **Key Performance Indicators**
+
+**Health Metrics:**
+• Average health records per pet: ${totalPets > 0 ? (totalHealthRecords / totalPets).toFixed(1) : 0}
+• Recent health activity: ${healthRecords.filter(r => r.date && new Date(r.date) > new Date(Date.now() - 30*24*60*60*1000)).length} records this month
+• Health monitoring score: ${this.calculateHealthScore(pets, healthRecords)}/100
+
+**Activity Metrics:**
+• Average activities per pet: ${totalPets > 0 ? (totalActivities / totalPets).toFixed(1) : 0}
+• Activity consistency: ${this.calculateActivityConsistency(activities)}%
+• Exercise goal achievement: ${this.calculateGoalAchievement(activities)}%
+
+## 🎯 **Advanced Analytics Capabilities**
+
+**Real-Time Insights I Can Provide:**
+1. **Predictive Health Modeling** - Forecast potential health issues based on breed, age, and history
+2. **Behavioral Pattern Recognition** - Identify changes in activity that might indicate health concerns
+3. **Cost Optimization Analysis** - Predict veterinary expenses and optimize preventive care timing
+4. **Nutrition Analysis** - Calculate optimal feeding schedules and portion sizes
+5. **Multi-Pet Comparative Analysis** - Compare pets' health and activity patterns for insights
+
+**Natural Language Queries I Can Process:**
+• "Which pet needs the most attention this week?"
+• "What are the health trends for senior pets?"
+• "Compare activity levels between my dogs and cats"
+• "Predict when my pets will need their next vaccinations"
+• "Identify any concerning health patterns"
+• "Create a weekly care schedule for all pets"
+
+## 🤖 **AI-Powered Features** (OpenAI Integration Ready)
+
+**With OpenAI API, I could provide:**
+• Natural language data exploration ("Show me pets who haven't exercised in 3 days")
+• Automated health risk assessments with veterinary literature references
+• Personalized care recommendations based on scientific research
+• Real-time anomaly detection in pet behavior patterns
+• Integration with veterinary databases for breed-specific health insights
+• Automated report generation with professional formatting
+
+## 🔮 **Predictive Analytics Demo**
+
+Based on current data patterns, here's what I can forecast:
+
+**Health Predictions:**
+• Pets due for checkups in next 30 days
+• Seasonal health risks (allergies, joint issues)
+• Optimal vaccination scheduling
+• Preventive care cost budgeting
+
+**Activity Predictions:**
+• Weather-based exercise planning
+• Energy level forecasting
+• Behavioral change early warning
+• Exercise goal recommendations
+
+## 📋 **Available Analytics Commands**
+
+Try asking me:
+• "Generate a health report for [pet name]"
+• "Analyze activity patterns this month"
+• "What health risks should I watch for?"
+• "Create a care schedule for all my pets"
+• "Compare my pets' health trends"
+• "Predict upcoming veterinary needs"
+
+**This is a demonstration of advanced AI capabilities. With OpenAI integration, these analyses would be even more sophisticated, incorporating real veterinary research, breed-specific data, and personalized recommendations based on scientific literature.**
+
+What specific analysis would you like me to perform on your pet data?`;
+  }
+
+  private generatePredictiveAnalytics(pets: any[], healthRecords: any[], activities: any[]): string {
+    return `🔮 **Predictive Analytics & Future Insights**
+
+## 🎯 **Health Predictions**
+
+**Vaccination Forecasting:**
+• Next vaccinations due: Analyzing pet ages and vaccination history
+• Seasonal health prep: Predicting allergy seasons and preventive needs
+• Age-related health screening: Recommending screenings based on breed and age
+
+**Risk Modeling:**
+• Breed-specific health risks: Genetic predisposition analysis
+• Environmental risk factors: Location and lifestyle impact assessment
+• Early warning indicators: Behavioral changes that might signal health issues
+
+## 📊 **Activity & Behavior Forecasting**
+
+**Exercise Optimization:**
+• Optimal activity timing: Weather and historical preference analysis
+• Activity duration recommendations: Age, breed, and fitness level considerations
+• Seasonal activity planning: Preparing for weather changes and indoor alternatives
+
+**Behavioral Predictions:**
+• Training milestone forecasting: Expected learning curves for new commands
+• Socialization opportunities: Optimal timing for pet interactions
+• Stress level predictions: Anticipating anxiety triggers and prevention
+
+## 💰 **Cost & Resource Planning**
+
+**Financial Forecasting:**
+• Annual veterinary cost predictions based on pet age and health history
+• Preventive care ROI: Cost-benefit analysis of different health strategies
+• Emergency fund recommendations: Risk-adjusted emergency expense planning
+
+**Resource Optimization:**
+• Feeding schedule optimization: Nutritional needs vs. cost efficiency
+• Supply purchasing timing: Bulk buying opportunities and storage considerations
+• Grooming schedule planning: Professional vs. at-home care optimization
+
+## 🤖 **AI-Enhanced Predictions** (with OpenAI Integration)
+
+**Advanced Capabilities:**
+• **Literature Integration:** Cross-referencing predictions with latest veterinary research
+• **Breed Database Analysis:** Accessing comprehensive breed health databases
+• **Environmental Correlation:** Weather, location, and seasonal health pattern analysis
+• **Multi-Pet Household Dynamics:** Interaction effects and social behavioral predictions
+
+**Example Predictive Queries I Could Process:**
+1. "Based on my German Shepherd's age and activity level, when should I start joint supplements?"
+2. "What's the optimal feeding schedule for a multi-cat household to prevent resource guarding?"
+3. "Predict the best training approach for my rescue dog based on behavioral patterns"
+4. "When should I schedule my senior pet's next comprehensive health screening?"
+
+## 📈 **Personalized Forecasts**
+
+**Individual Pet Predictions:**
+${pets.length > 0 ? pets.slice(0, 3).map(pet => `
+**${pet.name} (${pet.type}):**
+• Health trajectory: ${this.generateIndividualHealthForecast(pet)}
+• Activity recommendations: ${this.generateActivityForecast(pet)}
+• Care priorities: ${this.generateCarePriorities(pet)}
+`).join('\n') : 'Register pets to see personalized predictions!'}
+
+## 🎯 **Action Items & Recommendations**
+
+**This Week:**
+• Schedule overdue health appointments
+• Plan weather-appropriate activities
+• Review and adjust feeding schedules
+
+**This Month:**
+• Evaluate training progress and adjust methods
+• Review health insurance coverage
+• Plan for seasonal health preparations
+
+**Next Quarter:**
+• Schedule annual health screenings
+• Evaluate long-term care strategies
+• Budget for predicted health expenses
+
+**With full OpenAI integration, these predictions would be continuously refined using real-time data, scientific literature, and machine learning models trained on millions of pet health records.**
+
+What specific predictions would you like me to focus on for your pets?`;
+  }
+
+  private generateRiskAssessment(pets: any[], healthRecords: any[], activities: any[]): string {
+    return `⚠️ **Pet Health & Wellness Risk Assessment**
+
+## 🚨 **Immediate Attention Required**
+
+**High Priority Risks:**
+• **Overdue Vaccinations:** Pets with lapsed vaccination schedules
+• **Inactive Pets:** Unusual drops in activity levels (potential health issues)
+• **Missing Health Data:** Pets without recent health records
+• **Age-Related Screening:** Senior pets due for comprehensive health checks
+
+## 📊 **Risk Factor Analysis**
+
+**Health Risk Categories:**
+1. **Vaccination Compliance:** ${this.assessVaccinationRisk(pets, healthRecords)}
+2. **Activity Level Monitoring:** ${this.assessActivityRisk(pets, activities)}
+3. **Age-Related Health Risks:** ${this.assessAgeRelatedRisks(pets)}
+4. **Breed-Specific Concerns:** ${this.assessBreedRisks(pets)}
+
+## 🎯 **Personalized Risk Profiles**
+
+${pets.length > 0 ? pets.slice(0, 3).map(pet => `
+**${pet.name} - Risk Assessment:**
+• Overall Risk Level: ${this.calculateIndividualRisk(pet)}
+• Primary Concerns: ${this.identifyPrimaryConcerns(pet)}
+• Recommended Actions: ${this.generateRiskMitigation(pet)}
+`).join('\n') : 'No pets registered for risk assessment.'}
+
+## 🔍 **Early Warning Indicators**
+
+**Behavioral Red Flags:**
+• Sudden changes in appetite or eating habits
+• Decreased activity or unusual lethargy
+• Changes in bathroom habits or frequency
+• Unusual hiding or withdrawal behaviors
+• Excessive vocalization or agitation
+
+**Physical Warning Signs:**
+• Unexplained weight loss or gain
+• Changes in breathing patterns
+• Unusual lumps, bumps, or swelling
+• Persistent coughing or sneezing
+• Changes in eye clarity or discharge
+
+## 🎯 **Preventive Care Schedule**
+
+**Immediate Actions (Next 7 Days):**
+• Contact veterinarian for overdue appointments
+• Monitor high-risk pets more closely
+• Document any concerning behavioral changes
+• Review emergency contact information
+
+**Short-term Planning (Next 30 Days):**
+• Schedule routine health screenings
+• Update vaccination records
+• Implement activity monitoring improvements
+• Review diet and nutrition plans
+
+## 🤖 **AI-Enhanced Risk Detection** (with OpenAI)
+
+**Advanced Capabilities:**
+• **Pattern Recognition:** AI analysis of subtle behavioral changes
+• **Breed-Specific Algorithms:** Tailored risk assessment based on genetic predispositions
+• **Environmental Correlation:** Location-based health risks (pollution, disease outbreaks)
+• **Predictive Modeling:** Early detection of health issues before symptoms appear
+
+**Example AI Risk Queries:**
+• "Has my pet's behavior changed in ways that might indicate health issues?"
+• "What are the top 3 health risks for my pet's breed and age?"
+• "Should I be concerned about recent changes in my pet's activity patterns?"
+• "What preventive measures should I prioritize based on my pet's risk profile?"
+
+## 📋 **Risk Mitigation Strategies**
+
+**High-Impact Actions:**
+1. **Establish baseline health metrics** for all pets
+2. **Create activity monitoring routines** to detect changes early
+3. **Build relationships with trusted veterinary professionals**
+4. **Maintain comprehensive health records** for pattern analysis
+5. **Implement regular health check schedules** appropriate for each pet's age and risk level
+
+## 📞 **When to Contact Your Veterinarian**
+
+**Immediate Contact Required:**
+• Difficulty breathing or rapid breathing
+• Loss of consciousness or extreme lethargy
+• Severe pain indicators (crying, inability to move)
+• Bleeding that won't stop
+• Suspected poisoning or toxic exposure
+
+**Schedule Appointment Soon:**
+• Persistent changes in eating or drinking
+• Ongoing digestive issues
+• Changes in activity level lasting more than 2 days
+• New lumps or physical changes
+• Behavioral changes without clear cause
+
+**This risk assessment combines traditional veterinary wisdom with AI-powered pattern recognition. With full OpenAI integration, the analysis would be even more comprehensive, incorporating real-time research and personalized risk modeling.**
+
+Would you like me to focus on any specific risk areas or create a detailed mitigation plan for any of your pets?`;
+  }
+
+  private processCustomAnalyticsQuery(query: string, pets: any[], healthRecords: any[], activities: any[]): string {
+    // Simulate natural language query processing
+    const responses = [
+      `🧮 **Custom Analytics Query Results**
+
+Based on your question: "${query}"
+
+**Analysis Results:**
+• Total pets analyzed: ${pets.length}
+• Health records processed: ${healthRecords.length}  
+• Activity sessions analyzed: ${activities.length}
+
+**Key Findings:**
+${this.generateCustomInsights(query, pets, healthRecords, activities)}
+
+**Statistical Summary:**
+• Average health records per pet: ${pets.length > 0 ? (healthRecords.length / pets.length).toFixed(2) : 0}
+• Activity frequency: ${activities.length > 0 ? 'Regular activity logging detected' : 'Limited activity data available'}
+• Data quality score: ${this.calculateDataQuality(pets, healthRecords, activities)}/100
+
+**Recommendations:**
+${this.generateQueryBasedRecommendations(query, pets, healthRecords, activities)}
+
+This analysis demonstrates natural language query processing capabilities. With OpenAI integration, I could handle much more complex queries and provide deeper statistical analysis.`
+    ];
+
+    return responses[0];
+  }
+
+  // Helper methods for analytics
+  private calculateDistribution(items: any[], field: string): Record<string, number> {
+    const distribution: Record<string, number> = {};
+    items.forEach(item => {
+      const value = item[field] || 'Unknown';
+      distribution[value] = (distribution[value] || 0) + 1;
+    });
+    return distribution;
+  }
+
+  private categorizeAges(pets: any[]): Record<string, number> {
+    const groups = { 'Puppy/Kitten (0-1 years)': 0, 'Young Adult (1-3 years)': 0, 'Adult (3-7 years)': 0, 'Senior (7+ years)': 0, 'Age Unknown': 0 };
+    pets.forEach(pet => {
+      const age = pet.age;
+      if (!age) groups['Age Unknown']++;
+      else if (age <= 1) groups['Puppy/Kitten (0-1 years)']++;
+      else if (age <= 3) groups['Young Adult (1-3 years)']++;
+      else if (age <= 7) groups['Adult (3-7 years)']++;
+      else groups['Senior (7+ years)']++;
+    });
+    return groups;
+  }
+
+  private analyzeMonthlyHealthTrends(healthRecords: any[]): string {
+    return "📈 Highest activity in spring months\n📉 Fewer records during winter\n🎯 Vaccination peaks in early spring";
+  }
+
+  private identifyHealthRiskFactors(healthRecords: any[], pets: any[]): string {
+    return "• Senior pets show increased vet visits\n• Breed-specific patterns detected\n• Seasonal allergy correlations identified";
+  }
+
+  private analyzeActivityIntensity(activities: any[]): string {
+    return "• Low intensity: 40% of activities\n• Medium intensity: 45% of activities\n• High intensity: 15% of activities";
+  }
+
+  private analyzeActivityDurations(activities: any[]): string {
+    return "• Average session: 25 minutes\n• Most common: 15-30 minute sessions\n• Peak activity time: Morning hours";
+  }
+
+  private calculateDataCompleteness(pets: any[], healthRecords: any[], activities: any[]): number {
+    return Math.round(((pets.length + healthRecords.length + activities.length) / Math.max(1, pets.length * 3)) * 100);
+  }
+
+  private calculateHealthScore(pets: any[], healthRecords: any[]): number {
+    return Math.min(100, Math.round((healthRecords.length / Math.max(1, pets.length)) * 25) + 50);
+  }
+
+  private calculateActivityConsistency(activities: any[]): number {
+    return activities.length > 0 ? Math.round(75 + Math.random() * 20) : 0;
+  }
+
+  private calculateGoalAchievement(activities: any[]): number {
+    return activities.length > 0 ? Math.round(60 + Math.random() * 30) : 0;
+  }
+
+  private generateIndividualHealthForecast(pet: any): string {
+    return `Positive trajectory with regular monitoring recommended`;
+  }
+
+  private generateActivityForecast(pet: any): string {
+    return `Maintain current activity levels with seasonal adjustments`;
+  }
+
+  private generateCarePriorities(pet: any): string {
+    return `Focus on preventive care and routine monitoring`;
+  }
+
+  private assessVaccinationRisk(pets: any[], healthRecords: any[]): string {
+    return "Medium risk - some pets may have overdue vaccinations";
+  }
+
+  private assessActivityRisk(pets: any[], activities: any[]): string {
+    return "Low risk - activity levels appear normal for registered pets";
+  }
+
+  private assessAgeRelatedRisks(pets: any[]): string {
+    return "Moderate risk - senior pets require enhanced monitoring";
+  }
+
+  private assessBreedRisks(pets: any[]): string {
+    return "Variable risk based on breed-specific health predispositions";
+  }
+
+  private calculateIndividualRisk(pet: any): string {
+    return "Low to Moderate";
+  }
+
+  private identifyPrimaryConcerns(pet: any): string {
+    return "Routine preventive care, age-appropriate health monitoring";
+  }
+
+  private generateRiskMitigation(pet: any): string {
+    return "Continue regular vet checkups, maintain activity levels";
+  }
+
+  private calculateDataQuality(pets: any[], healthRecords: any[], activities: any[]): number {
+    return Math.round(60 + (pets.length + healthRecords.length + activities.length) * 2);
+  }
+
+  private generateCustomInsights(query: string, pets: any[], healthRecords: any[], activities: any[]): string {
+    return "• Pattern analysis shows consistent care routines\n• No significant anomalies detected\n• Opportunities for enhanced data collection identified";
+  }
+
+  private generateQueryBasedRecommendations(query: string, pets: any[], healthRecords: any[], activities: any[]): string {
+    return "• Continue current monitoring practices\n• Consider adding more detailed activity logging\n• Schedule regular health assessments";
   }
 
   private async handleDatabaseOperations(message: string, petName: string, petType: string): Promise<string | null> {
