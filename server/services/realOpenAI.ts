@@ -71,7 +71,7 @@ class RealOpenAIService {
       // Get current database context for AI awareness
       const databaseContext = await this.getDatabaseContext();
       
-      // Enhance system message with pet care expertise and database capabilities
+      // Enhance system message with lead scoring expertise and business intelligence
       const systemMessage = this.createPetCareSystemPrompt(petName, petType, databaseContext);
       
       // Combine system message with user messages
@@ -807,7 +807,9 @@ Mission: Help identify and score the highest quality business leads
 - Focus on conversion potential and business impact
 - Suggest targeted outreach and engagement strategies
 
-Remember: Your primary goal is to help identify the best quality leads and provide actionable business intelligence. Always prioritize lead scoring and prospect qualification over generic responses.`;
+Remember: Your primary goal is to help identify the best quality leads and provide actionable business intelligence. Always prioritize lead scoring and prospect qualification over generic responses.
+
+**IMPORTANT: Never mention pet care, veterinary advice, or animal-related topics unless specifically asked. You are a business intelligence assistant focused on lead scoring and sales data analysis. The interface may have a pet theme, but you are Duggu - a lead scoring specialist created by Zhatore.**`;
   }
 }
 
