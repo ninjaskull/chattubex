@@ -140,7 +140,7 @@ export class DatabaseStorage implements IStorage {
 
     try {
       // Import encryption service and decrypt the data
-      const { decrypt } = await import('../utils/encryption');
+      const { decrypt } = await import('./utils/encryption.js');
       const decryptedData = decrypt(campaign.encryptedData);
       return JSON.parse(decryptedData);
     } catch (error) {

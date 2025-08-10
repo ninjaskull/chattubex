@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Brain, Cpu, Database, Globe, Network, Zap, ArrowRight, CheckCircle, Star, Users, Award, Layers, Shield, Rocket, PawPrint } from "lucide-react";
+import { Brain, Cpu, Database, Globe, Network, Zap, ArrowRight, CheckCircle, Star, Users, Award, Layers, Shield, Rocket, Target } from "lucide-react";
 import { setAuthenticated } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
@@ -54,47 +54,47 @@ export default function Landing() {
   const features = [
     {
       icon: Brain,
-      title: "AI Pet Assistant",
-      description: "PawMate AI provides expert pet care advice, health insights, and personalized recommendations for your furry friends.",
+      title: "AI Lead Scoring",
+      description: "Advanced AI algorithms analyze contact data to identify high-value prospects and score lead quality with precision.",
       gradient: "from-purple-500 to-pink-500"
     },
     {
       icon: Cpu,
-      title: "Real-time Health Monitoring",
-      description: "Track your pet's vital signs, activity levels, and health metrics with live updates and smart notifications.",
+      title: "Real-time Analytics",
+      description: "Live dashboard with contact intelligence, campaign performance metrics, and business intelligence insights.",
       gradient: "from-blue-500 to-cyan-500"
     },
     {
       icon: Database,
-      title: "Secure Pet Records",
-      description: "Enterprise-grade security with encrypted storage for medical records, vaccination history, and health data.",
+      title: "Secure Contact Management",
+      description: "Enterprise-grade security with encrypted storage for contact data, campaign information, and business intelligence.",
       gradient: "from-green-500 to-emerald-500"
     },
     {
       icon: Network,
-      title: "Veterinary Network",
-      description: "Connect with certified veterinarians, schedule appointments, and manage pet care communications seamlessly.",
+      title: "Business Intelligence Network",
+      description: "Connect lead data sources, analyze market trends, and optimize campaign performance with comprehensive insights.",
       gradient: "from-orange-500 to-red-500"
     },
     {
       icon: Shield,
-      title: "Privacy Protection",
-      description: "Advanced encryption protocols protect your pet's sensitive health information and personal data at all times.",
+      title: "Enterprise Security",
+      description: "Advanced encryption protocols protect sensitive lead data and business intelligence with bank-level security.",
       gradient: "from-indigo-500 to-purple-500"
     },
     {
       icon: Globe,
-      title: "Multi-device Access",
-      description: "Access your pet's information anywhere with automatic cloud sync and offline capabilities across all devices.",
+      title: "Multi-platform Integration",
+      description: "Access lead scoring insights anywhere with automatic data sync and real-time updates across all platforms.",
       gradient: "from-teal-500 to-blue-500"
     }
   ];
 
   const stats = [
-    { number: "99.99%", label: "Uptime Guarantee", icon: CheckCircle },
-    { number: "10ms", label: "Response Time", icon: Zap },
-    { number: "500K+", label: "Active Users", icon: Users },
-    { number: "50+", label: "Awards Won", icon: Award }
+    { number: "99.99%", label: "Lead Accuracy", icon: CheckCircle },
+    { number: "5ms", label: "Analysis Speed", icon: Zap },
+    { number: "100K+", label: "Leads Scored", icon: Target },
+    { number: "95%", label: "Conversion Rate", icon: Award }
   ];
 
   return (
@@ -113,10 +113,10 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <PawPrint className="text-white text-lg" />
+                <Target className="text-white text-lg" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                PawMate Pro
+                LeadIQ Pro
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -149,16 +149,16 @@ export default function Landing() {
             </div>
             
             <h1 className="text-5xl sm:text-7xl font-bold mb-6 leading-tight">
-              Comprehensive
+              Intelligent
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                Pet Management
+                Lead Scoring
               </span>
             </h1>
             
             <p className="text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Advanced technology combined with engaging user experience for pet owners. 
-              AI-powered pet care assistance, health tracking, and real-time insights for your beloved companions.
+              Advanced AI technology combined with comprehensive business intelligence for sales teams. 
+              AI-powered lead analysis, contact scoring, and real-time insights for optimal campaign performance.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -199,10 +199,10 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Advanced Pet Care Features
+              Advanced Lead Intelligence Features
             </h2>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Everything you need for comprehensive pet management and AI-powered care assistance
+              Everything you need for comprehensive lead management and AI-powered business intelligence
             </p>
           </div>
           
@@ -231,10 +231,10 @@ export default function Landing() {
           <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-3xl p-12 border border-slate-800 backdrop-blur-xl">
             <Rocket className="w-16 h-16 mx-auto mb-6 text-blue-400" />
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Ready to Transform Pet Care?
+              Ready to Transform Lead Generation?
             </h2>
             <p className="text-xl text-slate-400 mb-8">
-              Join thousands of pet owners already using our AI-powered platform for better pet health management
+              Join hundreds of sales teams already using our AI-powered platform for superior lead qualification and conversion
             </p>
             <Button 
               size="lg" 
@@ -253,24 +253,24 @@ export default function Landing() {
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <PawPrint className="text-white text-lg" />
+                  <Target className="text-white text-lg" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  PawMate Pro
+                  LeadIQ Pro
                 </span>
               </div>
               <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
-                The ultimate pet management platform combining advanced technology with engaging user experience for comprehensive pet care.
+                The ultimate lead scoring platform combining advanced AI technology with comprehensive business intelligence for sales optimization.
               </p>
             </div>
             
             <div>
               <h4 className="font-semibold text-white mb-4">Platform</h4>
               <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Pet Health Records</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">AI Care Assistant</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">PawMate AI</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Veterinary Network</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Lead Scoring</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">AI Analysis</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Duggu AI Assistant</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Campaign Management</a></li>
               </ul>
             </div>
             
@@ -292,7 +292,7 @@ export default function Landing() {
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 2025
-              </span> PawMate Pro. All rights reserved.
+              </span> LeadIQ Pro. All rights reserved.
             </p>
             
             {showAdminAccess && (
@@ -310,7 +310,7 @@ export default function Landing() {
                   disabled={authMutation.isPending}
                   className="bg-slate-700 hover:bg-slate-600 border-slate-600 text-white"
                 >
-                  {authMutation.isPending ? "..." : <PawPrint className="w-4 h-4" />}
+                  {authMutation.isPending ? "..." : <Target className="w-4 h-4" />}
                 </Button>
               </form>
             )}
