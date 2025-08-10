@@ -49,7 +49,7 @@ This is a full-stack web application for campaign management with secure data ha
 
 ## Environment Configuration
 
-- Default dashboard password: `admin123` (configurable via `DASHBOARD_PASSWORD`)
+- Dashboard password: `demo1234` (configured via `DASHBOARD_PASSWORD`)
 - Database: PostgreSQL via `DATABASE_URL`
 - Development server runs on port 5000
 
