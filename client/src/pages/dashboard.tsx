@@ -16,15 +16,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearAuth } from "@/lib/auth";
 import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
-import UnifiedChatbot from "@/components/unified-chatbot";
-import PawMate from "@/components/pawmate";
+
+import PawMate from "@/components/pawmate-enhanced";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("files");
-  const [showChatbot, setShowChatbot] = useState(false);
+
 
   const { data: campaigns = [] } = useQuery<any[]>({
     queryKey: ['/api/campaigns'],
@@ -70,7 +70,7 @@ export default function Dashboard() {
       {/* Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4 bg-white/60 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Campaigns</span>
@@ -81,11 +81,7 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="pawmate" className="flex items-center gap-2">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Duggu Chat</span>
-            </TabsTrigger>
-            <TabsTrigger value="search" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Search</span>
+              <span className="hidden sm:inline">Duggu AI</span>
             </TabsTrigger>
           </TabsList>
 
@@ -101,42 +97,15 @@ export default function Dashboard() {
             <NotesDocuments />
           </TabsContent>
 
-          {/* Duggu Chat Tab - Original UI */}
+          {/* Duggu AI Tab - Enhanced with Advanced Search */}
           <TabsContent value="pawmate" className="mt-6">
             <PawMate />
-          </TabsContent>
-
-          {/* Advanced AI Search Tab */}
-          <TabsContent value="search" className="mt-6">
-            <Card className="p-6">
-              <CardHeader className="text-center">
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Database className="w-6 h-6 text-blue-600" />
-                  Advanced AI Search Assistant
-                </CardTitle>
-                <CardDescription>
-                  Unified chatbot with OpenAI conversation and database search
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <Button 
-                  onClick={() => setShowChatbot(true)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                >
-                  Open Advanced Assistant
-                </Button>
-              </CardContent>
-            </Card>
           </TabsContent>
 
         </Tabs>
       </div>
 
-      {/* Unified AI Chatbot */}
-      <UnifiedChatbot 
-        isOpen={showChatbot} 
-        onClose={() => setShowChatbot(false)} 
-      />
+
     </div>
   );
 }

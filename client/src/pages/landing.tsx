@@ -8,14 +8,14 @@ import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import UnifiedChatbot from "@/components/unified-chatbot";
-import PawMate from "@/components/pawmate";
+
+import PawMate from "@/components/pawmate-enhanced";
 
 export default function Landing() {
   const [clickCount, setClickCount] = useState(0);
   const [showAdminAccess, setShowAdminAccess] = useState(false);
   const [password, setPassword] = useState("");
-  const [showChatbot, setShowChatbot] = useState(false);
+
   const [showPawMate, setShowPawMate] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -169,16 +169,15 @@ export default function Landing() {
                 onClick={() => setShowPawMate(true)}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-2xl shadow-blue-500/25 text-lg group"
               >
-                Try Duggu Chat
+                Start Your Journey
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
-                onClick={() => setShowChatbot(true)}
                 className="px-8 py-4 bg-transparent border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 text-lg"
               >
-                Advanced AI Search
+                Watch Demo
               </Button>
             </div>
           </div>
@@ -327,10 +326,10 @@ export default function Landing() {
         </div>
       </footer>
       
-      {/* Original PawMate Chatbot */}
+      {/* Duggu AI Chatbot */}
       {showPawMate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-4xl h-[80vh] bg-white rounded-lg overflow-hidden">
+          <div className="w-full max-w-6xl h-[85vh] bg-white rounded-lg overflow-hidden relative">
             <div className="h-full">
               <PawMate />
             </div>
@@ -338,19 +337,13 @@ export default function Landing() {
               variant="ghost" 
               size="sm" 
               onClick={() => setShowPawMate(false)}
-              className="absolute top-4 right-4 bg-white/80 hover:bg-white"
+              className="absolute top-4 right-4 bg-white/80 hover:bg-white z-10"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
       )}
-
-      {/* Advanced Unified Chatbot */}
-      <UnifiedChatbot 
-        isOpen={showChatbot} 
-        onClose={() => setShowChatbot(false)} 
-      />
     </div>
   );
 }

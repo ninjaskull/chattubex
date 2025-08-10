@@ -5,28 +5,40 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Heart, MessageCircle, Zap, Dog, Settings, Send, Sparkles, Bot } from "lucide-react";
+import { 
+  Heart, MessageCircle, Zap, Dog, Settings, Send, Sparkles, Bot,
+  Search, Database, Target, Phone, Mail, Building, Globe, 
+  ExternalLink, Users, Filter, SortAsc, Grid, List, Download
+} from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
-  type: 'user' | 'bot';
+  type: 'user' | 'bot' | 'search-results';
   content: string;
   timestamp: Date;
   isTyping?: boolean;
+  searchResults?: any;
+  searchQuery?: string;
 }
 
 export default function PawMate() {
-  const [petName, setPetName] = useState(() => localStorage.getItem('pawmate_pet_name') || "");
-  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "dog");
+  const [petName, setPetName] = useState(() => localStorage.getItem('pawmate_pet_name') || "Duggu");
+  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "assistant");
   const [petMessage, setPetMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isUsingRealAI, setIsUsingRealAI] = useState<boolean | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(() => localStorage.getItem('pawmate_session_id'));
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchView, setSearchView] = useState<'cards' | 'table'>('cards');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -60,11 +72,31 @@ export default function PawMate() {
       
       // Load welcome message only if no history loaded
       if (messages.length === 0) {
-        const icon = getPetIcon(petType);
         setMessages([{
           id: '1',
           type: 'bot',
-          content: `Welcome to Duggu AI! I'm your lead intelligence assistant with direct database access. I can search through your 263+ contact records instantly.\n\n**🔍 Database Search Capabilities:**\n- Search by name, email, phone, company, title\n- Find complete contact details with phone numbers\n- Filter by any field in your campaign data\n- Real-time search through encrypted records\n\n**Try searching for:**\n- "delonza" - Find specific contacts\n- "@company.com" - Find all employees at a company\n- "CEO" or "Manager" - Search by job titles\n- Phone numbers to find contact details\n\nType your search query and I'll return the exact contact information with phone numbers instantly!`,
+          content: `👋 Welcome! I'm ${petName || 'Duggu'}, your AI-powered lead intelligence assistant with direct database access. 
+
+**🔍 Advanced Search Capabilities:**
+• Search through 263+ contact records instantly
+• Find complete contact details with phone numbers
+• Filter by name, email, phone, company, title
+• Real-time search through encrypted campaign data
+• Advanced data visualization for large datasets
+
+**💬 Conversational AI:**
+• Natural business intelligence conversations
+• Lead scoring and analysis insights
+• Campaign optimization recommendations
+• Market analysis and prospect evaluation
+
+**Try these commands:**
+• "search delonza" - Find specific contacts with full details
+• "find all CEOs" - Search by job titles
+• "show contacts at Dakkota" - Company-based searches
+• "What's the best lead scoring strategy?" - AI conversation
+
+I automatically detect whether you want to search or chat - just type naturally!`,
           timestamp: new Date()
         }]);
       }
@@ -95,6 +127,32 @@ export default function PawMate() {
     }
   };
 
+  // Search query detection logic
+  const isSearchQuery = (query: string): boolean => {
+    const searchKeywords = [
+      'search', 'find', 'show', 'get', 'lookup', 'contact', 'contacts',
+      'phone', 'email', 'company', 'title', 'manager', 'ceo', 'director',
+      'vp', 'vice president', 'executive', 'list', 'all', 'who'
+    ];
+    
+    const lowerQuery = query.toLowerCase();
+    
+    // Check if query contains search keywords
+    const hasSearchKeywords = searchKeywords.some(keyword => 
+      lowerQuery.includes(keyword)
+    );
+    
+    // Check if query looks like a name, email, or company
+    const looksLikeSearchTerm = (
+      /^[a-zA-Z\s]{2,}$/.test(query.trim()) ||  // Name-like
+      /@/.test(query) ||                        // Email-like
+      /\d{3,}/.test(query) ||                   // Phone-like
+      /\b(corp|inc|llc|ltd|company|co)\b/i.test(query) // Company-like
+    );
+    
+    return hasSearchKeywords || looksLikeSearchTerm;
+  };
+
   const handleSendMessage = async () => {
     if (!petMessage.trim()) return;
     
@@ -110,70 +168,61 @@ export default function PawMate() {
     setPetMessage("");
     setIsTyping(true);
 
-    // Try database search first for direct contact results
+    // Show typing indicator
+    const typingMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      type: 'bot',
+      content: 'Analyzing query...',
+      timestamp: new Date(),
+      isTyping: true
+    };
+    setMessages(prev => [...prev, typingMessage]);
+
     try {
-      const searchResponse = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          query, 
-          searchType: 'all', 
-          limit: 10 
-        })
-      });
-      
-      if (searchResponse.ok) {
-        const searchResults = await searchResponse.json();
+      // Determine if this should be a search or AI chat
+      if (isSearchQuery(query)) {
+        // Perform database search
+        const searchResponse = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            query, 
+            searchType: 'all', 
+            limit: 50  // Increased limit for larger datasets
+          })
+        });
         
-        if (searchResults.total > 0) {
-          let responseContent = `Found ${searchResults.total} results for "${query}":\n\n`;
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
           
-          // Display campaign data results with phone numbers
-          if (searchResults.campaignData && searchResults.campaignData.length > 0) {
-            searchResults.campaignData.forEach((campaign: any) => {
-              responseContent += `**${campaign.campaignName} Campaign (${campaign.totalMatches} matches):**\n\n`;
-              campaign.matches.slice(0, 5).forEach((contact: any) => {
-                responseContent += `📋 **${contact['First Name']} ${contact['Last Name']}**\n`;
-                responseContent += `🏢 ${contact.Company || 'N/A'}\n`;
-                responseContent += `💼 ${contact.Title || 'N/A'}\n`;
-                responseContent += `📧 ${contact.Email || 'N/A'}\n`;
-                responseContent += `📱 Mobile: ${contact['Mobile Phone'] || 'Not Available'}\n`;
-                responseContent += `☎️ Other: ${contact['Other Phone'] || 'Not Available'}\n`;
-                responseContent += `🏢 Corporate: ${contact['Corporate Phone'] || 'Not Available'}\n`;
-                responseContent += `🌐 Website: ${contact.Website || 'N/A'}\n`;
-                if (contact['Person Linkedin Url']) {
-                  responseContent += `🔗 LinkedIn: ${contact['Person Linkedin Url']}\n`;
-                }
-                responseContent += `\n`;
-              });
-            });
+          if (searchData.total > 0) {
+            const searchResultMessage: Message = {
+              id: Date.now().toString(),
+              type: 'search-results',
+              content: `🔍 Found ${searchData.total} results for "${query}"`,
+              searchResults: searchData,
+              searchQuery: query,
+              timestamp: new Date()
+            };
+            
+            // Remove typing indicator and add search results
+            setMessages(prev => prev.slice(0, -1).concat([searchResultMessage]));
+            setIsTyping(false);
+            return;
           }
-          
-          // Display direct contacts
-          if (searchResults.contacts && searchResults.contacts.length > 0) {
-            responseContent += `**Direct Contacts:**\n\n`;
-            searchResults.contacts.forEach((contact: any) => {
-              responseContent += `📋 **${contact.name}**\n`;
-              responseContent += `📧 ${contact.email}\n`;
-              responseContent += `📱 ${contact.mobile}\n\n`;
-            });
-          }
-          
-          const botMessage: Message = {
-            id: Date.now().toString(),
-            type: 'bot',
-            content: responseContent,
-            timestamp: new Date()
-          };
-          
-          setMessages(prev => [...prev, botMessage]);
-          setIsTyping(false);
-          return;
         }
       }
-    } catch (error) {
-      console.error('Search failed:', error);
-    }
+      
+      // If no search results or not a search query, use AI chat
+      const conversationHistory = [...messages, userMessage].map(msg => ({
+        role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
+        content: msg.content
+      }));
+
+      const systemMessage = {
+        role: 'system' as const,
+        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Zhatore. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers. If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
+      };
 
     // Fallback to AI assistant for general queries
     try {
@@ -191,6 +240,46 @@ export default function PawMate() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [systemMessage, ...conversationHistory],
+          petName: petName || 'Duggu',
+          petType: 'assistant',
+          sessionId: sessionId || `pawmate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsUsingRealAI(data.isRealAI);
+        let aiResponse = data.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
+        
+        // Clean up any unwanted recommendation sections
+        aiResponse = aiResponse.replace(/Recommendations?:[\s\S]*?(?=\n\n|$)/gi, '');
+        aiResponse = aiResponse.replace(/Next Steps?:[\s\S]*?(?=\n\n|$)/gi, '');
+        
+        const botMessage: Message = {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: aiResponse,
+          timestamp: new Date()
+        };
+        
+        // Remove typing indicator and add AI response
+        setMessages(prev => prev.slice(0, -1).concat([botMessage]));
+      }
+    } catch (error) {
+      console.error('Message processing failed:', error);
+      setMessages(prev => prev.slice(0, -1).concat([{
+        id: Date.now().toString(),
+        type: 'bot',
+        content: "I encountered an error processing your request. Please try again.",
+        timestamp: new Date()
+      }]));
+    } finally {
+      setIsTyping(false);
+    }
+  };
         },
         body: JSON.stringify({
           messages: [systemMessage, ...conversationHistory],
