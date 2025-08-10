@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { databaseService } from './databaseService';
 import { storage } from '../storage';
+import { apolloService } from './apolloService';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -45,11 +46,35 @@ class RealOpenAIService {
     });
   }
 
-  async generateChatCompletion(request: ChatCompletionRequest, petName?: string, petType?: string): Promise<ChatCompletionResponse> {
+  async generateChatCompletion(request: ChatCompletionRequest, aiName?: string, aiType?: string): Promise<ChatCompletionResponse> {
     try {
-      // Check if user wants database operations first
-      const userMessage = request.messages[request.messages.length - 1]?.content?.toLowerCase() || '';
-      const databaseResponse = await this.handleDatabaseOperations(userMessage, petName, petType);
+      const userMessage = request.messages[request.messages.length - 1]?.content || '';
+      const lowerUserMessage = userMessage.toLowerCase();
+      
+      // Check for Apollo.io API questions first
+      if (lowerUserMessage.includes('apollo') || lowerUserMessage.includes('api') || 
+          lowerUserMessage.includes('prospecting') || lowerUserMessage.includes('lead generation')) {
+        const apolloResponse = await this.handleApolloQueries(userMessage);
+        if (apolloResponse) {
+          return {
+            choices: [{
+              message: {
+                role: 'assistant',
+                content: apolloResponse
+              },
+              finish_reason: 'stop'
+            }],
+            usage: {
+              prompt_tokens: 150,
+              completion_tokens: apolloResponse.length / 4,
+              total_tokens: 150 + (apolloResponse.length / 4)
+            }
+          };
+        }
+      }
+
+      // Check if user wants database operations
+      const databaseResponse = await this.handleDatabaseOperations(lowerUserMessage, aiName, aiType);
       
       if (databaseResponse) {
         return {
@@ -72,7 +97,7 @@ class RealOpenAIService {
       const databaseContext = await this.getDatabaseContext();
       
       // Enhance system message with lead scoring expertise and business intelligence
-      const systemMessage = this.createLeadScoringSystemPrompt(petName, petType, databaseContext);
+      const systemMessage = this.createLeadScoringSystemPrompt(aiName, aiType, databaseContext);
       
       // Combine system message with user messages
       const enhancedMessages = [
@@ -126,7 +151,40 @@ class RealOpenAIService {
     }
   }
 
-  private async handleDatabaseOperations(message: string, petName?: string, petType?: string): Promise<string | null> {
+  private async handleApolloQueries(userMessage: string): Promise<string | null> {
+    try {
+      // Check for specific Apollo.io related queries
+      const apolloKnowledge = apolloService.getAPIKnowledge();
+      const recommendations = apolloService.generateAPIRecommendation(userMessage);
+      
+      if (userMessage.toLowerCase().includes('apollo')) {
+        return `# 🚀 Apollo.io Integration Expert
+
+I have complete knowledge of Apollo.io's API architecture and can help you with advanced prospecting and lead generation strategies.
+
+${recommendations}
+
+${apolloKnowledge}
+
+## 💡 What I can help you with:
+- **API Integration**: Specific endpoint recommendations and parameters
+- **Lead Prospecting**: Advanced search strategies and targeting
+- **Data Enrichment**: Contact enhancement and verification workflows  
+- **Outreach Automation**: Sequence creation and performance optimization
+- **CRM Integration**: Data synchronization and pipeline management
+- **Compliance**: GDPR/CCPA compliant data handling practices
+
+Ask me anything about Apollo.io APIs, prospecting strategies, or lead generation workflows!`;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Apollo query error:', error);
+      return null;
+    }
+  }
+
+  private async handleDatabaseOperations(message: string, aiName?: string, aiType?: string): Promise<string | null> {
     try {
       // Lead analysis and campaign data queries
       if (message.includes('campaign') || message.includes('upload') || message.includes('contact') || message.includes('data') || message.includes('lead') || message.includes('score')) {
@@ -655,7 +713,37 @@ Mission: Help identify and score the highest quality business leads for sales an
 
 Remember: Your primary goal is to help identify the best quality leads and provide actionable business intelligence. Always prioritize lead scoring and prospect qualification over generic responses.
 
-**IMPORTANT: Never mention pet care, veterinary advice, or animal-related topics unless specifically asked. You are a business intelligence assistant focused on lead scoring and sales data analysis. The interface may have a pet theme, but you are Duggu - a lead scoring specialist created by Zhatore.**`;
+## 🚀 Apollo.io API Integration Expert
+
+I have comprehensive knowledge of Apollo.io's API architecture:
+
+**Core API Endpoints:**
+- \`/v1/mixed_people/search\`: Advanced prospect search with complex filtering
+- \`/v1/mixed_companies/search\`: Account-based marketing and company research
+- \`/v1/people/match\`: Contact enrichment and data enhancement
+- \`/v1/email_addresses\`: Professional email discovery and verification
+- \`/v1/email_sequences\`: Multi-step outreach automation
+- \`/v1/contacts\`: CRM integration and contact management
+
+**Advanced Capabilities:**
+- Boolean search logic for precise targeting
+- Lead scoring integration with title and company analysis
+- Multi-channel outreach sequences (email, LinkedIn, phone)
+- Real-time data enrichment and verification
+- Bulk export operations up to 10,000 records
+- Webhook integrations for automated workflows
+
+**Strategic Applications:**
+- Executive prospecting with C-level targeting
+- Technology decision-maker identification
+- Account-based marketing campaigns
+- Competitive intelligence gathering
+- Market research and opportunity mapping
+- Sales pipeline optimization
+
+I can provide specific API calls, parameter recommendations, and integration strategies for any prospecting challenge.
+
+**IMPORTANT: I am a business intelligence assistant focused on lead scoring, sales data analysis, and Apollo.io API integration. I provide actionable insights for lead generation, prospecting strategies, and business development workflows.**`;
   }
 }
 

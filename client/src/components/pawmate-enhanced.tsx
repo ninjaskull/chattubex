@@ -296,39 +296,46 @@ export default function PawMate() {
         setMessages([{
           id: '1',
           type: 'bot',
-          content: `👋 Welcome! I'm ${petName || 'Duggu'}, your AI-powered lead intelligence assistant with direct database access and advanced CSV operations.
+          content: `# 👋 Hi! I'm ${petName || 'Duggu'}
 
-**🔍 Advanced Search Capabilities:**
-• Search through 263+ contact records instantly
-• Find complete contact details with phone numbers
-• Filter by name, email, phone, company, title
-• Real-time search through encrypted campaign data
-• Advanced data visualization for large datasets
+**Your Advanced AI Business Intelligence Assistant** - Created by Zhatore
 
-**📊 CSV Export & Import Module:**
-• Export search results to customizable CSV files
-• Import new data with automatic encryption
-• Create campaigns from uploaded CSV files
-• Batch operations with custom naming
-• Full data integrity and error handling
+I'm your comprehensive solution for lead generation, data analysis, and business intelligence with Apollo.io API expertise.
 
-**💬 Conversational AI:**
-• Natural business intelligence conversations
-• Lead scoring and analysis insights
-• Campaign optimization recommendations
-• Market analysis and prospect evaluation
+## 🚀 Advanced Capabilities:
+- **Lead Scoring & Analysis**: AI-powered prospect qualification with authority scoring
+- **Apollo.io Integration**: Complete API knowledge for advanced prospecting
+- **Campaign Management**: Create, analyze, and optimize marketing campaigns
+- **Data Operations**: Search, filter, export with complex multi-criteria queries
+- **Contact Enrichment**: Enhanced data with LinkedIn profiles and social signals
+- **Business Intelligence**: Market analysis, competitive insights, strategic recommendations
+- **Automation Workflows**: Process optimization and efficiency recommendations
 
-**Try these commands:**
-• "search delonza" - Find specific contacts with full details
-• "find all CEOs" - Search by job titles
-• "show contacts at Dakkota" - Company-based searches
-• "What's the best lead scoring strategy?" - AI conversation
+## 🎯 Apollo.io API Expertise:
+- **People Search API**: Advanced filtering with Boolean logic and complex criteria
+- **Organization Search**: Account-based marketing and company intelligence
+- **Contact Enrichment**: Email discovery, data enhancement, verification
+- **Sequence Automation**: Multi-channel outreach with performance tracking
+- **Bulk Operations**: Export up to 10,000 records with custom filtering
+- **CRM Integration**: Seamless data synchronization workflows
 
-**CSV Operations:**
-• Use Export CSV button after any search to download results
-• Use Import CSV button to add new contact data to the system
+## 📊 Current Database Status:
+- **Lead Intelligence**: Advanced scoring algorithms ready
+- **Campaign Data**: Multi-source analysis capabilities
+- **Search Engine**: Complex queries with Boolean operators
+- **Export Functions**: Custom campaign creation with automated naming
 
-I automatically detect whether you want to search or chat - just type naturally!`,
+## 💡 Smart Actions Available:
+- "How do I target C-level executives with Apollo.io?"
+- "Generate comprehensive prospect scoring report"
+- "Create automated prospecting workflow recommendations"
+- "Find high-value prospects with executive authority"
+- "Show me Apollo.io API examples for lead generation"
+- "Analyze my contact database for quality scoring"
+
+**I combine database operations, Apollo.io expertise, and strategic business intelligence to drive your lead generation success!** 🎯
+
+*What advanced prospecting challenge can I help you solve today?*`,
           timestamp: new Date()
         }]);
       }
@@ -794,29 +801,29 @@ Your data has been securely encrypted and added to the system. You can now searc
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setPetMessage("search delonza")}
+              onClick={() => setPetMessage("Show me comprehensive lead analysis with scoring")}
               className="text-xs"
             >
               <Search className="w-3 h-3 mr-1" />
-              Search Example
+              Lead Analysis
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setPetMessage("find all CEOs")}
+              onClick={() => setPetMessage("Find all C-level executives and VPs")}
               className="text-xs"
             >
               <Users className="w-3 h-3 mr-1" />
-              Find Executives
+              Executive Search
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setPetMessage("What's the best lead scoring strategy?")}
+              onClick={() => setPetMessage("How do I use Apollo.io API for prospecting?")}
               className="text-xs"
             >
               <Sparkles className="w-3 h-3 mr-1" />
-              AI Question
+              Apollo.io Guide
             </Button>
             <Button 
               variant="outline" 
