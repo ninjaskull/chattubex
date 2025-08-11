@@ -234,18 +234,6 @@ I automatically detect whether you want to search or chat - just type naturally!
 
       const systemMessage = {
         role: 'system' as const,
-        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers. If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
-      };
-
-    // Fallback to AI assistant for general queries
-    try {
-      const conversationHistory = [...messages, userMessage].map(msg => ({
-        role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
-        content: msg.content
-      }));
-
-      const systemMessage = {
-        role: 'system' as const,
         content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. Focus exclusively on lead analysis, contact intelligence, and campaign optimization. Provide direct, actionable business insights without generic recommendations.`
       };
 
@@ -265,6 +253,13 @@ I automatically detect whether you want to search or chat - just type naturally!
       if (response.ok) {
         const data = await response.json();
         setIsUsingRealAI(data.isRealAI);
+        
+        // Update sessionId if it was returned from the backend
+        if (data.sessionId && data.sessionId !== sessionId) {
+          setSessionId(data.sessionId);
+          localStorage.setItem('pawmate_session_id', data.sessionId);
+        }
+        
         let aiResponse = data.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
         
         // Clean up any unwanted recommendation sections
