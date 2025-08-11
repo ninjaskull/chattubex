@@ -101,112 +101,69 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
-      {/* Main Content Area with Sidebar */}
-      <div className="max-w-7xl mx-auto px-4 pt-3 flex gap-2">
-        {/* Smart Sidebar Navigation */}
-        <div className="hidden md:block shrink-0" style={{ width: isScrolled ? '3rem' : '8rem' }}>
-          <div className={`sticky top-20 bg-white/90 backdrop-blur-sm border border-slate-200/50 transition-all duration-300 ${
-            isScrolled 
-              ? 'rounded-r-lg shadow-lg fixed left-0 top-20 z-40 p-0.5' 
-              : 'rounded-lg p-1'
-          }`}>
+      {/* Sticky Sidebar - Always positioned */}
+      <div className={`hidden md:block fixed top-20 left-0 z-40 transition-all duration-300 ${
+        isScrolled ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="bg-white/95 backdrop-blur-sm border-r border-slate-200/50 shadow-lg h-screen w-12 flex flex-col">
+          <div className="p-1">
             <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="w-full">
-              <TabsList className={`grid w-full grid-rows-3 bg-transparent h-auto gap-0.5 ${isScrolled ? 'p-0' : 'p-0.5'}`}>
+              <TabsList className="grid w-full grid-rows-3 bg-transparent h-auto gap-1 p-0">
                 <TabsTrigger 
                   value="files" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 text-xs ${
-                    isScrolled 
-                      ? 'justify-center p-1.5 gap-0' 
-                      : 'justify-start gap-1.5 p-2'
-                  }`}
-                  title={isScrolled ? "Campaigns" : undefined}
+                  className="flex items-center justify-center w-full p-2 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300"
+                  title="Campaigns"
                 >
-                  <FolderOpen className="h-3.5 w-3.5" />
-                  {!isScrolled && <span>Campaigns</span>}
+                  <FolderOpen className="h-4 w-4" />
                 </TabsTrigger>
                 <TabsTrigger 
                   value="notes" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 text-xs ${
-                    isScrolled 
-                      ? 'justify-center p-1.5 gap-0' 
-                      : 'justify-start gap-1.5 p-2'
-                  }`}
-                  title={isScrolled ? "Documents" : undefined}
+                  className="flex items-center justify-center w-full p-2 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300"
+                  title="Documents"
                 >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  {!isScrolled && <span>Documents</span>}
+                  <MessageSquare className="h-4 w-4" />
                 </TabsTrigger>
                 <TabsTrigger 
                   value="pawmate" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 text-xs ${
-                    isScrolled 
-                      ? 'justify-center p-1.5 gap-0' 
-                      : 'justify-start gap-1.5 p-2'
-                  }`}
-                  title={isScrolled ? assistantName : undefined}
+                  className="flex items-center justify-center w-full p-2 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300"
+                  title={assistantName}
                 >
-                  <Dog className="h-3.5 w-3.5" />
-                  {!isScrolled && <span>{assistantName}</span>}
+                  <Dog className="h-4 w-4" />
                 </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Navigation (horizontal tabs on mobile) */}
-        <div className="md:hidden w-full">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-white/60 backdrop-blur-sm">
-              <TabsTrigger value="files" className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Campaigns</span>
-              </TabsTrigger>
-              <TabsTrigger value="notes" className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Documents</span>
-              </TabsTrigger>
-              <TabsTrigger value="pawmate" className="flex items-center gap-2">
-                <Dog className="h-4 w-4" />
-                <span className="hidden sm:inline">{assistantName}</span>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Main Content Area */}
-        <div className={`flex-1 min-w-0 transition-all duration-300 ${isScrolled ? 'md:ml-12' : ''}`}>
-          {/* Desktop Content (hidden on mobile, uses sidebar tabs) */}
-          <div className="hidden md:block">
-            {activeTab === "files" && (
-              <div className="mt-1">
-                <CampaignList />
-              </div>
-            )}
-            {activeTab === "notes" && (
-              <div className="mt-1">
-                <NotesDocuments />
-              </div>
-            )}
-            {activeTab === "pawmate" && (
-              <div className="mt-1">
-                <PawMate />
-              </div>
-            )}
+      {/* Main Content Area */}
+      <div className={`transition-all duration-300 ${isScrolled ? 'md:ml-12' : 'md:ml-0'}`}>
+        <div className="max-w-7xl mx-auto px-4 pt-3">
+          {/* Mobile Navigation (horizontal tabs on mobile) */}
+          <div className="md:hidden w-full mb-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-white/60 backdrop-blur-sm">
+                <TabsTrigger value="files" className="flex items-center gap-2">
+                  <FolderOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline">Campaigns</span>
+                </TabsTrigger>
+                <TabsTrigger value="notes" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  <span className="hidden sm:inline">Documents</span>
+                </TabsTrigger>
+                <TabsTrigger value="pawmate" className="flex items-center gap-2">
+                  <Dog className="h-4 w-4" />
+                  <span className="hidden sm:inline">{assistantName}</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
           
-          {/* Mobile Content (shown on mobile, uses mobile tabs) */}
-          <div className="md:hidden">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsContent value="files" className="mt-6">
-                <CampaignList />
-              </TabsContent>
-              <TabsContent value="notes" className="mt-6">
-                <NotesDocuments />
-              </TabsContent>
-              <TabsContent value="pawmate" className="mt-6">
-                <PawMate />
-              </TabsContent>
-            </Tabs>
+          {/* Content for all screen sizes */}
+          <div>
+            {activeTab === "files" && <CampaignList />}
+            {activeTab === "notes" && <NotesDocuments />}
+            {activeTab === "pawmate" && <PawMate />}
           </div>
         </div>
       </div>
