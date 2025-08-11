@@ -66,6 +66,77 @@
   background-size: 20px 20px;
 }
 
+/* High-tech futuristic styles */
+.neon-glow {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-glow:hover {
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+}
+
+.circuit-lines {
+  background-image: 
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.floating-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.tech-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.holographic {
+  background: linear-gradient(45deg, 
+    #00f5ff 0%, 
+    #3b82f6 25%, 
+    #8b5cf6 50%, 
+    #ec4899 75%, 
+    #00f5ff 100%);
+  background-size: 400% 400%;
+  animation: holographic 4s ease infinite;
+}
+
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+}
+
 /* Custom scrollbar styles for better chat experience */
 .scrollbar-thin {
   scrollbar-width: thin;

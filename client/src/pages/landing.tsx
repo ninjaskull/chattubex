@@ -1,22 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Brain, Cpu, Database, Globe, Network, Zap, ArrowRight, CheckCircle, Star, Users, Award, Layers, Shield, Rocket, Target, X } from "lucide-react";
+import { 
+  Brain, 
+  Cpu, 
+  Database, 
+  Globe, 
+  Network, 
+  Zap, 
+  ArrowRight, 
+  CheckCircle, 
+  Star, 
+  Users, 
+  Award, 
+  Layers, 
+  Shield, 
+  Rocket, 
+  Target, 
+  X,
+  Cloud,
+  Code,
+  Lock,
+  Bot,
+  Phone,
+  Mail,
+  ChevronRight,
+  Play,
+  Moon,
+  Sun,
+  Menu,
+  MessageCircle,
+  TrendingUp,
+  Sparkles
+} from "lucide-react";
 import { setAuthenticated } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-import PawMate from "@/components/pawmate-enhanced";
-
 export default function Landing() {
   const [clickCount, setClickCount] = useState(0);
   const [showAdminAccess, setShowAdminAccess] = useState(false);
   const [password, setPassword] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeService, setActiveService] = useState(0);
 
-  const [showPawMate, setShowPawMate] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -53,295 +84,609 @@ export default function Landing() {
     }
   };
 
-  const features = [
+  const services = [
     {
-      icon: Brain,
-      title: "AI Lead Scoring",
-      description: "Advanced AI algorithms analyze contact data to identify high-value prospects and score lead quality with precision.",
-      gradient: "from-purple-500 to-pink-500"
+      icon: Cloud,
+      title: "Cloud Integration",
+      description: "Seamlessly connect your startup to modern cloud infrastructure with scalable, secure solutions.",
+      features: ["AWS & Azure Setup", "Auto-scaling", "99.9% Uptime"],
+      color: "from-cyan-500 to-blue-600"
     },
     {
-      icon: Cpu,
-      title: "Real-time Analytics",
-      description: "Live dashboard with contact intelligence, campaign performance metrics, and business intelligence insights.",
-      gradient: "from-blue-500 to-cyan-500"
+      icon: Code,
+      title: "Custom Software Development",
+      description: "Build cutting-edge applications tailored to your business needs with modern tech stacks.",
+      features: ["React & Node.js", "Mobile Apps", "API Development"],
+      color: "from-purple-500 to-pink-600"
     },
     {
-      icon: Database,
-      title: "Secure Contact Management",
-      description: "Enterprise-grade security with encrypted storage for contact data, campaign information, and business intelligence.",
-      gradient: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: Network,
-      title: "Business Intelligence Network",
-      description: "Connect lead data sources, analyze market trends, and optimize campaign performance with comprehensive insights.",
-      gradient: "from-orange-500 to-red-500"
+      icon: Bot,
+      title: "AI Consulting",
+      description: "Leverage artificial intelligence to automate processes and gain competitive advantages.",
+      features: ["Machine Learning", "Data Analytics", "Process Automation"],
+      color: "from-green-500 to-emerald-600"
     },
     {
       icon: Shield,
-      title: "Enterprise Security",
-      description: "Advanced encryption protocols protect sensitive lead data and business intelligence with bank-level security.",
-      gradient: "from-indigo-500 to-purple-500"
-    },
-    {
-      icon: Globe,
-      title: "Multi-platform Integration",
-      description: "Access lead scoring insights anywhere with automatic data sync and real-time updates across all platforms.",
-      gradient: "from-teal-500 to-blue-500"
+      title: "Cybersecurity",
+      description: "Protect your digital assets with enterprise-grade security solutions and monitoring.",
+      features: ["24/7 Monitoring", "Penetration Testing", "Compliance"],
+      color: "from-red-500 to-orange-600"
     }
   ];
 
-  const stats = [
-    { number: "99.99%", label: "Lead Accuracy", icon: CheckCircle },
-    { number: "5ms", label: "Analysis Speed", icon: Zap },
-    { number: "100K+", label: "Leads Scored", icon: Target },
-    { number: "95%", label: "Conversion Rate", icon: Award }
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      company: "TechStart Inc.",
+      image: "💼",
+      quote: "FallOwl transformed our infrastructure. We scaled from 10 to 100,000 users seamlessly.",
+      rating: 5
+    },
+    {
+      name: "Marcus Rodriguez",
+      company: "InnovateNow",
+      image: "🚀",
+      quote: "Their AI solutions reduced our processing time by 80%. Game changer for our startup.",
+      rating: 5
+    },
+    {
+      name: "Emily Watson",
+      company: "DataFlow",
+      image: "📊",
+      quote: "Best cybersecurity implementation we've seen. Our data has never been safer.",
+      rating: 5
+    }
   ];
 
+  const caseStudies = [
+    {
+      title: "E-commerce Platform Scale-Up",
+      client: "ShopNext",
+      outcome: "400% traffic increase handled",
+      metric: "40ms response time",
+      image: "🛒"
+    },
+    {
+      title: "AI-Powered Analytics Dashboard",
+      client: "DataInsights Pro",
+      outcome: "90% faster decision making",
+      metric: "Real-time processing",
+      image: "📈"
+    },
+    {
+      title: "Fintech Security Overhaul",
+      client: "PaySecure",
+      outcome: "Zero security breaches",
+      metric: "SOC2 compliant",
+      image: "🔐"
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveService((prev) => (prev + 1) % services.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [services.length]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-1/4 left-1/2 w-96 h-96 bg-cyan-500/30 rounded-full blur-3xl animate-pulse delay-2000"></div>
-        </div>
+    <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}>
+      
+      {/* Animated Tech Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute inset-0 ${isDarkMode ? 'cyber-grid opacity-30' : 'circuit-lines opacity-20'}`}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl floating-animation"></div>
+        <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl floating-animation" style={{animationDelay: '2s'}}></div>
+        <div className="absolute bottom-1/4 left-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl floating-animation" style={{animationDelay: '4s'}}></div>
       </div>
+
       {/* Navigation */}
-      <nav className="relative z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <span className="text-white text-lg">🐾</span>
+      <nav className={`relative z-50 ${isDarkMode ? 'bg-slate-900/90' : 'bg-white/90'} backdrop-blur-xl border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 pulse-glow">
+                <Cpu className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                FallOwl
-              </span>
+              <div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  FallOwl
+                </span>
+                <p className="text-xs text-slate-500">Smart IT Solutions</p>
+              </div>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <button className="text-slate-300 hover:text-white transition-colors duration-300">
-                Solutions
-              </button>
-              <button className="text-slate-300 hover:text-white transition-colors duration-300">
-                Technology
-              </button>
-              <button className="text-slate-300 hover:text-white transition-colors duration-300">
-                Research
-              </button>
-              <Button 
-                onClick={() => setShowPawMate(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-lg shadow-blue-500/25"
-              >
+            
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-8">
+              <a href="#services" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>Services</a>
+              <a href="#about" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>About</a>
+              <a href="#portfolio" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>Portfolio</a>
+              <a href="#contact" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>Contact</a>
+              <Button onClick={toggleTheme} variant="ghost" size="icon" className="relative">
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </Button>
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-full neon-glow">
                 Get Started
               </Button>
             </div>
-          </div>
-        </div>
-      </nav>
-      {/* Hero Section */}
-      <section className="relative z-10 pt-20 pb-32">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-slate-800/50 rounded-full border border-slate-700 mb-8">
-              <Zap className="w-4 h-4 text-yellow-400 mr-2" />
-              <span className="text-sm text-slate-300">Powered by AI Technology</span>
-            </div>
-            
-            <h1 className="text-5xl sm:text-7xl font-bold mb-6 leading-tight">
-              Intelligent
-              <br />
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                Lead Scoring
-              </span>
-            </h1>
-            
-            <p className="text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Advanced AI technology combined with comprehensive business intelligence for sales teams. 
-              AI-powered lead analysis, contact scoring, and real-time insights for optimal campaign performance.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Button 
-                size="lg" 
-                onClick={() => setShowPawMate(true)}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-2xl shadow-blue-500/25 text-lg group"
-              >
-                Start Your Journey
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden flex items-center space-x-4">
+              <Button onClick={toggleTheme} variant="ghost" size="icon">
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </Button>
               <Button 
-                variant="outline" 
-                size="lg" 
-                className="px-8 py-4 bg-transparent border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 text-lg"
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className={isDarkMode ? 'text-white' : 'text-slate-900'}
               >
-                Watch Demo
+                <Menu className="w-6 h-6" />
               </Button>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-20">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mb-4 shadow-lg shadow-blue-500/25">
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-slate-400 text-sm">{stat.label}</div>
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className={`lg:hidden py-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+              <div className="flex flex-col space-y-4">
+                <a href="#services" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>Services</a>
+                <a href="#about" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>About</a>
+                <a href="#portfolio" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>Portfolio</a>
+                <a href="#contact" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>Contact</a>
+                <Button className="mx-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  Get Started
+                </Button>
               </div>
-            ))}
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-20 pb-32 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+            <div className="mb-12 lg:mb-0">
+              <div className="flex items-center space-x-2 mb-6">
+                <div className={`px-4 py-2 rounded-full border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'} text-sm font-medium`}>
+                  <Sparkles className="w-4 h-4 inline mr-2" />
+                  AI-Powered Solutions
+                </div>
+              </div>
+              
+              <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-8">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent text-glow">
+                  Smart IT Solutions
+                </span>
+                <br />
+                <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>
+                  for Visionary
+                </span>
+                <br />
+                <span className="holographic bg-clip-text text-transparent">
+                  Startups
+                </span>
+              </h1>
+              
+              <p className={`text-xl leading-relaxed mb-12 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                Transform your startup with cutting-edge technology solutions. 
+                We build scalable, secure, and innovative digital platforms 
+                that grow with your vision.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold shadow-2xl neon-glow transform hover:scale-105 transition-all duration-300"
+                >
+                  Get a Free Consultation
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className={`px-8 py-4 rounded-2xl text-lg font-semibold border-2 transition-all duration-300 ${isDarkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  See Our Work
+                </Button>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className={`flex items-center space-x-8 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span>100+ Projects</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  <span>4.9/5 Rating</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Users className="w-5 h-5 text-blue-500" />
+                  <span>50+ Startups</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Visual */}
+            <div className="relative">
+              <div className="relative z-10 floating-animation">
+                <div className={`w-full h-96 rounded-3xl ${isDarkMode ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'} border ${isDarkMode ? 'border-slate-700' : 'border-slate-200'} p-8 shadow-2xl`}>
+                  <div className="text-center">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Globe className="w-12 h-12 text-white animate-pulse" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                      Digital Transformation
+                    </h3>
+                    <div className="space-y-3">
+                      <div className={`h-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'} relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full w-4/5 animate-pulse"></div>
+                      </div>
+                      <div className={`h-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'} relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-400 rounded-full w-3/5 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                      </div>
+                      <div className={`h-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-300'} relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full w-5/6 animate-pulse" style={{animationDelay: '1s'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating Elements */}
+              <div className="absolute top-4 -right-4 w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg floating-animation" style={{animationDelay: '1s'}}>
+                <Cpu className="w-8 h-8 text-white" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg floating-animation" style={{animationDelay: '2s'}}>
+                <Rocket className="w-6 h-6 text-white" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      {/* Features Section */}
-      <section className="relative z-10 py-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Advanced Lead Intelligence Features
+
+      {/* About Section */}
+      <section id="about" className={`py-24 ${isDarkMode ? 'bg-slate-900/50' : 'bg-slate-50/50'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold mb-6">
+              <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Why Choose </span>
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">FallOwl</span>
             </h2>
-            <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Everything you need for comprehensive lead management and AI-powered business intelligence
+            <p className={`text-xl max-w-3xl mx-auto ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              We partner with visionary startups to transform ideas into scalable, 
+              secure, and innovative digital solutions that drive growth and success.
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="bg-slate-900/50 border-slate-800 backdrop-blur-xl hover:bg-slate-800/50 transition-all duration-500 group">
-                <CardContent className="p-8">
-                  <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300`}>
-                    <feature.icon className="text-white text-2xl" />
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: Rocket,
+                title: "Startup Agility",
+                description: "Move fast with lean methodologies and rapid prototyping",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                icon: TrendingUp,
+                title: "Scalable Growth",
+                description: "Solutions that grow from MVP to millions of users",
+                color: "from-purple-500 to-pink-500"
+              },
+              {
+                icon: Zap,
+                title: "Lightning Fast",
+                description: "Rapid deployment and time-to-market optimization",
+                color: "from-yellow-500 to-orange-500"
+              },
+              {
+                icon: Target,
+                title: "Cost Effective",
+                description: "Startup-friendly pricing with maximum value delivery",
+                color: "from-green-500 to-emerald-500"
+              }
+            ].map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <Card key={index} className={`${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white/50 border-slate-200'} backdrop-blur-sm hover:scale-105 transition-all duration-300 group`}>
+                  <CardContent className="p-8 text-center">
+                    <div className={`w-16 h-16 mx-auto mb-6 bg-gradient-to-r ${item.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-shadow duration-300`}>
+                      <IconComponent className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                      {item.title}
+                    </h3>
+                    <p className={isDarkMode ? 'text-slate-300' : 'text-slate-600'}>
+                      {item.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold mb-6">
+              <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Our </span>
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Services</span>
+            </h2>
+            <p className={`text-xl max-w-3xl mx-auto ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              Comprehensive IT solutions designed to accelerate your startup's growth and digital transformation.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {services.map((service, index) => {
+              const IconComponent = service.icon;
+              return (
+                <Card 
+                  key={index} 
+                  className={`${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white/50 border-slate-200'} backdrop-blur-sm hover:scale-105 transition-all duration-500 group cursor-pointer ${activeService === index ? 'ring-2 ring-blue-500' : ''}`}
+                  onMouseEnter={() => setActiveService(index)}
+                >
+                  <CardContent className="p-8">
+                    <div className="flex items-start space-x-6">
+                      <div className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 group-hover:shadow-2xl transition-shadow duration-300`}>
+                        <IconComponent className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                          {service.title}
+                        </h3>
+                        <p className={`mb-6 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {service.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {service.features.map((feature, featureIndex) => (
+                            <span 
+                              key={featureIndex}
+                              className={`px-3 py-1 rounded-full text-sm ${isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-700'}`}
+                            >
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Case Studies Section */}
+      <section id="portfolio" className={`py-24 ${isDarkMode ? 'bg-slate-900/50' : 'bg-slate-50/50'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold mb-6">
+              <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Success </span>
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Stories</span>
+            </h2>
+            <p className={`text-xl max-w-3xl mx-auto ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              Real results from real startups. See how we've helped companies scale and succeed.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {caseStudies.map((study, index) => (
+              <Card key={index} className={`${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white/50 border-slate-200'} backdrop-blur-sm hover:scale-105 transition-all duration-300 group overflow-hidden`}>
+                <CardContent className="p-0">
+                  <div className={`h-32 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-4xl`}>
+                    {study.image}
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-400 transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-400 leading-relaxed">
-                    {feature.description}
+                  <div className="p-6">
+                    <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                      {study.title}
+                    </h3>
+                    <p className={`text-sm mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      {study.client}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                        {study.outcome}
+                      </span>
+                      <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        {study.metric}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Testimonials */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className={`${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white/50 border-slate-200'} backdrop-blur-sm`}>
+                <CardContent className="p-8">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
+                    ))}
+                  </div>
+                  <p className={`mb-6 italic ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                    "{testimonial.quote}"
                   </p>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-2xl">{testimonial.image}</div>
+                    <div>
+                      <p className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                        {testimonial.name}
+                      </p>
+                      <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        {testimonial.company}
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
       </section>
-      {/* CTA Section */}
-      <section className="relative z-10 py-20">
-        <div className="max-w-4xl mx-auto px-6 sm:px-8 text-center">
-          <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-3xl p-12 border border-slate-800 backdrop-blur-xl">
-            <Rocket className="w-16 h-16 mx-auto mb-6 text-blue-400" />
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Ready to Transform Lead Generation?
-            </h2>
-            <p className="text-xl text-slate-400 mb-8">
-              Join hundreds of sales teams already using our AI-powered platform for superior lead qualification and conversion
-            </p>
-            <Button 
-              size="lg" 
-              onClick={() => setShowPawMate(true)}
-              className="px-12 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-2xl shadow-blue-500/25 text-lg"
-            >
-              Get Started Today
-            </Button>
-          </div>
+
+      {/* CTA Banner */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-90"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')]"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
+            Let's Build the Future Together
+          </h2>
+          <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto">
+            Ready to transform your startup with cutting-edge technology? 
+            Schedule a free consultation and discover how we can accelerate your growth.
+          </p>
+          <Button 
+            size="lg"
+            className="bg-white text-blue-600 hover:bg-slate-100 px-12 py-6 rounded-2xl text-xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300"
+          >
+            <Phone className="w-6 h-6 mr-3" />
+            Schedule a Call
+          </Button>
         </div>
       </section>
+
       {/* Footer */}
-      <footer className="relative z-10 bg-slate-900/80 backdrop-blur-xl border-t border-slate-800 py-16">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-1 md:col-span-2">
+      <footer className={`py-16 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-100'} border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-12">
+            <div>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <span className="text-white text-lg">🐾</span>
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <Cpu className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   FallOwl
                 </span>
               </div>
-              <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
-                The ultimate lead scoring platform combining advanced AI technology with comprehensive business intelligence for sales optimization.
+              <p className={`mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Transforming startups with innovative IT solutions that scale.
               </p>
+              <div className="flex space-x-4">
+                <Button variant="ghost" size="icon" className={isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}>
+                  <Mail className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className={isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}>
+                  <Phone className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Lead Scoring</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">AI Analysis</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Duggu AI Assistant</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Campaign Management</a></li>
+              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Services</h3>
+              <ul className="space-y-3">
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Cloud Integration</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Custom Development</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>AI Consulting</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Cybersecurity</a></li>
               </ul>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Research</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Company</h3>
+              <ul className="space-y-3">
+                <li><a href="#about" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>About Us</a></li>
+                <li><a href="#portfolio" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Portfolio</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Careers</a></li>
+                <li><a href="#contact" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Contact</a></li>
               </ul>
+            </div>
+
+            <div>
+              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Stay Updated</h3>
+              <p className={`mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Get the latest tech insights and startup tips.
+              </p>
+              <div className="flex space-x-2">
+                <Input 
+                  placeholder="Enter email" 
+                  className={`flex-1 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`}
+                />
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
-          
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-slate-400 mb-4 md:mb-0">
-              © <span 
-                onClick={handleYearClick} 
-                className="cursor-pointer hover:text-white transition-colors"
-              >
-                2025
-              </span> FallOwl. All rights reserved.
+
+          <div className={`mt-12 pt-8 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-300'} flex justify-between items-center`}>
+            <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+              © <span onClick={handleYearClick} className="cursor-pointer">2025</span> FallOwl. All rights reserved.
             </p>
-            
-            {showAdminAccess && (
-              <form onSubmit={handleAdminLogin} className="flex items-center space-x-3">
-                <Input
-                  type="password"
-                  placeholder="Admin access..."
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-40 bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-blue-500"
-                />
-                <Button 
-                  type="submit" 
-                  size="sm"
-                  disabled={authMutation.isPending}
-                  className="bg-slate-700 hover:bg-slate-600 border-slate-600 text-white"
-                >
-                  {authMutation.isPending ? "..." : <Target className="w-4 h-4" />}
-                </Button>
-              </form>
-            )}
-            
-            {!showAdminAccess && (
-              <div className="text-slate-500 text-sm">
-                Privacy Policy • Terms of Service
-              </div>
-            )}
+            <div className="flex items-center space-x-4">
+              <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Privacy</a>
+              <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Terms</a>
+            </div>
           </div>
         </div>
       </footer>
-      
-      {/* Duggu AI Chatbot */}
-      {showPawMate && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-hidden">
-          <div className="w-full max-w-5xl h-[90vh] max-h-[800px] bg-white rounded-lg overflow-hidden relative shadow-2xl">
-            <div className="h-full overflow-hidden">
-              <PawMate />
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowPawMate(false)}
-              className="absolute top-4 right-4 bg-white/80 hover:bg-white z-10 shadow-lg"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+
+      {/* Floating Chat Widget */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <Button 
+          size="lg"
+          className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl neon-glow floating-animation"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* Admin Access Modal */}
+      {showAdminAccess && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className={`w-full max-w-md ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`}>
+            <CardContent className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                  Admin Access
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowAdminAccess(false)}
+                  className={isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}
+                >
+                  <X className="w-6 h-6" />
+                </Button>
+              </div>
+              
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <Input
+                  type="password"
+                  placeholder="Enter admin password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={isDarkMode ? 'bg-slate-700 border-slate-600' : 'bg-white border-slate-300'}
+                />
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  disabled={authMutation.isPending}
+                >
+                  {authMutation.isPending ? "Authenticating..." : "Access Dashboard"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
