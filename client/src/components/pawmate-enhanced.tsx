@@ -741,6 +741,8 @@ Your data has been securely encrypted and added to the system. You can now searc
                   onChange={(e) => {
                     setPetName(e.target.value);
                     localStorage.setItem('pawmate_pet_name', e.target.value);
+                    // Dispatch event to notify other components about the name change
+                    window.dispatchEvent(new CustomEvent('assistantNameChanged'));
                   }}
                   placeholder="Enter assistant name"
                 />

@@ -8,7 +8,8 @@ import {
   LogOut, 
   FolderOpen, 
   MessageSquare,
-  Target
+  Target,
+  Dog
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,11 +24,33 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("files");
+  const [assistantName, setAssistantName] = useState(() => 
+    localStorage.getItem('pawmate_pet_name') || "Duggu"
+  );
 
 
   const { data: campaigns = [] } = useQuery<any[]>({
     queryKey: ['/api/campaigns'],
   });
+
+  // Listen for changes to the assistant name in localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const newName = localStorage.getItem('pawmate_pet_name') || "Duggu";
+      setAssistantName(newName);
+    };
+
+    // Listen for storage events (from other tabs/windows)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events from the same tab
+    window.addEventListener('assistantNameChanged', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('assistantNameChanged', handleStorageChange);
+    };
+  }, []);
 
   const handleLogout = () => {
     clearAuth();
@@ -79,8 +102,8 @@ export default function Dashboard() {
               <span className="hidden sm:inline">Documents</span>
             </TabsTrigger>
             <TabsTrigger value="pawmate" className="flex items-center gap-2">
-              <span className="text-sm">🐕</span>
-              <span className="hidden sm:inline">Duggu AI</span>
+              <Dog className="h-4 w-4" />
+              <span className="hidden sm:inline">{assistantName} AI</span>
             </TabsTrigger>
           </TabsList>
 
@@ -96,7 +119,7 @@ export default function Dashboard() {
             <NotesDocuments />
           </TabsContent>
 
-          {/* Duggu AI Tab - Enhanced with Advanced Search */}
+          {/* AI Assistant Tab - Enhanced with Advanced Search */}
           <TabsContent value="pawmate" className="mt-6">
             <PawMate />
           </TabsContent>
