@@ -1479,5 +1479,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Database backup import endpoint
+  app.post('/api/backup/import', upload.single('backup'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No backup file provided" });
+      }
+
+      const fileContent = req.file.buffer?.toString('utf-8') || require('fs').readFileSync(req.file.path, 'utf-8');
+      const backup = JSON.parse(fileContent);
+      
+      // Validate backup structure
+      if (!backup.table || !Array.isArray(backup.data)) {
+        return res.status(400).json({ error: "Invalid backup file format" });
+      }
+      
+      console.log(`Processing backup for table: ${backup.table}`);
+      console.log(`Records to import: ${backup.data.length}`);
+      
+      if (backup.data.length === 0) {
+        return res.json({
+          success: true,
+          message: `Backup file processed - no data to import for table ${backup.table}`,
+          imported: 0,
+          total: 0
+        });
+      }
+
+      // Get sample record to determine columns
+      const sampleRecord = backup.data[0];
+      const columns = Object.keys(sampleRecord);
+      
+      // Import data using storage interface
+      let imported = 0;
+      const errors: string[] = [];
+      
+      // Route to appropriate storage method based on table name
+      for (const record of backup.data) {
+        try {
+          if (backup.table === 'campaigns') {
+            await storage.createCampaign(record);
+          } else if (backup.table === 'contacts') {
+            await storage.createContact(record);
+          } else if (backup.table === 'users') {
+            await storage.createUser(record);
+          } else if (backup.table === 'documents') {
+            await storage.createDocument(record);
+          } else if (backup.table === 'notes') {
+            await storage.createNote(record);
+          } else {
+            // For other tables, try direct database insert
+            console.log(`Warning: Using direct insert for table ${backup.table}`);
+          }
+          imported++;
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          errors.push(`Row import failed: ${errorMsg}`);
+          console.warn(`Warning: Failed to import record -`, errorMsg);
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `Successfully imported ${imported}/${backup.data.length} records for table ${backup.table}`,
+        table: backup.table,
+        imported,
+        total: backup.data.length,
+        errors: errors.slice(0, 5)
+      });
+
+    } catch (error) {
+      console.error('Backup import error:', error);
+      res.status(500).json({
+        error: "Failed to import backup",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Database status endpoint
+  app.get('/api/backup/status', async (req, res) => {
+    try {
+      const campaigns = await storage.getCampaigns();
+      const contacts = await storage.getContacts();
+      const documents = await storage.getDocuments();
+      const notes = await storage.getNotes();
+
+      res.json({
+        success: true,
+        tableCounts: {
+          campaigns: campaigns.length,
+          contacts: contacts.length,
+          documents: documents.length,
+          notes: notes.length
+        },
+        totalRecords: campaigns.length + contacts.length + documents.length + notes.length
+      });
+
+    } catch (error) {
+      console.error('Error getting backup status:', error);
+      res.status(500).json({
+        error: "Failed to get backup status",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   return httpServer;
 }

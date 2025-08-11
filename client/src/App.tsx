@@ -7,6 +7,7 @@ import { isAuthenticated } from "@/lib/auth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import CampaignView from "@/pages/campaign-view";
+import BackupImport from "@/pages/BackupImport";
 import NotFound from "@/pages/not-found";
 
 // Protected Route component
@@ -30,6 +31,9 @@ function Router() {
       </Route>
       <Route path="/campaign/:id">
         <ProtectedRoute component={CampaignView} />
+      </Route>
+      <Route path="/backup-import">
+        <ProtectedRoute component={BackupImport} />
       </Route>
       <Route component={NotFound} />
     </Switch>

@@ -1,0 +1,21 @@
+{
+  "table": "campaigns",
+  "timestamp": "2025-08-11T10:54:00.000Z",
+  "recordCount": 2,
+  "data": [
+    {
+      "id": 1,
+      "name": "Test Campaign 1",
+      "description": "Sample campaign from old database",
+      "encryptedData": "encrypted_data_placeholder",
+      "createdAt": "2025-08-11T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Test Campaign 2", 
+      "description": "Another sample campaign",
+      "encryptedData": "encrypted_data_placeholder_2",
+      "createdAt": "2025-08-11T10:30:00.000Z"
+    }
+  ]
+}
