@@ -27,6 +27,14 @@ This is a full-stack web application for campaign management with secure data ha
 
 ## Recent Changes
 
+### Deployment Files Cleanup (August 11, 2025)
+- ✓ Removed all third-party automatic deployment configurations
+- ✓ Deleted AWS, Heroku, Railway, Render, Vercel, Fly.io deployment files
+- ✓ Removed Docker and Docker Compose configurations
+- ✓ Cleaned up deployment scripts (deploy-aws.sh, deploy.sh, install.sh)
+- ✓ Eliminated automatic server creation during AWS deployment
+- ✓ Project now ready for manual AWS deployment without conflicts
+
 ### Chat History Persistence Fix (August 11, 2025)
 - ✓ Fixed chatbot chat history not being saved properly to database
 - ✓ Resolved LSP diagnostic syntax errors in pawmate.tsx component
