@@ -801,19 +801,19 @@ Your data has been securely encrypted and added to the system. You can now searc
 
   return (
     <Card className="w-full h-[600px] max-h-[600px] flex flex-col overflow-hidden fixed-chat-card">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b flex-shrink-0">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-            <Dog className="w-5 h-5 text-white" />
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2 px-4 border-b flex-shrink-0">
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+            <Dog className="w-3 h-3 text-white" />
           </div>
           <div>
-            <CardTitle className="text-xl">{petName || 'Duggu'}</CardTitle>
-            <p className="text-sm text-muted-foreground flex items-center mt-1">
-              <MessageCircle className="w-3 h-3 mr-1" />
-              AI Chat & Advanced Database Search
+            <CardTitle className="text-sm font-medium">{petName || 'Duggu'}</CardTitle>
+            <p className="text-xs text-muted-foreground flex items-center">
+              <MessageCircle className="w-2 h-2 mr-1" />
+              AI Chat
               {isUsingRealAI !== null && (
-                <Badge variant="outline" className="ml-2 text-xs">
-                  {isUsingRealAI ? 'OpenAI GPT-4' : 'Basic Mode'}
+                <Badge variant="outline" className="ml-1 text-[10px] px-1 py-0 h-4">
+                  {isUsingRealAI ? 'GPT-4' : 'Basic'}
                 </Badge>
               )}
             </p>
@@ -822,8 +822,8 @@ Your data has been securely encrypted and added to the system. You can now searc
         
         <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Settings className="w-4 h-4" />
+            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+              <Settings className="w-3 h-3" />
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -863,14 +863,14 @@ Your data has been securely encrypted and added to the system. You can now searc
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden min-h-0">
-        <ScrollArea className="flex-1 p-6 overflow-y-auto" style={{ height: '400px', maxHeight: '400px' }}>
+        <ScrollArea className="flex-1 p-4 overflow-y-auto" style={{ height: '460px', maxHeight: '460px' }}>
           <div className="space-y-4 pr-2">
             {messages.map(renderMessage)}
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
-        <div className="border-t p-4 flex-shrink-0 bg-white">
+        <div className="border-t p-3 flex-shrink-0 bg-white">
           <div className="flex space-x-2">
             <Input
               value={petMessage}
@@ -893,7 +893,7 @@ Your data has been securely encrypted and added to the system. You can now searc
             </Button>
           </div>
           
-          <div className="flex flex-wrap gap-2 mt-3 max-h-20 overflow-y-auto">
+          <div className="flex flex-wrap gap-1 mt-2 max-h-16 overflow-y-auto">
             <Button 
               variant="outline" 
               size="sm" 
