@@ -2,8 +2,8 @@ import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
-// Use Neon database if available, fallback to local DATABASE_URL
-const databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+// Use Neon database with branch if available, then fallback to regular Neon, then local DATABASE_URL
+const databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   throw new Error(
