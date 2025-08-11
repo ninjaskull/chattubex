@@ -168,7 +168,7 @@ export default function NotesDocuments() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)] bg-white rounded-lg border">
+    <div className="flex flex-col h-[calc(100vh-160px)] bg-white rounded-lg border">
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b bg-slate-50 rounded-t-lg">
         <div className="flex items-center space-x-3">

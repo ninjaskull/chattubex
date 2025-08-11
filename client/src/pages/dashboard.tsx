@@ -60,8 +60,21 @@ export default function Dashboard() {
       setIsScrolled(scrollTop > 100); // Show sticky sidebar after 100px scroll
     };
 
+    // Use passive scroll listener for better performance
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Also handle scroll on the main content area
+    const mainContent = document.querySelector('.main-content-area');
+    if (mainContent) {
+      mainContent.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (mainContent) {
+        mainContent.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, []);
 
   const handleLogout = () => {
@@ -183,7 +196,7 @@ export default function Dashboard() {
           </div>
           
           {/* Content for all screen sizes */}
-          <div>
+          <div className="main-content-area">
             {activeTab === "files" && <CampaignList />}
             {activeTab === "notes" && <NotesDocuments />}
             {activeTab === "pawmate" && <PawMate />}
