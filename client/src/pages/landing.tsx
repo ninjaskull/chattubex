@@ -659,10 +659,15 @@ export default function Landing() {
                       {authMutation.isPending ? (
                         <Zap className="w-3 h-3 animate-spin" />
                       ) : (
-                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="3"/>
-                          <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
-                          <path d="m19.07 4.93-4.24 4.24m-5.66 0L4.93 4.93m14.14 14.14-4.24-4.24m-5.66 0L4.93 19.07"/>
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                          {/* Paw pad */}
+                          <ellipse cx="12" cy="16" rx="3.5" ry="2.5"/>
+                          {/* Toe pads */}
+                          <circle cx="8" cy="10" r="1.5"/>
+                          <circle cx="12" cy="8" r="1.5"/>
+                          <circle cx="16" cy="10" r="1.5"/>
+                          <circle cx="10" cy="12" r="1.2"/>
+                          <circle cx="14" cy="12" r="1.2"/>
                         </svg>
                       )}
                     </Button>
