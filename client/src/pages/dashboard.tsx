@@ -59,14 +59,6 @@ export default function Dashboard() {
             <Badge variant="secondary" className="bg-blue-100 text-blue-700">
               {totalCampaigns} Lead Campaigns
             </Badge>
-            <Button 
-              variant="outline" 
-              onClick={() => setLocation('/backup-import')}
-              className="text-slate-600 hover:text-slate-900 border-blue-200 hover:bg-blue-50"
-            >
-              <Upload className="mr-2 h-4 w-4" />
-              Import Data
-            </Button>
             <Button variant="ghost" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
               <LogOut className="mr-2 h-4 w-4" />
               Logout
