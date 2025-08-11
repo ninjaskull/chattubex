@@ -1350,12 +1350,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fullResponse = '';
       
       try {
-        // Create streaming response with faster model
+        // Create streaming response with faster OpenRouter model
         const stream = await realOpenAI.createStreamingResponse({
-          model: "gpt-4o-mini",
+          model: "anthropic/claude-3-haiku",
           messages: [systemMessage, ...messages],
           temperature: 0.7,
-          max_tokens: 300,
+          max_tokens: 400,
           stream: true
         });
 
@@ -1374,7 +1374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: 'assistant',
             content: fullResponse,
             metadata: { 
-              model: 'gpt-4o-mini',
+              model: 'anthropic/claude-3-haiku',
               petName, 
               userName,
               petType,
@@ -1459,7 +1459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
       const response = await realOpenAI.generateChatCompletion({
-        model: "gpt-4o-mini", // Using fast OpenAI model for better performance
+        model: "anthropic/claude-3-haiku", // Using faster OpenRouter model
         messages: messages,
         temperature: 0.7,
         max_tokens: 500 // Reduced for faster responses
@@ -1474,7 +1474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: 'assistant',
           content: response.choices[0].message.content,
           metadata: { 
-            model: 'gpt-4o-mini',
+            model: 'anthropic/claude-3-haiku',
             tokens: response.usage,
             petName, 
             userName,

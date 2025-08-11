@@ -36,9 +36,14 @@ class RealOpenAIService {
   private openai: OpenAI;
 
   constructor(apiKey: string) {
-    // Use OpenAI directly for better performance
+    // Use OpenRouter API as requested
     this.openai = new OpenAI({
-      apiKey: apiKey
+      apiKey: apiKey,
+      baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer": "https://fallowl.replit.app", // Your site URL
+        "X-Title": "FallOwl Campaign Manager", // Your site name
+      }
     });
   }
 
@@ -116,12 +121,12 @@ class RealOpenAIService {
         ...request.messages
       ];
 
-      // Using fast OpenAI GPT-4o-mini for better performance
+      // Using OpenRouter with faster model for better performance
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "anthropic/claude-3-haiku", // Faster than wizardlm-2-8x22b
         messages: enhancedMessages,
         temperature: request.temperature || 0.7,
-        max_tokens: request.max_tokens || 300, // Reduced for faster responses
+        max_tokens: request.max_tokens || 400,
       });
 
       return {
@@ -148,10 +153,10 @@ class RealOpenAIService {
     try {
       // For streaming, we'll use a simpler approach with OpenAI
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4o-mini", // Much faster and cheaper model
+        model: "anthropic/claude-3-haiku", // Faster model via OpenRouter
         messages: request.messages,
         temperature: request.temperature || 0.7,
-        max_tokens: request.max_tokens || 300, // Reduce tokens for speed
+        max_tokens: request.max_tokens || 400,
         stream: true
       });
 
