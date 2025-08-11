@@ -125,7 +125,7 @@ class RealOpenAIService {
         model: "microsoft/wizardlm-2-8x22b",
         messages: enhancedMessages,
         temperature: request.temperature || 0.7,
-        max_tokens: request.max_tokens || 1000, // Increased for comprehensive responses
+        max_tokens: request.max_tokens || 500, // Reduced for faster responses
       });
 
       return {

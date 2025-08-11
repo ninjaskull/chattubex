@@ -259,6 +259,7 @@ export default function PawMate() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [lastSearchQuery, setLastSearchQuery] = useState('');
+  const [historyInitialized, setHistoryInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -269,6 +270,8 @@ export default function PawMate() {
 
   // Load chat history on component mount
   useEffect(() => {
+    if (historyInitialized) return; // Prevent re-initialization
+    
     const loadChatHistory = async () => {
       let historyLoaded = false;
       
@@ -342,10 +345,12 @@ I'm your comprehensive solution for lead generation, data analysis, and business
           timestamp: new Date()
         }]);
       }
+      
+      setHistoryInitialized(true);
     };
 
     loadChatHistory();
-  }, [sessionId, petName, userName]);
+  }, [sessionId, historyInitialized]); // Only depend on sessionId to avoid reloading when name changes
 
   // Search query detection logic
   const isSearchQuery = (query: string): boolean => {

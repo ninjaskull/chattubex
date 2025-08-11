@@ -1329,7 +1329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         model: "microsoft/wizardlm-2-8x22b", // Using OpenRouter model as requested
         messages: messages,
         temperature: 0.7,
-        max_tokens: 1500
+        max_tokens: 500 // Reduced for faster responses
       }, petName, petType);
       
       response.isRealAI = true;
