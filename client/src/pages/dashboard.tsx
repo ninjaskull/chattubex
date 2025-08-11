@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [assistantName, setAssistantName] = useState(() => 
     localStorage.getItem('pawmate_pet_name') || "Duggu"
   );
+  const [isScrolled, setIsScrolled] = useState(false);
 
 
   const { data: campaigns = [] } = useQuery<any[]>({
@@ -50,6 +51,17 @@ export default function Dashboard() {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('assistantNameChanged', handleStorageChange);
     };
+  }, []);
+
+  // Scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setIsScrolled(scrollTop > 100); // Show sticky sidebar after 100px scroll
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLogout = () => {
@@ -91,31 +103,50 @@ export default function Dashboard() {
       </header>
       {/* Main Content Area with Sidebar */}
       <div className="max-w-7xl mx-auto px-4 pt-3 flex gap-6">
-        {/* Sticky Sidebar Navigation */}
-        <div className="hidden md:block w-48 shrink-0">
-          <div className="sticky top-20 bg-white/80 backdrop-blur-sm rounded-lg border border-slate-200/50 p-2">
+        {/* Smart Sidebar Navigation */}
+        <div className="hidden md:block shrink-0" style={{ width: isScrolled ? '3.5rem' : '12rem' }}>
+          <div className={`sticky top-20 bg-white/90 backdrop-blur-sm border border-slate-200/50 transition-all duration-300 ${
+            isScrolled 
+              ? 'rounded-r-lg shadow-lg fixed left-0 top-20 z-40 p-1' 
+              : 'rounded-lg p-2'
+          }`}>
             <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="w-full">
-              <TabsList className="grid w-full grid-rows-3 bg-transparent p-1 h-auto gap-1">
+              <TabsList className={`grid w-full grid-rows-3 bg-transparent h-auto gap-1 ${isScrolled ? 'p-0' : 'p-1'}`}>
                 <TabsTrigger 
                   value="files" 
-                  className="flex items-center justify-start gap-2 w-full p-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-slate-50"
+                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 ${
+                    isScrolled 
+                      ? 'justify-center p-2 gap-0' 
+                      : 'justify-start gap-2 p-3'
+                  }`}
+                  title={isScrolled ? "Campaigns" : undefined}
                 >
                   <FolderOpen className="h-4 w-4" />
-                  <span>Campaigns</span>
+                  {!isScrolled && <span>Campaigns</span>}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="notes" 
-                  className="flex items-center justify-start gap-2 w-full p-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-slate-50"
+                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 ${
+                    isScrolled 
+                      ? 'justify-center p-2 gap-0' 
+                      : 'justify-start gap-2 p-3'
+                  }`}
+                  title={isScrolled ? "Documents" : undefined}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>Documents</span>
+                  {!isScrolled && <span>Documents</span>}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="pawmate" 
-                  className="flex items-center justify-start gap-2 w-full p-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-slate-50"
+                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 ${
+                    isScrolled 
+                      ? 'justify-center p-2 gap-0' 
+                      : 'justify-start gap-2 p-3'
+                  }`}
+                  title={isScrolled ? assistantName : undefined}
                 >
                   <Dog className="h-4 w-4" />
-                  <span>{assistantName}</span>
+                  {!isScrolled && <span>{assistantName}</span>}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -143,7 +174,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
+        <div className={`flex-1 min-w-0 transition-all duration-300 ${isScrolled ? 'md:ml-14' : ''}`}>
           {/* Desktop Content (hidden on mobile, uses sidebar tabs) */}
           <div className="hidden md:block">
             {activeTab === "files" && (
