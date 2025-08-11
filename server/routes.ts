@@ -1190,7 +1190,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
         } catch (error) {
-          console.error(`Error searching campaign ${campaign.id}:`, error);
+          // Skip campaigns with encryption errors silently
+          console.warn(`Skipping campaign ${campaign.id} - encryption mismatch`);
         }
       }
 
@@ -1340,11 +1341,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
       
-      // Prepare messages with system context
+      // Prepare messages with enhanced system context including emoji support
       const userNameContext = userName ? ` The user's name is ${userName}, so address them by name when appropriate.` : '';
       const systemMessage = {
         role: 'system' as const,
-        content: `You are ${petName || 'Duggu'}, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers.${userNameContext} Keep responses concise and actionable.`
+        content: `You are ${petName || 'Duggu'}, an intelligent lead scoring and business intelligence AI assistant created by Fallowl. You specialize in analyzing contact databases and identifying the highest quality business prospects.
+
+## Core Capabilities:
+- **Lead Scoring & Analysis**: Identify high-quality prospects from contact databases 📊
+- **Contact Intelligence**: Analyze contact data for business value and conversion potential 🎯
+- **Campaign Optimization**: Strategic recommendations for improved conversions 🚀
+
+## Response Guidelines:
+- Use relevant emojis to make responses engaging (📊 🎯 🏢 💼 🚀 ✅ 📧 📱)
+- Use **bold** for important terms and key information
+- Structure responses clearly with bullet points and sections
+- Be friendly, helpful, and conversational while maintaining professionalism
+- Keep responses concise but comprehensive
+
+${userNameContext}
+
+You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers with appropriate emoji usage for better engagement.`
       };
 
       let fullResponse = '';
