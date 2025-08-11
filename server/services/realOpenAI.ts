@@ -148,6 +148,24 @@ class RealOpenAIService {
     }
   }
 
+  async createStreamingResponse(request: ChatCompletionRequest & { stream: boolean }) {
+    try {
+      // For streaming, we'll use a simpler approach with OpenAI
+      const response = await this.openai.chat.completions.create({
+        model: "microsoft/wizardlm-2-8x22b",
+        messages: request.messages,
+        temperature: request.temperature || 0.7,
+        max_tokens: request.max_tokens || 500,
+        stream: true
+      });
+
+      return response;
+    } catch (error) {
+      console.error('OpenAI streaming error:', error);
+      throw new Error('Failed to create streaming response');
+    }
+  }
+
   private async getDatabaseContext(): Promise<string> {
     try {
       const [campaigns, contacts] = await Promise.all([

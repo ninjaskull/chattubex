@@ -453,7 +453,8 @@ I'm your comprehensive solution for lead generation, data analysis, and business
         content: `You are ${petName || 'Duggu'}, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers.${userNameContext} If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
       };
 
-      const response = await fetch('/api/pawmate/chat', {
+      // Use streaming endpoint for real-time responses
+      const response = await fetch('/api/pawmate/chat-stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -467,31 +468,111 @@ I'm your comprehensive solution for lead generation, data analysis, and business
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setIsUsingRealAI(data.isRealAI);
+      if (response.ok && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let streamedContent = '';
+        let currentBotMessageId = Date.now().toString();
         
-        // Update session ID if returned from server
-        if (data.sessionId && data.sessionId !== sessionId) {
-          setSessionId(data.sessionId);
-          localStorage.setItem('pawmate_session_id', data.sessionId);
-        }
-        
-        let aiResponse = data.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
-        
-        // Clean up any unwanted recommendation sections
-        aiResponse = aiResponse.replace(/Recommendations?:[\s\S]*?(?=\n\n|$)/gi, '');
-        aiResponse = aiResponse.replace(/Next Steps?:[\s\S]*?(?=\n\n|$)/gi, '');
-        
-        const botMessage: Message = {
-          id: Date.now().toString(),
+        // Remove typing indicator and add empty bot message for streaming
+        setMessages(prev => prev.slice(0, -1).concat([{
+          id: currentBotMessageId,
           type: 'bot',
-          content: aiResponse,
+          content: '',
           timestamp: new Date()
-        };
-        
-        // Remove typing indicator and add AI response
-        setMessages(prev => prev.slice(0, -1).concat([botMessage]));
+        }]));
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(6));
+                  
+                  if (data.type === 'session' && data.sessionId && data.sessionId !== sessionId) {
+                    setSessionId(data.sessionId);
+                    localStorage.setItem('pawmate_session_id', data.sessionId);
+                  } else if (data.type === 'content') {
+                    streamedContent += data.content;
+                    // Update the bot message with streaming content
+                    setMessages(prev => prev.map(msg => 
+                      msg.id === currentBotMessageId 
+                        ? { ...msg, content: streamedContent }
+                        : msg
+                    ));
+                  } else if (data.type === 'done') {
+                    setIsUsingRealAI(true);
+                  } else if (data.type === 'error') {
+                    console.error('Streaming error:', data.message);
+                    // Update message with error content
+                    setMessages(prev => prev.map(msg => 
+                      msg.id === currentBotMessageId 
+                        ? { ...msg, content: "I encountered an error processing your request. Please try again." }
+                        : msg
+                    ));
+                  }
+                } catch (parseError) {
+                  // Ignore parsing errors for incomplete chunks
+                }
+              }
+            }
+          }
+        } catch (streamError) {
+          console.error('Stream reading error:', streamError);
+          setMessages(prev => prev.map(msg => 
+            msg.id === currentBotMessageId 
+              ? { ...msg, content: "I encountered an error processing your request. Please try again." }
+              : msg
+          ));
+        }
+      } else {
+        // Fallback to original endpoint if streaming fails
+        const fallbackResponse = await fetch('/api/pawmate/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: [systemMessage, ...conversationHistory],
+            petName: petName || 'Duggu',
+            userName: userName || '',
+            petType: 'assistant',
+            sessionId: sessionId || `pawmate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          }),
+        });
+
+        if (fallbackResponse.ok) {
+          const data = await fallbackResponse.json();
+          setIsUsingRealAI(data.isRealAI);
+          
+          // Update session ID if returned from server
+          if (data.sessionId && data.sessionId !== sessionId) {
+            setSessionId(data.sessionId);
+            localStorage.setItem('pawmate_session_id', data.sessionId);
+          }
+          
+          let aiResponse = data.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
+          
+          // Clean up any unwanted recommendation sections
+          aiResponse = aiResponse.replace(/Recommendations?:[\s\S]*?(?=\n\n|$)/gi, '');
+          aiResponse = aiResponse.replace(/Next Steps?:[\s\S]*?(?=\n\n|$)/gi, '');
+          
+          const botMessage: Message = {
+            id: Date.now().toString(),
+            type: 'bot',
+            content: aiResponse,
+            timestamp: new Date()
+          };
+          
+          // Remove typing indicator and add AI response
+          setMessages(prev => prev.slice(0, -1).concat([botMessage]));
+        }
       }
     } catch (error) {
       console.error('Message processing failed:', error);

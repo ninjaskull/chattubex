@@ -1273,14 +1273,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PawMate Chatbot endpoint with persistent history
-  app.post('/api/pawmate/chat', async (req, res) => {
+  // PawMate Chatbot endpoint with streaming support
+  app.post('/api/pawmate/chat-stream', async (req, res) => {
     try {
-      const { messages, petName, petType, sessionId } = req.body;
+      const { messages, petName, userName, petType, sessionId } = req.body;
       
       if (!messages || !Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({ message: 'Messages array is required' });
       }
+
+      // Set up SSE headers
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Cache-Control'
+      });
 
       let currentSessionId = sessionId;
 
@@ -1290,7 +1299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await databaseService.createChatSession({
           sessionId: currentSessionId,
           petName: petName || null,
-          petType: petType || 'pet',
+          petType: petType || 'assistant',
           title: null,
           isActive: true
         });
@@ -1301,7 +1310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await databaseService.createChatSession({
             sessionId: currentSessionId,
             petName: petName || null,
-            petType: petType || 'pet',
+            petType: petType || 'assistant',
             title: null,
             isActive: true
           });
@@ -1315,7 +1324,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sessionId: currentSessionId,
           role: 'user',
           content: latestUserMessage.content,
-          metadata: { petName, petType }
+          metadata: { petName, userName, petType }
+        });
+      }
+
+      // Send session ID first
+      res.write(`data: ${JSON.stringify({ type: 'session', sessionId: currentSessionId })}\n\n`);
+
+      // Use real OpenAI service with streaming
+      if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.trim() === '') {
+        res.write(`data: ${JSON.stringify({ type: 'error', message: 'OpenAI API key is required' })}\n\n`);
+        res.end();
+        return;
+      }
+
+      const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
+      
+      // Prepare messages with system context
+      const userNameContext = userName ? ` The user's name is ${userName}, so address them by name when appropriate.` : '';
+      const systemMessage = {
+        role: 'system' as const,
+        content: `You are ${petName || 'Duggu'}, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers.${userNameContext} Keep responses concise and actionable.`
+      };
+
+      let fullResponse = '';
+      
+      try {
+        // Create streaming response
+        const stream = await realOpenAI.createStreamingResponse({
+          model: "microsoft/wizardlm-2-8x22b",
+          messages: [systemMessage, ...messages],
+          temperature: 0.7,
+          max_tokens: 500,
+          stream: true
+        });
+
+        for await (const chunk of stream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          if (content) {
+            fullResponse += content;
+            res.write(`data: ${JSON.stringify({ type: 'content', content })}\n\n`);
+          }
+        }
+
+        // Save the complete AI response to history
+        if (fullResponse) {
+          await databaseService.saveChatMessage({
+            sessionId: currentSessionId,
+            role: 'assistant',
+            content: fullResponse,
+            metadata: { 
+              model: 'microsoft/wizardlm-2-8x22b',
+              petName, 
+              userName,
+              petType,
+              streaming: true
+            }
+          });
+
+          // Auto-generate title if this is a new conversation
+          const session = await databaseService.getChatSession(currentSessionId);
+          if (session && !session.title) {
+            const title = await databaseService.generateSessionTitle(currentSessionId);
+            await databaseService.updateChatSession(currentSessionId, { title });
+          }
+        }
+
+        res.write(`data: ${JSON.stringify({ type: 'done', sessionId: currentSessionId })}\n\n`);
+        res.end();
+        
+      } catch (streamError) {
+        console.error('Streaming error:', streamError);
+        res.write(`data: ${JSON.stringify({ type: 'error', message: 'Failed to generate response' })}\n\n`);
+        res.end();
+      }
+
+    } catch (error) {
+      console.error('PawMate chat stream error:', error);
+      res.write(`data: ${JSON.stringify({ type: 'error', message: 'Failed to initialize chat' })}\n\n`);
+      res.end();
+    }
+  });
+
+  // Keep the original endpoint for backward compatibility
+  app.post('/api/pawmate/chat', async (req, res) => {
+    try {
+      const { messages, petName, userName, petType, sessionId } = req.body;
+      
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ message: 'Messages array is required' });
+      }
+
+      let currentSessionId = sessionId;
+
+      // Create or get session
+      if (!currentSessionId) {
+        currentSessionId = `pawmate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        await databaseService.createChatSession({
+          sessionId: currentSessionId,
+          petName: petName || null,
+          petType: petType || 'assistant',
+          title: null,
+          isActive: true
+        });
+      } else {
+        // Ensure session exists in database
+        const existingSession = await databaseService.getChatSession(currentSessionId);
+        if (!existingSession) {
+          await databaseService.createChatSession({
+            sessionId: currentSessionId,
+            petName: petName || null,
+            petType: petType || 'assistant',
+            title: null,
+            isActive: true
+          });
+        }
+      }
+
+      // Save the latest user message to history
+      const latestUserMessage = messages[messages.length - 1];
+      if (latestUserMessage && latestUserMessage.role === 'user') {
+        await databaseService.saveChatMessage({
+          sessionId: currentSessionId,
+          role: 'user',
+          content: latestUserMessage.content,
+          metadata: { petName, userName, petType }
         });
       }
 
@@ -1344,6 +1477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             model: 'microsoft/wizardlm-2-8x22b',
             tokens: response.usage,
             petName, 
+            userName,
             petType 
           }
         });
