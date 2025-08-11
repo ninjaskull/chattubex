@@ -709,10 +709,10 @@ Your data has been securely encrypted and added to the system. You can now searc
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b flex-shrink-0">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-lg">🐕</span>
+            <Dog className="w-5 h-5 text-white" />
           </div>
           <div>
-            <CardTitle className="text-xl">{petName || 'Duggu'} AI Assistant</CardTitle>
+            <CardTitle className="text-xl">{petName || 'Duggu'}</CardTitle>
             <p className="text-sm text-muted-foreground flex items-center mt-1">
               <MessageCircle className="w-3 h-3 mr-1" />
               AI Chat & Advanced Database Search
