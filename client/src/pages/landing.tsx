@@ -189,7 +189,7 @@ export default function Landing() {
 
       {/* Navigation */}
       <nav className={`relative z-50 ${isDarkMode ? 'bg-slate-900/90' : 'bg-white/90'} backdrop-blur-xl border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 xl:px-12">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 pulse-glow">
@@ -252,7 +252,7 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-32 min-h-screen flex items-center overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
+        <div className="max-w-full mx-auto px-4 sm:px-6 xl:px-12 w-full">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
             <div className="mb-12 lg:mb-0">
               <div className="flex items-center space-x-2 mb-6">
@@ -355,7 +355,7 @@ export default function Landing() {
 
       {/* About Section */}
       <section id="about" className={`py-24 ${isDarkMode ? 'bg-slate-900/50' : 'bg-slate-50/50'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 xl:px-12">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Why Choose </span>
@@ -417,7 +417,7 @@ export default function Landing() {
 
       {/* Services Section */}
       <section id="services" className="py-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 xl:px-12">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Our </span>
@@ -471,7 +471,7 @@ export default function Landing() {
 
       {/* Case Studies Section */}
       <section id="portfolio" className={`py-24 ${isDarkMode ? 'bg-slate-900/50' : 'bg-slate-50/50'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 xl:px-12">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Success </span>
@@ -550,7 +550,7 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')]"></div>
         
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
+        <div className="relative max-w-full mx-auto px-4 sm:px-6 xl:px-12 text-center">
           <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
             Let's Build the Future Together
           </h2>
@@ -570,7 +570,7 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className={`py-16 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-100'} border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 xl:px-12">
           <div className="grid md:grid-cols-4 gap-12">
             <div>
               <div className="flex items-center space-x-3 mb-6">
