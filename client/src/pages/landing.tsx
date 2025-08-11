@@ -627,7 +627,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className={`mt-12 pt-8 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-300'} flex justify-between items-center relative`}>
+          <div className={`mt-12 pt-8 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-300'} flex justify-between items-center`}>
             <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
               © <span onClick={handleYearClick} className="cursor-pointer hover:text-blue-400 transition-colors">2025</span> FallOwl. All rights reserved.
             </p>
@@ -635,58 +635,63 @@ export default function Landing() {
               <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Privacy</a>
               <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Terms</a>
             </div>
-            
-            {/* Hidden password field that appears after clicking 2025 five times */}
-            {showPasswordField && (
-              <div className="absolute bottom-full right-0 mb-4 flex items-center space-x-2 p-3 rounded-lg shadow-lg backdrop-blur-sm bg-slate-900/80 border border-slate-700">
-                <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
-                  <Input 
-                    type="password"
-                    placeholder="🔑 Admin password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-40 h-8 text-sm bg-slate-800 border-slate-600 text-white placeholder-slate-400"
-                  />
-                  <Button 
-                    type="submit"
-                    size="sm"
-                    className="h-8 w-8 p-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                    disabled={authMutation.isPending}
-                  >
-                    {authMutation.isPending ? (
-                      <Zap className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793c-.39.39-1.023.39-1.414 0L13 13v6c0 .553-.448 1-1 1s-1-.447-1-1v-6l-1.793 1.793c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414L12 8.586l4.207 4.207c.39.39.39 1.024 0 1.414z"/>
-                        <ellipse cx="12" cy="6" rx="3" ry="2" fill="currentColor" opacity="0.6"/>
-                        <path d="M8.5 10.5c-.5.8-.5 1.5 0 2s1 .5 1.5 0c.3-.3.7-.5 1-.5s.7.2 1 .5c.5.5 1-.5 1.5 0s.5-1.2 0-2c-.3-.5-.8-.8-1.5-.8s-1.2.3-1.5.8z" fill="currentColor" opacity="0.8"/>
-                      </svg>
-                    )}
-                  </Button>
-                </form>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0 text-slate-400 hover:text-white"
-                  onClick={() => setShowPasswordField(false)}
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </footer>
 
-      {/* Floating Chat Widget */}
-      <div className="fixed bottom-8 right-8 z-50">
-        <Button 
-          size="lg"
-          className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl neon-glow floating-animation"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </Button>
-      </div>
+      {/* Floating Chat Widget - Hidden when password field is visible */}
+      {!showPasswordField && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <Button 
+            size="lg"
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl neon-glow floating-animation"
+          >
+            <MessageCircle className="w-6 h-6" />
+          </Button>
+        </div>
+      )}
+
+      {/* Hidden password field that appears after clicking 2025 five times */}
+      {showPasswordField && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <div className="flex items-center space-x-2 p-4 rounded-2xl shadow-2xl backdrop-blur-sm bg-slate-900/90 border border-slate-700">
+            <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
+              <Input 
+                type="password"
+                placeholder="🔑 Admin password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-48 h-10 text-sm bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                autoFocus
+              />
+              <Button 
+                type="submit"
+                size="sm"
+                className="h-10 w-10 p-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full"
+                disabled={authMutation.isPending}
+              >
+                {authMutation.isPending ? (
+                  <Zap className="w-4 h-4 animate-spin" />
+                ) : (
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793c-.39.39-1.023.39-1.414 0L13 13v6c0 .553-.448 1-1 1s-1-.447-1-1v-6l-1.793 1.793c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414L12 8.586l4.207 4.207c.39.39.39 1.024 0 1.414z"/>
+                    <ellipse cx="12" cy="6" rx="3" ry="2" fill="currentColor" opacity="0.6"/>
+                    <path d="M8.5 10.5c-.5.8-.5 1.5 0 2s1 .5 1.5 0c.3-.3.7-.5 1-.5s.7.2 1 .5c.5.5 1-.5 1.5 0s.5-1.2 0-2c-.3-.5-.8-.8-1.5-.8s-1.2.3-1.5.8z" fill="currentColor" opacity="0.8"/>
+                  </svg>
+                )}
+              </Button>
+            </form>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-slate-400 hover:text-white rounded-full"
+              onClick={() => setShowPasswordField(false)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Admin Access Modal */}
       {showAdminAccess && (
