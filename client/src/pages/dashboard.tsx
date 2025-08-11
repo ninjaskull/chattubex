@@ -66,31 +66,31 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 px-6 py-4 sticky top-0 z-50">
+      {/* Compact Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 px-4 py-2 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Target className="text-white h-5 w-5" />
+          <div className="flex items-center space-x-3">
+            <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow">
+              <Target className="text-white h-3 w-3" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">FallOwl Dashboard</h1>
-              <p className="text-sm text-slate-600">AI-powered lead scoring and business intelligence</p>
+              <h1 className="text-lg font-bold text-slate-900">FallOwl Dashboard</h1>
+              <p className="text-xs text-slate-500">AI-powered lead scoring and business intelligence</p>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-              {totalCampaigns} Lead Campaigns
+          <div className="flex items-center space-x-2">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs px-2 py-0">
+              {totalCampaigns} Campaigns
             </Badge>
-            <Button variant="ghost" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
-              <LogOut className="mr-2 h-4 w-4" />
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-600 hover:text-slate-900 text-sm h-7">
+              <LogOut className="mr-1 h-3 w-3" />
               Logout
             </Button>
           </div>
         </div>
       </header>
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-6 pt-6">
+      <div className="max-w-7xl mx-auto px-4 pt-3">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
