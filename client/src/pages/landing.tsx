@@ -651,32 +651,33 @@ export default function Landing() {
         </div>
       )}
 
-      {/* Hidden password field that appears after clicking 2025 five times */}
+      {/* Hidden password field that appears after clicking 2025 five times - Windows activation style */}
       {showPasswordField && (
-        <div className="fixed bottom-8 right-8 z-50">
-          <div className="flex items-center space-x-2 p-4 rounded-2xl shadow-2xl backdrop-blur-sm bg-slate-900/90 border border-slate-700">
+        <div className="fixed bottom-4 right-4 z-50">
+          <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-slate-800/70 backdrop-blur-sm border border-slate-600/50 text-xs">
             <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
               <Input 
                 type="password"
-                placeholder="🔑 Admin password" 
+                placeholder="Admin password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-48 h-10 text-sm bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                className="w-32 h-7 text-xs bg-slate-700/50 border-slate-500/30 text-slate-200 placeholder-slate-400 focus:border-slate-400"
                 autoFocus
               />
               <Button 
                 type="submit"
                 size="sm"
-                className="h-10 w-10 p-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full"
+                variant="ghost"
+                className="h-7 w-7 p-0 text-slate-300 hover:text-white hover:bg-slate-600/50"
                 disabled={authMutation.isPending}
               >
                 {authMutation.isPending ? (
-                  <Zap className="w-4 h-4 animate-spin" />
+                  <Zap className="w-3 h-3 animate-spin" />
                 ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793c-.39.39-1.023.39-1.414 0L13 13v6c0 .553-.448 1-1 1s-1-.447-1-1v-6l-1.793 1.793c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414L12 8.586l4.207 4.207c.39.39.39 1.024 0 1.414z"/>
-                    <ellipse cx="12" cy="6" rx="3" ry="2" fill="currentColor" opacity="0.6"/>
-                    <path d="M8.5 10.5c-.5.8-.5 1.5 0 2s1 .5 1.5 0c.3-.3.7-.5 1-.5s.7.2 1 .5c.5.5 1-.5 1.5 0s.5-1.2 0-2c-.3-.5-.8-.8-1.5-.8s-1.2.3-1.5.8z" fill="currentColor" opacity="0.8"/>
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                    <path d="m19.07 4.93-4.24 4.24m-5.66 0L4.93 4.93m14.14 14.14-4.24-4.24m-5.66 0L4.93 19.07"/>
                   </svg>
                 )}
               </Button>
@@ -684,10 +685,10 @@ export default function Landing() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 text-slate-400 hover:text-white rounded-full"
+              className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
               onClick={() => setShowPasswordField(false)}
             >
-              <X className="w-4 h-4" />
+              <X className="w-3 h-3" />
             </Button>
           </div>
         </div>
