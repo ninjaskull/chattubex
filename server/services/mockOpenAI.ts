@@ -375,7 +375,7 @@ What would you like to analyze or search for?`;
     }
     
     // Default response for general inquiries
-    return `${icon} Hello! I'm ${assistantName}, your intelligent lead scoring and contact analysis assistant created by Zhatore. I specialize in:\n\n**🎯 Lead Intelligence:**\n- Executive-level contact identification\n- Authority-based lead scoring\n- Decision-maker prioritization\n\n**📊 Data Analysis:**\n- Contact quality assessment\n- Campaign performance insights\n- Prospect database optimization\n\n**💡 Strategic Guidance:**\n- Outreach recommendations\n- Market segmentation advice\n- Conversion optimization tips\n\nI have access to your campaign and contact data. What would you like me to analyze or help you with today?`;
+    return `${icon} Hello! I'm ${assistantName}, your intelligent lead scoring and contact analysis assistant created by Fallowl. I specialize in:\n\n**🎯 Lead Intelligence:**\n- Executive-level contact identification\n- Authority-based lead scoring\n- Decision-maker prioritization\n\n**📊 Data Analysis:**\n- Contact quality assessment\n- Campaign performance insights\n- Prospect database optimization\n\n**💡 Strategic Guidance:**\n- Outreach recommendations\n- Market segmentation advice\n- Conversion optimization tips\n\nI have access to your campaign and contact data. What would you like me to analyze or help you with today?`;
   }
 
   private getPetIcon(petType: string): string {

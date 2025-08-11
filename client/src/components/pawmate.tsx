@@ -105,6 +105,19 @@ I automatically detect whether you want to search or chat - just type naturally!
     loadChatHistory();
   }, [sessionId, petType, petName]); // Don't include messages.length to avoid infinite loop
 
+  // Helper function to get pet icon
+  const getPetIcon = (petType: string): string => {
+    switch (petType?.toLowerCase()) {
+      case 'dog': return '🐕';
+      case 'cat': return '🐱';
+      case 'bird': return '🐦';
+      case 'fish': return '🐠';
+      case 'rabbit': return '🐰';
+      case 'hamster': return '🐹';
+      default: return '🎯';
+    }
+  };
+
   // Clear chat and create new session function
   const clearChatHistory = async () => {
     try {
@@ -118,7 +131,7 @@ I automatically detect whether you want to search or chat - just type naturally!
       setMessages([{
         id: '1',
         type: 'bot',
-        content: `${icon} Welcome! I'm ${petName || 'Duggu'}, your intelligent lead scoring and contact analysis AI assistant created by Zhatore. I have full database access and can help you with:\n\n**📊 Lead Scoring & Analysis**\n- Score contacts by business value and conversion potential\n- Identify C-level executives and decision-makers\n- Analyze contact completeness and qualification\n\n**🔍 Database Intelligence**\n- Search and analyze your uploaded contact data\n- Generate insights from campaign data\n- Contact enrichment and data quality assessment\n\n**🎯 Campaign Optimization**\n- Prospect prioritization and segmentation\n- Market analysis and competitive intelligence\n- Outreach recommendations and lead qualification\n\nI have access to all your campaign and contact data - ready to help you identify the highest quality leads! What would you like to analyze?`,
+        content: `${icon} Welcome! I'm ${petName || 'Duggu'}, your intelligent lead scoring and contact analysis AI assistant created by Fallowl. I have full database access and can help you with:\n\n**📊 Lead Scoring & Analysis**\n- Score contacts by business value and conversion potential\n- Identify C-level executives and decision-makers\n- Analyze contact completeness and qualification\n\n**🔍 Database Intelligence**\n- Search and analyze your uploaded contact data\n- Generate insights from campaign data\n- Contact enrichment and data quality assessment\n\n**🎯 Campaign Optimization**\n- Prospect prioritization and segmentation\n- Market analysis and competitive intelligence\n- Outreach recommendations and lead qualification\n\nI have access to all your campaign and contact data - ready to help you identify the highest quality leads! What would you like to analyze?`,
         timestamp: new Date()
       }]);
       
@@ -221,7 +234,7 @@ I automatically detect whether you want to search or chat - just type naturally!
 
       const systemMessage = {
         role: 'system' as const,
-        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Zhatore. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers. If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
+        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers. If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
       };
 
     // Fallback to AI assistant for general queries
@@ -233,7 +246,7 @@ I automatically detect whether you want to search or chat - just type naturally!
 
       const systemMessage = {
         role: 'system' as const,
-        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Zhatore. Focus exclusively on lead analysis, contact intelligence, and campaign optimization. Provide direct, actionable business insights without generic recommendations.`
+        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. Focus exclusively on lead analysis, contact intelligence, and campaign optimization. Provide direct, actionable business insights without generic recommendations.`
       };
 
       const response = await fetch('/api/pawmate/chat', {
@@ -276,64 +289,6 @@ I automatically detect whether you want to search or chat - just type naturally!
         content: "I encountered an error processing your request. Please try again.",
         timestamp: new Date()
       }]));
-    } finally {
-      setIsTyping(false);
-    }
-  };
-        },
-        body: JSON.stringify({
-          messages: [systemMessage, ...conversationHistory],
-          petName: petName || 'Duggu',
-          petType: petType || 'assistant',
-          sessionId: sessionId
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
-      let botResponse = data.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response right now. Please try again!";
-      
-      // Remove all recommendation sections
-      botResponse = botResponse.replace(/Recommendations?:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Next Steps?:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Please remember to respect[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Outreach:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Engagement Strategy:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Data Completion:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Email Engagement:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Data Enrichment:[\s\S]*?(?=\n\n|$)/gi, '');
-      botResponse = botResponse.replace(/Follow-Up:[\s\S]*?(?=\n\n|$)/gi, '');
-      
-      setIsUsingRealAI(data.isRealAI);
-      
-      if (data.sessionId && data.sessionId !== sessionId) {
-        setSessionId(data.sessionId);
-        localStorage.setItem('pawmate_session_id', data.sessionId);
-      }
-      
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: botResponse,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      // Fallback to simple response
-      const fallbackResponse = generateBotResponse(currentMessage);
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: fallbackResponse,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
     } finally {
       setIsTyping(false);
     }
@@ -391,16 +346,7 @@ I automatically detect whether you want to search or chat - just type naturally!
     }
   };
 
-  const getPetIcon = (type: string) => {
-    switch (type) {
-      case 'cat': return '🐱';
-      case 'bird': return '🐦';
-      case 'fish': return '🐠';
-      case 'rabbit': return '🐰';
-      case 'hamster': return '🐹';
-      default: return '🐕';
-    }
-  };
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

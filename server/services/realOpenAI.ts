@@ -737,7 +737,7 @@ What specific contact update would you like to make?`;
     // Get AI name from settings (defaults to "Duggu" if not set)
     const aiName = assistantName || 'Duggu';
     
-    return `You are ${aiName}, an intelligent lead scoring and contact analysis AI assistant created by Zhatore. You specialize in analyzing contact databases and identifying the highest quality business prospects. Format all responses using proper Markdown for better readability:
+    return `You are ${aiName}, an intelligent lead scoring and contact analysis AI assistant created by Fallowl. You specialize in analyzing contact databases and identifying the highest quality business prospects. Format all responses using proper Markdown for better readability:
 
 **Use headings (## for main topics, ### for subtopics)**
 **Use bullet points (• or -) for lists**
@@ -818,7 +818,7 @@ ${databaseContext || 'Ready to analyze contact data for lead scoring'}
 
 🎯 **Current Focus:**
 AI Name: ${aiName}
-Created by: Zhatore
+Created by: Fallowl
 Mission: Help identify and score the highest quality business leads for sales and marketing campaigns
 
 **Response Approach:**
