@@ -114,11 +114,12 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <img 
-                src="/attached_assets/image_1754929915271.png" 
-                alt="FallOwl Logo" 
-                className="w-auto h-10 object-contain"
-              />
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <span className="text-white text-lg">🐾</span>
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                FallOwl
+              </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <button className="text-slate-300 hover:text-white transition-colors duration-300">
@@ -253,11 +254,12 @@ export default function Landing() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
-                <img 
-                  src="/attached_assets/image_1754929915271.png" 
-                  alt="FallOwl Logo" 
-                  className="w-auto h-10 object-contain"
-                />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                  <span className="text-white text-lg">🐾</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  FallOwl
+                </span>
               </div>
               <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
                 The ultimate lead scoring platform combining advanced AI technology with comprehensive business intelligence for sales optimization.
