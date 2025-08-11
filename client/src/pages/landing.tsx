@@ -120,21 +120,21 @@ export default function Landing() {
     {
       name: "Sarah Chen",
       company: "TechStart Inc.",
-      image: "💼",
+      image: "SC",
       quote: "FallOwl transformed our infrastructure. We scaled from 10 to 100,000 users seamlessly.",
       rating: 5
     },
     {
       name: "Marcus Rodriguez",
       company: "InnovateNow",
-      image: "🚀",
+      image: "MR",
       quote: "Their AI solutions reduced our processing time by 80%. Game changer for our startup.",
       rating: 5
     },
     {
       name: "Emily Watson",
       company: "DataFlow",
-      image: "📊",
+      image: "EW",
       quote: "Best cybersecurity implementation we've seen. Our data has never been safer.",
       rating: 5
     }
@@ -146,21 +146,21 @@ export default function Landing() {
       client: "ShopNext",
       outcome: "400% traffic increase handled",
       metric: "40ms response time",
-      image: "🛒"
+      gradient: "from-blue-500 to-indigo-600"
     },
     {
       title: "AI-Powered Analytics Dashboard",
       client: "DataInsights Pro",
       outcome: "90% faster decision making",
       metric: "Real-time processing",
-      image: "📈"
+      gradient: "from-purple-500 to-pink-600"
     },
     {
       title: "Fintech Security Overhaul",
       client: "PaySecure",
       outcome: "Zero security breaches",
       metric: "SOC2 compliant",
-      image: "🔐"
+      gradient: "from-cyan-500 to-blue-600"
     }
   ];
 
@@ -177,7 +177,7 @@ export default function Landing() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}>
+    <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 text-slate-900'}`}>
       
       {/* Animated Tech Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -486,8 +486,10 @@ export default function Landing() {
             {caseStudies.map((study, index) => (
               <Card key={index} className={`${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white/50 border-slate-200'} backdrop-blur-sm hover:scale-105 transition-all duration-300 group overflow-hidden`}>
                 <CardContent className="p-0">
-                  <div className={`h-32 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-4xl`}>
-                    {study.image}
+                  <div className={`h-32 bg-gradient-to-br ${study.gradient} flex items-center justify-center`}>
+                    <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                      <div className="w-8 h-8 bg-white rounded-lg"></div>
+                    </div>
                   </div>
                   <div className="p-6">
                     <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -524,7 +526,9 @@ export default function Landing() {
                     "{testimonial.quote}"
                   </p>
                   <div className="flex items-center space-x-4">
-                    <div className="text-2xl">{testimonial.image}</div>
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      {testimonial.image}
+                    </div>
                     <div>
                       <p className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                         {testimonial.name}
