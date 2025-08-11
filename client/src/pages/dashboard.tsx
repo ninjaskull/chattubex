@@ -89,44 +89,96 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
-      {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 pt-3">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
-            <TabsTrigger value="files" className="flex items-center gap-2">
-              <FolderOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Campaigns</span>
-            </TabsTrigger>
-            <TabsTrigger value="notes" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Documents</span>
-            </TabsTrigger>
-            <TabsTrigger value="pawmate" className="flex items-center gap-2">
-              <Dog className="h-4 w-4" />
-              <span className="hidden sm:inline">{assistantName}</span>
-            </TabsTrigger>
-          </TabsList>
+      {/* Main Content Area with Sidebar */}
+      <div className="max-w-7xl mx-auto px-4 pt-3 flex gap-6">
+        {/* Sticky Sidebar Navigation */}
+        <div className="hidden md:block w-48 shrink-0">
+          <div className="sticky top-20 bg-white/80 backdrop-blur-sm rounded-lg border border-slate-200/50 p-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="w-full">
+              <TabsList className="grid w-full grid-rows-3 bg-transparent p-1 h-auto gap-1">
+                <TabsTrigger 
+                  value="files" 
+                  className="flex items-center justify-start gap-2 w-full p-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-slate-50"
+                >
+                  <FolderOpen className="h-4 w-4" />
+                  <span>Campaigns</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="notes" 
+                  className="flex items-center justify-start gap-2 w-full p-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-slate-50"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Documents</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="pawmate" 
+                  className="flex items-center justify-start gap-2 w-full p-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-slate-50"
+                >
+                  <Dog className="h-4 w-4" />
+                  <span>{assistantName}</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
 
+        {/* Mobile Navigation (horizontal tabs on mobile) */}
+        <div className="md:hidden w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-white/60 backdrop-blur-sm">
+              <TabsTrigger value="files" className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">Campaigns</span>
+              </TabsTrigger>
+              <TabsTrigger value="notes" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                <span className="hidden sm:inline">Documents</span>
+              </TabsTrigger>
+              <TabsTrigger value="pawmate" className="flex items-center gap-2">
+                <Dog className="h-4 w-4" />
+                <span className="hidden sm:inline">{assistantName}</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
-
-          {/* Lead Campaigns Tab */}
-          <TabsContent value="files" className="mt-6">
-            <CampaignList />
-          </TabsContent>
-
-          {/* Documents Tab */}
-          <TabsContent value="notes" className="mt-6">
-            <NotesDocuments />
-          </TabsContent>
-
-          {/* AI Assistant Tab - Enhanced with Advanced Search */}
-          <TabsContent value="pawmate" className="mt-6">
-            <PawMate />
-          </TabsContent>
-        </Tabs>
+        {/* Main Content Area */}
+        <div className="flex-1 min-w-0">
+          {/* Desktop Content (hidden on mobile, uses sidebar tabs) */}
+          <div className="hidden md:block">
+            {activeTab === "files" && (
+              <div className="mt-3">
+                <CampaignList />
+              </div>
+            )}
+            {activeTab === "notes" && (
+              <div className="mt-3">
+                <NotesDocuments />
+              </div>
+            )}
+            {activeTab === "pawmate" && (
+              <div className="mt-3">
+                <PawMate />
+              </div>
+            )}
+          </div>
+          
+          {/* Mobile Content (shown on mobile, uses mobile tabs) */}
+          <div className="md:hidden">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsContent value="files" className="mt-6">
+                <CampaignList />
+              </TabsContent>
+              <TabsContent value="notes" className="mt-6">
+                <NotesDocuments />
+              </TabsContent>
+              <TabsContent value="pawmate" className="mt-6">
+                <PawMate />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </div>
-
-
     </div>
   );
 }
