@@ -137,6 +137,13 @@
   text-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
 }
 
+/* Fixed chat card positioning */
+.fixed-chat-card {
+  position: relative;
+  max-height: 600px;
+  min-height: 600px;
+}
+
 /* Custom scrollbar styles for better chat experience */
 .scrollbar-thin {
   scrollbar-width: thin;
@@ -158,6 +165,29 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Enhanced scroll area styling */
+[data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 
