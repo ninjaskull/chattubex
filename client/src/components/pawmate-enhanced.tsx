@@ -763,16 +763,16 @@ Your data has been securely encrypted and added to the system. You can now searc
     
     return (
       <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
-        <div className={`flex max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start space-x-2`}>
-          <Avatar className="w-8 h-8 mt-1">
+        <div className={`flex w-full max-w-none ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start space-x-2`}>
+          <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
             <AvatarFallback className={isUser ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'}>
               {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
             </AvatarFallback>
           </Avatar>
           
-          <div className={`rounded-lg px-4 py-3 ${
+          <div className={`rounded-lg px-4 py-3 min-w-0 flex-1 ${
             isUser 
-              ? 'bg-blue-500 text-white ml-2' 
+              ? 'bg-blue-500 text-white ml-2 max-w-[80%] self-end' 
               : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 mr-2'
           }`}>
             {msg.isTyping ? (
@@ -782,8 +782,16 @@ Your data has been securely encrypted and added to the system. You can now searc
                 <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
             ) : (
-              <div className="text-sm whitespace-pre-wrap">
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              <div className="text-sm break-words overflow-wrap-anywhere">
+                <ReactMarkdown 
+                  components={{
+                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                    pre: ({ children }) => <pre className="bg-gray-200 dark:bg-gray-700 p-2 rounded text-xs overflow-x-auto">{children}</pre>,
+                    code: ({ children }) => <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">{children}</code>,
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
                 
                 {msg.type === 'search-results' && msg.searchResults && (
                   <SearchResultsDisplay 
