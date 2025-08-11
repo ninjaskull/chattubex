@@ -43,6 +43,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Landing() {
   const [clickCount, setClickCount] = useState(0);
   const [showAdminAccess, setShowAdminAccess] = useState(false);
+  const [showPasswordField, setShowPasswordField] = useState(false);
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -72,7 +73,7 @@ export default function Landing() {
     setClickCount(newCount);
     
     if (newCount >= 5) {
-      setShowAdminAccess(true);
+      setShowPasswordField(true);
       setClickCount(0);
     }
   };
@@ -610,37 +611,69 @@ export default function Landing() {
             </div>
 
             <div>
-              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Admin Access</h3>
+              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Stay Updated</h3>
               <p className={`mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                Enter password to access dashboard.
+                Get the latest tech insights and startup tips.
               </p>
-              <form onSubmit={handleAdminLogin} className="flex space-x-2">
+              <div className="flex space-x-2">
                 <Input 
-                  type="password"
-                  placeholder="Enter admin password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter email" 
                   className={`flex-1 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`}
                 />
-                <Button 
-                  type="submit"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
-                  disabled={authMutation.isPending}
-                >
-                  {authMutation.isPending ? <Zap className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
-              </form>
+              </div>
             </div>
           </div>
 
-          <div className={`mt-12 pt-8 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-300'} flex justify-between items-center`}>
+          <div className={`mt-12 pt-8 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-300'} flex justify-between items-center relative`}>
             <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
-              © <span onClick={handleYearClick} className="cursor-pointer">2025</span> FallOwl. All rights reserved.
+              © <span onClick={handleYearClick} className="cursor-pointer hover:text-blue-400 transition-colors">2025</span> FallOwl. All rights reserved.
             </p>
             <div className="flex items-center space-x-4">
               <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Privacy</a>
               <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Terms</a>
             </div>
+            
+            {/* Hidden password field that appears after clicking 2025 five times */}
+            {showPasswordField && (
+              <div className="absolute bottom-full right-0 mb-4 flex items-center space-x-2 p-3 rounded-lg shadow-lg backdrop-blur-sm bg-slate-900/80 border border-slate-700">
+                <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
+                  <Input 
+                    type="password"
+                    placeholder="🔑 Admin password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-40 h-8 text-sm bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                  />
+                  <Button 
+                    type="submit"
+                    size="sm"
+                    className="h-8 w-8 p-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    disabled={authMutation.isPending}
+                  >
+                    {authMutation.isPending ? (
+                      <Zap className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793c-.39.39-1.023.39-1.414 0L13 13v6c0 .553-.448 1-1 1s-1-.447-1-1v-6l-1.793 1.793c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414L12 8.586l4.207 4.207c.39.39.39 1.024 0 1.414z"/>
+                        <ellipse cx="12" cy="6" rx="3" ry="2" fill="currentColor" opacity="0.6"/>
+                        <path d="M8.5 10.5c-.5.8-.5 1.5 0 2s1 .5 1.5 0c.3-.3.7-.5 1-.5s.7.2 1 .5c.5.5 1-.5 1.5 0s.5-1.2 0-2c-.3-.5-.8-.8-1.5-.8s-1.2.3-1.5.8z" fill="currentColor" opacity="0.8"/>
+                      </svg>
+                    )}
+                  </Button>
+                </form>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-slate-400 hover:text-white"
+                  onClick={() => setShowPasswordField(false)}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </footer>
