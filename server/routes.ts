@@ -453,6 +453,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let decryptedData = null;
       try {
         // Try to decrypt campaign data
+        console.log(`\n=== ROUTE DEBUG - Campaign ${id} ===`);
+        console.log(`Encrypted data length: ${campaign.encryptedData?.length || 'NULL'}`);
+        console.log(`Encrypted data preview: ${campaign.encryptedData?.substring(0, 100) || 'NULL'}...`);
+        console.log(`=====================================\n`);
+        
         decryptedData = JSON.parse(decrypt(campaign.encryptedData));
       } catch (decryptError: any) {
         console.error(`Failed to decrypt campaign ${id}:`, decryptError.message);

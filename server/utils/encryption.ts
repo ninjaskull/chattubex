@@ -6,6 +6,12 @@ const LEGACY_ALGORITHM = 'aes-256-cbc';
 
 // Ensure the key is exactly 32 bytes for AES-256
 function getKey(): Buffer {
+  // If the key is exactly 64 hex characters (32 bytes), use it directly
+  if (ENCRYPTION_KEY.length === 64 && /^[0-9a-fA-F]+$/.test(ENCRYPTION_KEY)) {
+    return Buffer.from(ENCRYPTION_KEY, 'hex');
+  }
+  
+  // Otherwise, hash it to ensure 32 bytes
   const key = crypto.createHash('sha256').update(ENCRYPTION_KEY).digest();
   return key;
 }
@@ -22,6 +28,19 @@ export function encrypt(text: string): string {
 }
 
 export function decrypt(encryptedData: string): string {
+  // Since all standard decryption methods fail, check if data is already decrypted
+  if (!encryptedData) {
+    throw new Error('No encrypted data provided');
+  }
+  
+  // Try to parse as JSON first - maybe it's not encrypted at all
+  try {
+    const parsed = JSON.parse(encryptedData);
+    console.log('Data appears to be unencrypted JSON, returning as-is');
+    return encryptedData;
+  } catch (e) {
+    // Not JSON, continue with decryption attempts
+  }
   // First check if it's base64 encoded (legacy format)
   try {
     const decoded = Buffer.from(encryptedData, 'base64').toString('utf8');
@@ -49,10 +68,10 @@ export function decrypt(encryptedData: string): string {
       
       // Try multiple key derivation methods with IV
       const keyMethods = [
-        () => getKey(), // Current method (SHA256)
+        () => Buffer.from(ENCRYPTION_KEY, 'hex'), // Direct hex key (primary method)
+        () => getKey(), // Current method (SHA256 if not hex)
         () => Buffer.from(ENCRYPTION_KEY.substring(0, 32).padEnd(32, '0'), 'utf8'), // Direct key
         () => crypto.createHash('md5').update(ENCRYPTION_KEY).digest(), // MD5 hash
-        () => Buffer.from(ENCRYPTION_KEY, 'hex').subarray(0, 32), // Hex to buffer (if key is hex)
       ];
       
       for (const keyMethod of keyMethods) {
@@ -68,11 +87,23 @@ export function decrypt(encryptedData: string): string {
         }
       }
       
-      // Try legacy decipher methods with IV
+      // Try legacy decipher methods with IV - using the whole encrypted string 
+      try {
+        const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
+        let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        JSON.parse(decrypted); // Validate JSON
+        return decrypted;
+      } catch (legacyError) {
+        // Continue to other methods
+      }
+      
+      // Try legacy decipher methods with encrypted part only
       try {
         const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
         let decrypted = decipher.update(encrypted, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
+        JSON.parse(decrypted); // Validate JSON
         return decrypted;
       } catch (legacyError) {
         // Try with different key derivation
@@ -89,15 +120,36 @@ export function decrypt(encryptedData: string): string {
     }
   }
   
-  // Try legacy method without IV - multiple approaches
+  // Try legacy method without IV - comprehensive approach with various methods
   const legacyMethods = [
     () => {
+      // Method 1: Direct createDecipher with aes256
       const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
       let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       return decrypted;
     },
     () => {
+      // Method 2: Use the encryption key as a passphrase for the whole data
+      const parts = encryptedData.split(':');
+      if (parts.length === 2) {
+        const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
+        let decrypted = decipher.update(parts[1], 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+      }
+      throw new Error('No colon found');
+    },
+    () => {
+      // Method 3: Treat the entire string as the encrypted data (ignore colon)
+      const dataWithoutColon = encryptedData.replace(':', '');
+      const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
+      let decrypted = decipher.update(dataWithoutColon, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    },
+    () => {
+      // Method 4: MD5 hash of the key
       const legacyKey = crypto.createHash('md5').update(ENCRYPTION_KEY).digest('hex');
       const decipher = crypto.createDecipher('aes256', legacyKey);
       let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
@@ -105,18 +157,23 @@ export function decrypt(encryptedData: string): string {
       return decrypted;
     },
     () => {
-      const decipher = crypto.createDecipher('aes-256-cbc', ENCRYPTION_KEY);
+      // Method 5: Direct key with SHA256
+      const sha256Key = crypto.createHash('sha256').update(ENCRYPTION_KEY).digest('hex');
+      const decipher = crypto.createDecipher('aes256', sha256Key);
       let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       return decrypted;
     },
     () => {
-      // Try using the raw hex key directly
-      const rawKey = Buffer.from(ENCRYPTION_KEY, 'hex').subarray(0, 32);
-      const decipher = crypto.createDecipher('aes256', rawKey.toString('hex'));
-      let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      return decrypted;
+      // Method 6: Try direct decryption with just the encrypted part and the key
+      const parts = encryptedData.split(':');
+      if (parts.length === 2) {
+        const decipher = crypto.createDecipher('aes-256-cbc', ENCRYPTION_KEY);
+        let decrypted = decipher.update(parts[1], 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+      }
+      throw new Error('No colon found');
     }
   ];
   
@@ -130,11 +187,15 @@ export function decrypt(encryptedData: string): string {
     }
   }
   
-  // If all methods fail, return the data as-is (might be unencrypted)
-  try {
-    JSON.parse(encryptedData); // Test if it's already valid JSON
-    return encryptedData;
-  } catch (e) {
-    throw new Error(`Unable to decrypt data: ${encryptedData.substring(0, 50)}...`);
-  }
+  // If all methods fail, provide detailed error information
+  console.log('\n❌ ALL DECRYPTION METHODS FAILED');
+  console.log(`Tried multiple key derivation methods with IV`);
+  console.log(`Tried multiple legacy decryption methods`);
+  console.log('This suggests:');
+  console.log('1. Data was encrypted with a different key');
+  console.log('2. Data uses a non-standard encryption method');
+  console.log('3. Data may be corrupted');
+  console.log('');
+  
+  throw new Error(`Unable to decrypt campaign data with the provided encryption key. All standard AES decryption methods failed. The data appears to be encrypted with: IV format (${encryptedData.substring(0, 50)}...), but none of the attempted decryption keys or methods worked. Please verify the encryption key is correct.`);
 }
