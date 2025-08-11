@@ -196,19 +196,19 @@ export default function Landing() {
                 <Cpu className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   FallOwl
                 </span>
-                <p className="text-xs text-slate-500">Smart IT Solutions</p>
+                <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Smart IT Solutions</p>
               </div>
             </div>
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
-              <a href="#services" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>Services</a>
-              <a href="#about" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>About</a>
-              <a href="#portfolio" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>Portfolio</a>
-              <a href="#contact" className={`${isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors duration-300`}>Contact</a>
+              <a href="#services" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} font-medium transition-colors duration-300`}>Services</a>
+              <a href="#about" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} font-medium transition-colors duration-300`}>About</a>
+              <a href="#portfolio" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} font-medium transition-colors duration-300`}>Portfolio</a>
+              <a href="#contact" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} font-medium transition-colors duration-300`}>Contact</a>
               <Button onClick={toggleTheme} variant="ghost" size="icon" className="relative">
                 {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </Button>
@@ -237,11 +237,11 @@ export default function Landing() {
           {isMenuOpen && (
             <div className={`lg:hidden py-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
               <div className="flex flex-col space-y-4">
-                <a href="#services" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>Services</a>
-                <a href="#about" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>About</a>
-                <a href="#portfolio" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>Portfolio</a>
-                <a href="#contact" className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} px-4 py-2`}>Contact</a>
-                <Button className="mx-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                <a href="#services" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} px-4 py-2 font-medium transition-colors`}>Services</a>
+                <a href="#about" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} px-4 py-2 font-medium transition-colors`}>About</a>
+                <a href="#portfolio" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} px-4 py-2 font-medium transition-colors`}>Portfolio</a>
+                <a href="#contact" className={`${isDarkMode ? 'text-slate-300 hover:text-blue-300' : 'text-slate-700 hover:text-blue-600'} px-4 py-2 font-medium transition-colors`}>Contact</a>
+                <Button className="mx-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
                   Get Started
                 </Button>
               </div>
@@ -263,18 +263,18 @@ export default function Landing() {
               </div>
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-8">
-                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent block mb-2">
+                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent block mb-2">
                   Smart IT Solutions
                 </span>
                 <span className={`${isDarkMode ? 'text-white' : 'text-slate-900'} block mb-2`}>
                   for Visionary
                 </span>
-                <span className="holographic bg-clip-text text-transparent block">
+                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent block">
                   Startups
                 </span>
               </h1>
               
-              <p className={`text-xl leading-relaxed mb-12 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              <p className={`text-xl leading-relaxed mb-12 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                 Transform your startup with cutting-edge technology solutions. 
                 We build scalable, secure, and innovative digital platforms 
                 that grow with your vision.
@@ -299,7 +299,7 @@ export default function Landing() {
               </div>
 
               {/* Trust Indicators */}
-              <div className={`flex items-center space-x-8 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              <div className={`flex items-center space-x-8 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-5 h-5 text-green-500" />
                   <span>100+ Projects</span>
@@ -323,7 +323,7 @@ export default function Landing() {
                     <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
                       <Globe className="w-12 h-12 text-white animate-pulse" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                       Digital Transformation
                     </h3>
                     <div className="space-y-3">
@@ -359,7 +359,7 @@ export default function Landing() {
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Why Choose </span>
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">FallOwl</span>
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">FallOwl</span>
             </h2>
             <p className={`text-xl max-w-3xl mx-auto ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
               We partner with visionary startups to transform ideas into scalable, 
@@ -577,7 +577,7 @@ export default function Landing() {
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                   <Cpu className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   FallOwl
                 </span>
               </div>
@@ -585,10 +585,10 @@ export default function Landing() {
                 Transforming startups with innovative IT solutions that scale.
               </p>
               <div className="flex space-x-4">
-                <Button variant="ghost" size="icon" className={isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}>
+                <Button variant="ghost" size="icon" className={isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'}>
                   <Mail className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className={isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}>
+                <Button variant="ghost" size="icon" className={isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'}>
                   <Phone className="w-5 h-5" />
                 </Button>
               </div>
@@ -597,20 +597,20 @@ export default function Landing() {
             <div>
               <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Services</h3>
               <ul className="space-y-3">
-                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Cloud Integration</a></li>
-                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Custom Development</a></li>
-                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>AI Consulting</a></li>
-                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Cybersecurity</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Cloud Integration</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Custom Development</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>AI Consulting</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Cybersecurity</a></li>
               </ul>
             </div>
 
             <div>
               <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Company</h3>
               <ul className="space-y-3">
-                <li><a href="#about" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>About Us</a></li>
-                <li><a href="#portfolio" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Portfolio</a></li>
-                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Careers</a></li>
-                <li><a href="#contact" className={`${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Contact</a></li>
+                <li><a href="#about" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>About Us</a></li>
+                <li><a href="#portfolio" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Portfolio</a></li>
+                <li><a href="#" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Careers</a></li>
+                <li><a href="#contact" className={`${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Contact</a></li>
               </ul>
             </div>
 
@@ -624,7 +624,7 @@ export default function Landing() {
                   placeholder="Enter email" 
                   className={`flex-1 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`}
                 />
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
@@ -637,8 +637,8 @@ export default function Landing() {
             </p>
             <div className="flex flex-col items-end">
               <div className="flex items-center space-x-4 mb-2">
-                <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Privacy</a>
-                <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Terms</a>
+                <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Privacy</a>
+                <a href="#" className={`text-sm ${isDarkMode ? 'text-slate-400 hover:text-blue-300' : 'text-slate-600 hover:text-blue-600'} transition-colors`}>Terms</a>
               </div>
               
               {/* Hidden password field that appears after clicking 2025 five times */}
