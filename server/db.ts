@@ -2,23 +2,26 @@ import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
+// Use Neon database if available, fallback to local DATABASE_URL
+const databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+
+if (!databaseUrl) {
   throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
+    "NEON_DATABASE_URL or DATABASE_URL must be set. Did you forget to provision a database?",
   );
 }
 
-// Create pool with Replit-optimized settings
+// Create pool with Neon-optimized settings
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: false, // Replit internal database doesn't need SSL
-  max: 5, // Reduced pool size for Replit
-  min: 1,  // Minimal connections
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000, // Longer timeout for Replit
-  allowExitOnIdle: true, // Allow pool to close when idle
-  query_timeout: 15000, // Query timeout
-  statement_timeout: 15000, // Statement timeout
+  connectionString: databaseUrl,
+  ssl: databaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false, // SSL for Neon
+  max: 10, // Higher pool size for Neon
+  min: 2,  // Keep some connections alive
+  idleTimeoutMillis: 60000, // Longer idle timeout for cloud
+  connectionTimeoutMillis: 20000, // Longer timeout for cloud connection
+  allowExitOnIdle: false, // Keep pool alive for cloud database
+  query_timeout: 30000, // Longer query timeout for cloud
+  statement_timeout: 30000, // Longer statement timeout for cloud
 });
 
 // Handle pool errors
