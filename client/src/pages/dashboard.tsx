@@ -89,7 +89,7 @@ export default function Dashboard() {
               <span className="hidden sm:inline">Documents</span>
             </TabsTrigger>
             <TabsTrigger value="pawmate" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
+              <span className="text-sm">🐕</span>
               <span className="hidden sm:inline">Duggu AI</span>
             </TabsTrigger>
             <TabsTrigger value="backup" className="flex items-center gap-2">
