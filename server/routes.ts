@@ -1479,6 +1479,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SQL Import Handler
+  async function handleSqlImport(req: any, res: any, sqlContent: string): Promise<any> {
+    try {
+      console.log('Processing SQL backup file...');
+      
+      // Import the database module to execute SQL
+      const { db } = await import('./db.js');
+      
+      // Split SQL content into individual statements
+      const statements = sqlContent
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+      
+      let executedStatements = 0;
+      const errors: string[] = [];
+      
+      // Execute each SQL statement
+      for (const statement of statements) {
+        try {
+          // Skip certain PostgreSQL-specific statements that might cause issues
+          if (statement.toUpperCase().includes('CREATE DATABASE') ||
+              statement.toUpperCase().includes('DROP DATABASE') ||
+              statement.toUpperCase().includes('\\connect') ||
+              statement.toUpperCase().includes('SET ')) {
+            continue;
+          }
+          
+          await db.execute(statement);
+          executedStatements++;
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          errors.push(`SQL execution failed: ${errorMsg}`);
+          console.warn(`Warning: Failed to execute SQL statement:`, errorMsg);
+          
+          // Don't fail completely on individual statement errors
+          if (errors.length > 10) break; // Limit error collection
+        }
+      }
+      
+      return res.json({
+        success: true,
+        message: `Successfully executed ${executedStatements}/${statements.length} SQL statements`,
+        table: 'multiple_tables',
+        imported: executedStatements,
+        total: statements.length,
+        errors: errors.slice(0, 5)
+      });
+      
+    } catch (error) {
+      console.error('SQL import error:', error);
+      return res.status(500).json({
+        error: "Failed to import SQL file",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
   // Database backup import endpoint
   app.post('/api/backup/import', upload.single('backup'), async (req, res) => {
     try {
@@ -1487,6 +1545,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const fileContent = req.file.buffer?.toString('utf-8') || require('fs').readFileSync(req.file.path, 'utf-8');
+      const fileName = req.file.originalname || '';
+      
+      // Handle SQL files differently
+      if (fileName.endsWith('.sql')) {
+        return await handleSqlImport(req, res, fileContent);
+      }
+      
+      // Handle JSON files
       const backup = JSON.parse(fileContent);
       
       // Validate backup structure

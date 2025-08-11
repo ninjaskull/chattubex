@@ -35,10 +35,10 @@ export default function BackupImport() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.json')) {
+    if (!file.name.endsWith('.json') && !file.name.endsWith('.sql')) {
       toast({
         title: "Invalid File",
-        description: "Please select a JSON backup file",
+        description: "Please select a JSON or SQL backup file",
         variant: "destructive",
       });
       return;
@@ -108,11 +108,11 @@ export default function BackupImport() {
               <FileJson className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <div className="space-y-2">
                 <p className="text-sm text-gray-600">
-                  Select JSON backup files from your old database
+                  Select JSON or SQL backup files from your old database
                 </p>
                 <input
                   type="file"
-                  accept=".json"
+                  accept=".json,.sql"
                   onChange={handleFileUpload}
                   disabled={isUploading}
                   className="hidden"
@@ -126,7 +126,7 @@ export default function BackupImport() {
                     asChild
                   >
                     <span>
-                      {isUploading ? 'Importing...' : 'Choose JSON File'}
+                      {isUploading ? 'Importing...' : 'Choose Backup File'}
                     </span>
                   </Button>
                 </label>
@@ -134,8 +134,9 @@ export default function BackupImport() {
             </div>
 
             <div className="text-xs text-gray-500 space-y-1">
-              <p>• Supported format: JSON backup files</p>
-              <p>• Each file should contain one table's data</p>
+              <p>• Supported formats: JSON backup files, SQL dump files</p>
+              <p>• JSON files should contain one table's data</p>
+              <p>• SQL files can contain full database dumps</p>
               <p>• Files are automatically validated before import</p>
               <p>• Duplicate records are safely ignored</p>
             </div>
