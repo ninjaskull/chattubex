@@ -102,50 +102,56 @@ export default function Dashboard() {
         </div>
       </header>
       {/* Smart Sidebar Navigation */}
-      <div className="hidden md:block shrink-0" style={{ width: isScrolled ? '3rem' : '10rem' }}>
-        <div className={`transition-all duration-300 ${
+      <div className="hidden md:block shrink-0" style={{ width: isScrolled ? '3rem' : '8rem' }}>
+        <div className={`transition-all duration-500 ease-in-out ${
           isScrolled 
-            ? 'fixed left-0 top-20 z-40 bg-white/95 backdrop-blur-sm border-r border-slate-200/50 shadow-lg h-screen w-12' 
+            ? 'fixed left-0 top-20 z-40 bg-white/95 backdrop-blur-sm border-r border-slate-200/50 shadow-xl h-screen w-12' 
             : 'sticky top-20 bg-white/80 backdrop-blur-sm rounded-lg border border-slate-200/50'
         }`}>
-          <div className={isScrolled ? 'p-1' : 'p-2'}>
+          <div className={`transition-all duration-500 ease-in-out ${isScrolled ? 'p-0.5' : 'p-1.5'}`}>
             <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="w-full">
-              <TabsList className={`grid w-full grid-rows-3 bg-transparent h-auto gap-1 ${isScrolled ? 'p-0' : 'p-1'}`}>
+              <TabsList className={`grid w-full grid-rows-3 bg-transparent h-auto transition-all duration-500 ease-in-out ${isScrolled ? 'gap-0.5 p-0' : 'gap-1 p-0.5'}`}>
                 <TabsTrigger 
                   value="files" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 text-xs ${
+                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-500 ease-in-out text-xs ${
                     isScrolled 
-                      ? 'justify-center p-2 gap-0' 
-                      : 'justify-start gap-2 p-2'
+                      ? 'justify-center p-1.5 gap-0 rounded-md' 
+                      : 'justify-start gap-1.5 p-2 rounded-md'
                   }`}
                   title={isScrolled ? "Campaigns" : undefined}
                 >
-                  <FolderOpen className="h-4 w-4" />
-                  {!isScrolled && <span>Campaigns</span>}
+                  <FolderOpen className={`transition-all duration-500 ease-in-out ${isScrolled ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                  <span className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                    isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'
+                  }`}>Campaigns</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="notes" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 text-xs ${
+                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-500 ease-in-out text-xs ${
                     isScrolled 
-                      ? 'justify-center p-2 gap-0' 
-                      : 'justify-start gap-2 p-2'
+                      ? 'justify-center p-1.5 gap-0 rounded-md' 
+                      : 'justify-start gap-1.5 p-2 rounded-md'
                   }`}
                   title={isScrolled ? "Documents" : undefined}
                 >
-                  <MessageSquare className="h-4 w-4" />
-                  {!isScrolled && <span>Documents</span>}
+                  <MessageSquare className={`transition-all duration-500 ease-in-out ${isScrolled ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                  <span className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                    isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'
+                  }`}>Documents</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="pawmate" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-300 text-xs ${
+                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-500 ease-in-out text-xs ${
                     isScrolled 
-                      ? 'justify-center p-2 gap-0' 
-                      : 'justify-start gap-2 p-2'
+                      ? 'justify-center p-1.5 gap-0 rounded-md' 
+                      : 'justify-start gap-1.5 p-2 rounded-md'
                   }`}
                   title={isScrolled ? assistantName : undefined}
                 >
-                  <Dog className="h-4 w-4" />
-                  {!isScrolled && <span>{assistantName}</span>}
+                  <Dog className={`transition-all duration-500 ease-in-out ${isScrolled ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                  <span className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                    isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'
+                  }`}>{assistantName}</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -154,8 +160,8 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Area */}
-      <div className={`flex-1 min-w-0 transition-all duration-300 ${isScrolled ? 'md:ml-12' : ''}`}>
-        <div className="max-w-7xl mx-auto px-4 pt-3">
+      <div className={`flex-1 min-w-0 transition-all duration-500 ease-in-out ${isScrolled ? 'md:ml-12' : ''}`}>
+        <div className="max-w-7xl mx-auto px-2 pt-3">
           {/* Mobile Navigation (horizontal tabs on mobile) */}
           <div className="md:hidden w-full mb-4">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
