@@ -46,32 +46,44 @@ export function decrypt(encryptedData: string): string {
     if (parts.length === 2) {
       const iv = Buffer.from(parts[0], 'hex');
       const encrypted = parts[1];
-      const key = getKey();
       
+      // Try multiple key derivation methods with IV
+      const keyMethods = [
+        () => getKey(), // Current method (SHA256)
+        () => Buffer.from(ENCRYPTION_KEY.substring(0, 32).padEnd(32, '0'), 'utf8'), // Direct key
+        () => crypto.createHash('md5').update(ENCRYPTION_KEY).digest(), // MD5 hash
+        () => Buffer.from(ENCRYPTION_KEY, 'hex').subarray(0, 32), // Hex to buffer (if key is hex)
+      ];
+      
+      for (const keyMethod of keyMethods) {
+        try {
+          const key = keyMethod();
+          const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+          let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+          decrypted += decipher.final('utf8');
+          JSON.parse(decrypted); // Validate it's JSON
+          return decrypted;
+        } catch (error) {
+          continue;
+        }
+      }
+      
+      // Try legacy decipher methods with IV
       try {
-        // Try new encryption method first
-        const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+        const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
         let decrypted = decipher.update(encrypted, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
         return decrypted;
-      } catch (error) {
-        // Try legacy decipher method with IV
+      } catch (legacyError) {
+        // Try with different key derivation
         try {
-          const decipher = crypto.createDecipher('aes256', ENCRYPTION_KEY);
+          const legacyKey = crypto.createHash('md5').update(ENCRYPTION_KEY).digest('hex');
+          const decipher = crypto.createDecipher('aes256', legacyKey);
           let decrypted = decipher.update(encrypted, 'hex', 'utf8');
           decrypted += decipher.final('utf8');
           return decrypted;
-        } catch (legacyError) {
-          // Try with different key derivation
-          try {
-            const legacyKey = crypto.createHash('md5').update(ENCRYPTION_KEY).digest('hex');
-            const decipher = crypto.createDecipher('aes256', legacyKey);
-            let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-            decrypted += decipher.final('utf8');
-            return decrypted;
-          } catch (e) {
-            // Continue to other methods
-          }
+        } catch (e) {
+          // Continue to other methods
         }
       }
     }
@@ -94,6 +106,14 @@ export function decrypt(encryptedData: string): string {
     },
     () => {
       const decipher = crypto.createDecipher('aes-256-cbc', ENCRYPTION_KEY);
+      let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    },
+    () => {
+      // Try using the raw hex key directly
+      const rawKey = Buffer.from(ENCRYPTION_KEY, 'hex').subarray(0, 32);
+      const decipher = crypto.createDecipher('aes256', rawKey.toString('hex'));
       let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       return decrypted;
