@@ -187,15 +187,7 @@ export function decrypt(encryptedData: string): string {
     }
   }
   
-  // If all methods fail, provide detailed error information
-  console.log('\n❌ ALL DECRYPTION METHODS FAILED');
-  console.log(`Tried multiple key derivation methods with IV`);
-  console.log(`Tried multiple legacy decryption methods`);
-  console.log('This suggests:');
-  console.log('1. Data was encrypted with a different key');
-  console.log('2. Data uses a non-standard encryption method');
-  console.log('3. Data may be corrupted');
-  console.log('');
+  // Silent fail - don't flood logs with decryption errors
   
   throw new Error(`Unable to decrypt campaign data with the provided encryption key. All standard AES decryption methods failed. The data appears to be encrypted with: IV format (${encryptedData.substring(0, 50)}...), but none of the attempted decryption keys or methods worked. Please verify the encryption key is correct.`);
 }

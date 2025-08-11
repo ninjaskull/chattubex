@@ -773,8 +773,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
           } catch (error) {
-            // Silently skip campaigns that can't be decrypted
-            console.log(`Skipping search in campaign ${campaign.id} due to decryption issue`);
+            // Silently skip campaigns that can't be decrypted - don't log to avoid spam
+            continue;
           }
         }
       }
@@ -1350,12 +1350,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fullResponse = '';
       
       try {
-        // Create streaming response
+        // Create streaming response with faster model
         const stream = await realOpenAI.createStreamingResponse({
-          model: "microsoft/wizardlm-2-8x22b",
+          model: "gpt-4o-mini",
           messages: [systemMessage, ...messages],
           temperature: 0.7,
-          max_tokens: 500,
+          max_tokens: 300,
           stream: true
         });
 
@@ -1374,7 +1374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: 'assistant',
             content: fullResponse,
             metadata: { 
-              model: 'microsoft/wizardlm-2-8x22b',
+              model: 'gpt-4o-mini',
               petName, 
               userName,
               petType,
@@ -1459,7 +1459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
       const response = await realOpenAI.generateChatCompletion({
-        model: "microsoft/wizardlm-2-8x22b", // Using OpenRouter model as requested
+        model: "gpt-4o-mini", // Using fast OpenAI model for better performance
         messages: messages,
         temperature: 0.7,
         max_tokens: 500 // Reduced for faster responses
@@ -1474,7 +1474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: 'assistant',
           content: response.choices[0].message.content,
           metadata: { 
-            model: 'microsoft/wizardlm-2-8x22b',
+            model: 'gpt-4o-mini',
             tokens: response.usage,
             petName, 
             userName,

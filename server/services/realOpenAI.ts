@@ -36,13 +36,9 @@ class RealOpenAIService {
   private openai: OpenAI;
 
   constructor(apiKey: string) {
+    // Use OpenAI directly for better performance
     this.openai = new OpenAI({
-      apiKey: apiKey,
-      baseURL: "https://openrouter.ai/api/v1",
-      defaultHeaders: {
-        "HTTP-Referer": "https://pawmate.replit.app", // Your site URL
-        "X-Title": "PawMate Pro", // Your site name
-      }
+      apiKey: apiKey
     });
   }
 
@@ -120,12 +116,12 @@ class RealOpenAIService {
         ...request.messages
       ];
 
-      // Using OpenRouter with gpt-oss-20b model as requested by user
+      // Using fast OpenAI GPT-4o-mini for better performance
       const response = await this.openai.chat.completions.create({
-        model: "microsoft/wizardlm-2-8x22b",
+        model: "gpt-4o-mini",
         messages: enhancedMessages,
         temperature: request.temperature || 0.7,
-        max_tokens: request.max_tokens || 500, // Reduced for faster responses
+        max_tokens: request.max_tokens || 300, // Reduced for faster responses
       });
 
       return {
@@ -152,10 +148,10 @@ class RealOpenAIService {
     try {
       // For streaming, we'll use a simpler approach with OpenAI
       const response = await this.openai.chat.completions.create({
-        model: "microsoft/wizardlm-2-8x22b",
+        model: "gpt-4o-mini", // Much faster and cheaper model
         messages: request.messages,
         temperature: request.temperature || 0.7,
-        max_tokens: request.max_tokens || 500,
+        max_tokens: request.max_tokens || 300, // Reduce tokens for speed
         stream: true
       });
 

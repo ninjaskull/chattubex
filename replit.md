@@ -52,5 +52,5 @@ The application features a React frontend with a TypeScript Express.js backend.
 # External Dependencies
 
 - **Database**: Neon (PostgreSQL)
-- **AI Services**: OpenRouter API (using WizardLM-2 8x22B model), OpenAI API
+- **AI Services**: OpenAI API (using GPT-4o-mini for fast responses)
 - **Third-party APIs**: Apollo.io API (integrated for advanced business intelligence, lead scoring, and prospecting)
