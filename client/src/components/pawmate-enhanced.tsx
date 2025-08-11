@@ -800,7 +800,7 @@ Your data has been securely encrypted and added to the system. You can now searc
   };
 
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden">
+    <Card className="w-full h-full max-h-full flex flex-col overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b flex-shrink-0">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
@@ -862,9 +862,9 @@ Your data has been securely encrypted and added to the system. You can now searc
         </Dialog>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-        <ScrollArea className="flex-1 p-6 overflow-auto">
-          <div className="space-y-4 min-h-0">
+      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden min-h-0">
+        <ScrollArea className="flex-1 p-6 max-h-full" style={{ height: 'calc(100vh - 280px)' }}>
+          <div className="space-y-4">
             {messages.map(renderMessage)}
             <div ref={messagesEndRef} />
           </div>
