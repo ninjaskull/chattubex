@@ -52,7 +52,7 @@ export default function Dashboard() {
               <Target className="text-white h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">LeadIQ Pro Dashboard</h1>
+              <h1 className="text-2xl font-bold text-slate-900">FallOwl Dashboard</h1>
               <p className="text-sm text-slate-600">AI-powered lead scoring and business intelligence</p>
             </div>
           </div>

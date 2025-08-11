@@ -29,7 +29,7 @@ interface Message {
 
 export default function PawMate() {
   const [petName, setPetName] = useState(() => localStorage.getItem('pawmate_pet_name') || "Duggu");
-  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "assistant");
+  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "dog");
   const [petMessage, setPetMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -114,7 +114,7 @@ I automatically detect whether you want to search or chat - just type naturally!
       case 'fish': return '🐠';
       case 'rabbit': return '🐰';
       case 'hamster': return '🐹';
-      default: return '🎯';
+      default: return '🐕';
     }
   };
 

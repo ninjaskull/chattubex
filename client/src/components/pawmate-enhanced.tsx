@@ -247,7 +247,7 @@ const SearchResultsDisplay = ({ searchResults, searchQuery }: SearchResultsDispl
 
 export default function PawMate() {
   const [petName, setPetName] = useState(() => localStorage.getItem('pawmate_pet_name') || "Duggu");
-  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "assistant");
+  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "dog");
   const [petMessage, setPetMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -499,13 +499,13 @@ I'm your comprehensive solution for lead generation, data analysis, and business
   const getPetIcon = (type: string) => {
     switch (type) {
       case 'assistant':
-        return '🤖';
+        return '🐕';
       case 'dog':
         return '🐕';
       case 'cat':
         return '🐱';
       default:
-        return '🤖';
+        return '🐕';
     }
   };
 

@@ -118,7 +118,7 @@ export default function Landing() {
                 <Target className="text-white text-lg" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                LeadIQ Pro
+                FallOwl
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -132,7 +132,7 @@ export default function Landing() {
                 Research
               </button>
               <Button 
-                onClick={() => setShowChatbot(true)}
+                onClick={() => setShowPawMate(true)}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-lg shadow-blue-500/25"
               >
                 Get Started
@@ -240,7 +240,7 @@ export default function Landing() {
             </p>
             <Button 
               size="lg" 
-              onClick={() => setShowChatbot(true)}
+              onClick={() => setShowPawMate(true)}
               className="px-12 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-2xl shadow-blue-500/25 text-lg"
             >
               Get Started Today
@@ -258,7 +258,7 @@ export default function Landing() {
                   <Target className="text-white text-lg" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  LeadIQ Pro
+                  FallOwl
                 </span>
               </div>
               <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
@@ -294,7 +294,7 @@ export default function Landing() {
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 2025
-              </span> LeadIQ Pro. All rights reserved.
+              </span> FallOwl. All rights reserved.
             </p>
             
             {showAdminAccess && (

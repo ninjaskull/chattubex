@@ -369,7 +369,7 @@ export default function EnhancedChatbot({ isOpen, onClose }: EnhancedChatbotProp
 
           {/* Footer */}
           <div className="p-3 border-t bg-gray-50 dark:bg-gray-800 text-center text-xs text-gray-500">
-            🚀 Powered by LeadIQ Pro Intelligence • Real-time database search
+            🚀 Powered by FallOwl Intelligence • Real-time database search
           </div>
         </CardContent>
       </Card>
