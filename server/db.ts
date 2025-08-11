@@ -6,6 +6,8 @@ import * as schema from "@shared/schema";
 const databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
 if (!databaseUrl) {
+  console.error("Database URL not found. Please ensure DATABASE_URL environment variable is set.");
+  console.error("Available env vars:", Object.keys(process.env).filter(key => key.includes('DATABASE')));
   throw new Error(
     "NEON_DATABASE_URL or DATABASE_URL must be set. Did you forget to provision a database?",
   );
