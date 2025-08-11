@@ -328,16 +328,16 @@ export default function Landing() {
       
       {/* Duggu AI Chatbot */}
       {showPawMate && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-6xl h-[85vh] bg-white rounded-lg overflow-hidden relative">
-            <div className="h-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="w-full max-w-5xl h-[90vh] max-h-[800px] bg-white rounded-lg overflow-hidden relative shadow-2xl">
+            <div className="h-full overflow-hidden">
               <PawMate />
             </div>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => setShowPawMate(false)}
-              className="absolute top-4 right-4 bg-white/80 hover:bg-white z-10"
+              className="absolute top-4 right-4 bg-white/80 hover:bg-white z-10 shadow-lg"
             >
               <X className="w-4 h-4" />
             </Button>

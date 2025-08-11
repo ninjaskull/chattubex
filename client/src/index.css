@@ -65,3 +65,35 @@
     linear-gradient(to bottom, theme('colors.slate.100') 1px, transparent 1px);
   background-size: 20px 20px;
 }
+
+/* Custom scrollbar styles for better chat experience */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f9fafb;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.scrollbar-thumb-green-300::-webkit-scrollbar-thumb {
+  background: #86efac;
+}
+
+.scrollbar-track-green-100::-webkit-scrollbar-track {
+  background: #dcfce7;
+}

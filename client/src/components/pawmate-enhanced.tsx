@@ -165,7 +165,7 @@ const SearchResultsDisplay = ({ searchResults, searchQuery }: SearchResultsDispl
       </div>
       
       {viewMode === 'cards' ? (
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+        <div className="space-y-3 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100">
           {displayContacts.map((contact: any, index: number) => (
             <ContactCard 
               key={index} 
@@ -175,7 +175,7 @@ const SearchResultsDisplay = ({ searchResults, searchQuery }: SearchResultsDispl
           ))}
         </div>
       ) : (
-        <div className="max-h-96 overflow-y-auto">
+        <div className="max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100">
           <div className="grid grid-cols-1 gap-2 text-sm">
             {displayContacts.map((contact: any, index: number) => (
               <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border">
@@ -702,8 +702,8 @@ Your data has been securely encrypted and added to the system. You can now searc
   };
 
   return (
-    <Card className="w-full h-full flex flex-col">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
+    <Card className="w-full h-full flex flex-col overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b flex-shrink-0">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
             <Target className="w-5 h-5 text-white" />
@@ -766,15 +766,15 @@ Your data has been securely encrypted and added to the system. You can now searc
         </Dialog>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0">
-        <ScrollArea className="flex-1 p-6">
-          <div className="space-y-4">
+      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+        <ScrollArea className="flex-1 p-6 overflow-auto">
+          <div className="space-y-4 min-h-0">
             {messages.map(renderMessage)}
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
-        <div className="border-t p-4">
+        <div className="border-t p-4 flex-shrink-0 bg-white">
           <div className="flex space-x-2">
             <Input
               value={petMessage}
@@ -797,7 +797,7 @@ Your data has been securely encrypted and added to the system. You can now searc
             </Button>
           </div>
           
-          <div className="flex flex-wrap gap-2 mt-3">
+          <div className="flex flex-wrap gap-2 mt-3 max-h-20 overflow-y-auto">
             <Button 
               variant="outline" 
               size="sm" 
