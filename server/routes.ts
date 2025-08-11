@@ -1668,5 +1668,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Data recovery endpoint
+  app.post('/api/recovery/campaigns', async (req, res) => {
+    try {
+      console.log('Starting campaign data recovery...');
+      const { recoverAllCampaigns } = await import('./utils/dataRecovery.js');
+      const result = await recoverAllCampaigns();
+      
+      res.json({
+        message: 'Campaign recovery completed',
+        recovered: result.recovered,
+        failed: result.failed,
+        total: result.recovered + result.failed
+      });
+    } catch (error) {
+      console.error('Recovery error:', error);
+      res.status(500).json({ message: 'Failed to recover campaigns' });
+    }
+  });
+
+  // Single campaign recovery endpoint
+  app.post('/api/recovery/campaigns/:id', async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      console.log(`Starting recovery for campaign ${campaignId}...`);
+      
+      const { recoverCampaignData } = await import('./utils/dataRecovery.js');
+      const success = await recoverCampaignData(campaignId);
+      
+      if (success) {
+        res.json({ message: `Campaign ${campaignId} recovered successfully` });
+      } else {
+        res.status(400).json({ message: `Failed to recover campaign ${campaignId}` });
+      }
+    } catch (error) {
+      console.error('Single recovery error:', error);
+      res.status(500).json({ message: 'Failed to recover campaign' });
+    }
+  });
+
   return httpServer;
 }
