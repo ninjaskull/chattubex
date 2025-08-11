@@ -247,7 +247,7 @@ const SearchResultsDisplay = ({ searchResults, searchQuery }: SearchResultsDispl
 
 export default function PawMate() {
   const [petName, setPetName] = useState(() => localStorage.getItem('pawmate_pet_name') || "Duggu");
-  const [petType, setPetType] = useState(() => localStorage.getItem('pawmate_pet_type') || "dog");
+  const [userName, setUserName] = useState(() => localStorage.getItem('pawmate_user_name') || "");
   const [petMessage, setPetMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -293,10 +293,11 @@ export default function PawMate() {
       
       // Load welcome message only if no history loaded
       if (messages.length === 0) {
+        const userGreeting = userName ? ` ${userName}` : '';
         setMessages([{
           id: '1',
           type: 'bot',
-          content: `# 👋 Hi! I'm ${petName || 'Duggu'}
+          content: `# 👋 Hi${userGreeting}! I'm ${petName || 'Duggu'}
 
 **Your Advanced AI Business Intelligence Assistant** - Created by Fallowl
 
@@ -342,7 +343,7 @@ I'm your comprehensive solution for lead generation, data analysis, and business
     };
 
     loadChatHistory();
-  }, [sessionId, petType, petName]);
+  }, [sessionId, petName, userName]);
 
   // Search query detection logic
   const isSearchQuery = (query: string): boolean => {
@@ -439,9 +440,10 @@ I'm your comprehensive solution for lead generation, data analysis, and business
         content: msg.content
       }));
 
+      const userNameContext = userName ? ` The user's name is ${userName}, so address them by name when appropriate.` : '';
       const systemMessage = {
         role: 'system' as const,
-        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers. If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
+        content: `You are ${petName || 'Duggu'}, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers.${userNameContext} If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
       };
 
       const response = await fetch('/api/pawmate/chat', {
@@ -452,6 +454,7 @@ I'm your comprehensive solution for lead generation, data analysis, and business
         body: JSON.stringify({
           messages: [systemMessage, ...conversationHistory],
           petName: petName || 'Duggu',
+          userName: userName || '',
           petType: 'assistant',
           sessionId: sessionId || `pawmate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         }),
@@ -748,20 +751,16 @@ Your data has been securely encrypted and added to the system. You can now searc
                 />
               </div>
               <div>
-                <Label htmlFor="pet-type">Assistant Type</Label>
-                <Select value={petType} onValueChange={(value) => {
-                  setPetType(value);
-                  localStorage.setItem('pawmate_pet_type', value);
-                }}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="assistant">AI Assistant</SelectItem>
-                    <SelectItem value="dog">Dog</SelectItem>
-                    <SelectItem value="cat">Cat</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="user-name">Your Name (How assistant addresses you)</Label>
+                <Input
+                  id="user-name"
+                  value={userName}
+                  onChange={(e) => {
+                    setUserName(e.target.value);
+                    localStorage.setItem('pawmate_user_name', e.target.value);
+                  }}
+                  placeholder="Enter your name (optional)"
+                />
               </div>
             </div>
           </DialogContent>
