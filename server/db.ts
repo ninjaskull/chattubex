@@ -2,26 +2,34 @@ import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
-// Use Neon database with branch if available, then fallback to regular Neon, then local DATABASE_URL
-const databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+// Function to get database URL with proper fallback
+function getDatabaseUrl(): string {
+  // Use Neon database with branch if available, then fallback to regular Neon, then local DATABASE_URL
+  const databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+  
+  console.log('Checking database URL availability...');
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('NEON_DATABASE_URL exists:', !!process.env.NEON_DATABASE_URL);
+  console.log('NEON_DATABASE_URL_WITH_BRANCH exists:', !!process.env.NEON_DATABASE_URL_WITH_BRANCH);
+  console.log('Selected database URL exists:', !!databaseUrl);
 
-console.log('Checking database URL availability...');
-console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
-console.log('NEON_DATABASE_URL exists:', !!process.env.NEON_DATABASE_URL);
-console.log('NEON_DATABASE_URL_WITH_BRANCH exists:', !!process.env.NEON_DATABASE_URL_WITH_BRANCH);
+  if (!databaseUrl) {
+    console.error("Database URL not found. Please ensure DATABASE_URL environment variable is set.");
+    console.error("Available env vars:", Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('NEON') || key.includes('PG')));
+    throw new Error(
+      "Database URL must be set. Did you forget to provision a database?",
+    );
+  }
 
-if (!databaseUrl) {
-  console.error("Database URL not found. Please ensure DATABASE_URL environment variable is set.");
-  console.error("Available env vars:", Object.keys(process.env).filter(key => key.includes('DATABASE')));
-  throw new Error(
-    "NEON_DATABASE_URL or DATABASE_URL must be set. Did you forget to provision a database?",
+  console.log('Using database URL from:', 
+    process.env.NEON_DATABASE_URL_WITH_BRANCH ? 'NEON_DATABASE_URL_WITH_BRANCH' :
+    process.env.NEON_DATABASE_URL ? 'NEON_DATABASE_URL' : 'DATABASE_URL'
   );
+  
+  return databaseUrl;
 }
 
-console.log('Using database URL from:', 
-  process.env.NEON_DATABASE_URL_WITH_BRANCH ? 'NEON_DATABASE_URL_WITH_BRANCH' :
-  process.env.NEON_DATABASE_URL ? 'NEON_DATABASE_URL' : 'DATABASE_URL'
-);
+const databaseUrl = getDatabaseUrl();
 
 // Create pool with Neon-optimized settings
 export const pool = new Pool({ 
