@@ -250,8 +250,8 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section className="relative pt-24 pb-32 min-h-screen flex items-center overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
             <div className="mb-12 lg:mb-0">
               <div className="flex items-center space-x-2 mb-6">
@@ -261,16 +261,14 @@ export default function Landing() {
                 </div>
               </div>
               
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-8">
-                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent text-glow">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-8">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent block mb-2">
                   Smart IT Solutions
                 </span>
-                <br />
-                <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>
+                <span className={`${isDarkMode ? 'text-white' : 'text-slate-900'} block mb-2`}>
                   for Visionary
                 </span>
-                <br />
-                <span className="holographic bg-clip-text text-transparent">
+                <span className="holographic bg-clip-text text-transparent block">
                   Startups
                 </span>
               </h1>
@@ -612,19 +610,26 @@ export default function Landing() {
             </div>
 
             <div>
-              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Stay Updated</h3>
+              <h3 className={`font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Admin Access</h3>
               <p className={`mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                Get the latest tech insights and startup tips.
+                Enter password to access dashboard.
               </p>
-              <div className="flex space-x-2">
+              <form onSubmit={handleAdminLogin} className="flex space-x-2">
                 <Input 
-                  placeholder="Enter email" 
+                  type="password"
+                  placeholder="Enter admin password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className={`flex-1 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`}
                 />
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                  <ChevronRight className="w-4 h-4" />
+                <Button 
+                  type="submit"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                  disabled={authMutation.isPending}
+                >
+                  {authMutation.isPending ? <Zap className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
 
