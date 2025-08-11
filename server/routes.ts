@@ -4,13 +4,13 @@ import { WebSocketServer, WebSocket } from "ws";
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
-import { storage } from "./storage.js";
-import { encrypt, decrypt } from "./utils/encryption.js";
-import { deriveTimezone } from "./utils/timezone.js";
-import { sendContactFormEmail } from "./utils/email.js";
-import { createRealOpenAIService } from "./services/realOpenAI.js";
-import { mockOpenAIService } from "./services/mockOpenAI.js";
-import { databaseService } from "./services/databaseService.js";
+import { storage } from "./storage";
+import { encrypt, decrypt } from "./utils/encryption";
+import { deriveTimezone } from "./utils/timezone";
+import { sendContactFormEmail } from "./utils/email";
+import { createRealOpenAIService } from "./services/realOpenAI";
+import { mockOpenAIService } from "./services/mockOpenAI";
+import { databaseService } from "./services/databaseService";
 
 // Configure multer for file uploads with increased limits
 const upload = multer({ 
