@@ -103,7 +103,7 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="pawmate" className="flex items-center gap-2">
               <Dog className="h-4 w-4" />
-              <span className="hidden sm:inline">{assistantName} AI</span>
+              <span className="hidden sm:inline">{assistantName}</span>
             </TabsTrigger>
           </TabsList>
 
