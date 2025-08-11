@@ -450,8 +450,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Campaign not found' });
       }
 
-      // Decrypt campaign data
-      const decryptedData = JSON.parse(decrypt(campaign.encryptedData));
+      let decryptedData = null;
+      try {
+        // Try to decrypt campaign data
+        decryptedData = JSON.parse(decrypt(campaign.encryptedData));
+      } catch (decryptError: any) {
+        console.error(`Failed to decrypt campaign ${id}:`, decryptError.message);
+        
+        // Return campaign info without data but indicate encryption issue
+        return res.json({
+          id: campaign.id,
+          name: campaign.name,
+          data: null,
+          error: 'Unable to decrypt campaign data. This may be due to encryption key changes.',
+          createdAt: campaign.createdAt,
+          recordCount: campaign.recordCount,
+          encryptionError: true
+        });
+      }
       
       res.json({
         id: campaign.id,
@@ -752,7 +768,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
           } catch (error) {
-            console.error(`Error searching campaign ${campaign.id}:`, error);
+            // Silently skip campaigns that can't be decrypted
+            console.log(`Skipping search in campaign ${campaign.id} due to decryption issue`);
           }
         }
       }

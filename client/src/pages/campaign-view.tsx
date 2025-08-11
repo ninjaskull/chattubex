@@ -94,6 +94,38 @@ export default function CampaignView() {
     );
   }
 
+  // Handle encryption error case
+  if (campaignData && (campaignData as any).encryptionError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <Card className="w-full max-w-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl text-slate-900">Campaign Data Unavailable</CardTitle>
+            <CardDescription>Unable to decrypt campaign data</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <p className="text-sm text-amber-800">
+                <strong>Campaign:</strong> {(campaignData as any).name}
+              </p>
+              <p className="text-sm text-amber-800 mt-2">
+                This campaign's data cannot be accessed due to encryption key changes. 
+                The campaign exists but the data is currently unreadable.
+              </p>
+            </div>
+            <p className="text-xs text-slate-500">
+              Campaign ID: {(campaignData as any).id} | Created: {new Date((campaignData as any).createdAt).toLocaleDateString()}
+            </p>
+            <Button onClick={() => setLocation("/dashboard")} className="w-full">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Return to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const campaign = campaignData as CampaignData;
   const headers = campaign.data?.headers || [];
   const rows = campaign.data?.rows || [];
