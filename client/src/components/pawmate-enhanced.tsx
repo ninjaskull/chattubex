@@ -270,6 +270,8 @@ export default function PawMate() {
   // Load chat history on component mount
   useEffect(() => {
     const loadChatHistory = async () => {
+      let historyLoaded = false;
+      
       if (sessionId) {
         try {
           const response = await fetch(`/api/pawmate/sessions/${sessionId}/history`);
@@ -283,7 +285,7 @@ export default function PawMate() {
                 timestamp: new Date(msg.createdAt)
               }));
               setMessages(formattedMessages);
-              return; // Don't load welcome message if history exists
+              historyLoaded = true;
             }
           }
         } catch (error) {
@@ -291,8 +293,8 @@ export default function PawMate() {
         }
       }
       
-      // Load welcome message only if no history loaded
-      if (messages.length === 0) {
+      // Load welcome message only if no history was loaded
+      if (!historyLoaded) {
         const userGreeting = userName ? ` ${userName}` : '';
         setMessages([{
           id: '1',
@@ -463,6 +465,13 @@ I'm your comprehensive solution for lead generation, data analysis, and business
       if (response.ok) {
         const data = await response.json();
         setIsUsingRealAI(data.isRealAI);
+        
+        // Update session ID if returned from server
+        if (data.sessionId && data.sessionId !== sessionId) {
+          setSessionId(data.sessionId);
+          localStorage.setItem('pawmate_session_id', data.sessionId);
+        }
+        
         let aiResponse = data.choices?.[0]?.message?.content || "I'm having trouble responding right now. Please try again.";
         
         // Clean up any unwanted recommendation sections
