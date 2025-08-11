@@ -9,7 +9,8 @@ import {
   LogOut, 
   FolderOpen, 
   MessageSquare,
-  Target
+  Target,
+  Upload
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -60,6 +61,14 @@ export default function Dashboard() {
             <Badge variant="secondary" className="bg-blue-100 text-blue-700">
               {totalCampaigns} Lead Campaigns
             </Badge>
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation('/backup-import')}
+              className="text-slate-600 hover:text-slate-900 border-blue-200 hover:bg-blue-50"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import Data
+            </Button>
             <Button variant="ghost" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
               <LogOut className="mr-2 h-4 w-4" />
               Logout
@@ -70,7 +79,7 @@ export default function Dashboard() {
       {/* Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-fit lg:grid-cols-3 bg-white/60 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="files" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Campaigns</span>
@@ -82,6 +91,10 @@ export default function Dashboard() {
             <TabsTrigger value="pawmate" className="flex items-center gap-2">
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Duggu AI</span>
+            </TabsTrigger>
+            <TabsTrigger value="backup" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              <span className="hidden sm:inline">Data Import</span>
             </TabsTrigger>
           </TabsList>
 
@@ -100,6 +113,46 @@ export default function Dashboard() {
           {/* Duggu AI Tab - Enhanced with Advanced Search */}
           <TabsContent value="pawmate" className="mt-6">
             <PawMate />
+          </TabsContent>
+
+          {/* Data Import Tab */}
+          <TabsContent value="backup" className="mt-6">
+            <Card className="bg-white/80 backdrop-blur-sm border-slate-200/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5 text-blue-600" />
+                  Database Migration & Import
+                </CardTitle>
+                <CardDescription>
+                  Import data from your old database or backup files into FallOwl
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-sm text-slate-600 space-y-2">
+                  <p>To migrate your existing campaign data:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Use the backup tool to export your old database to JSON format</li>
+                    <li>Upload the JSON files through the import interface</li>
+                    <li>Monitor the import progress and verify data integrity</li>
+                  </ul>
+                </div>
+                
+                <Button 
+                  onClick={() => setLocation('/backup-import')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Open Data Import Interface
+                </Button>
+                
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-xs text-blue-700">
+                    <strong>Quick Access:</strong> The import interface is also available directly at 
+                    <code className="bg-blue-100 px-1 rounded ml-1">/backup-import</code>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
         </Tabs>
