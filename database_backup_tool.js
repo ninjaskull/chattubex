@@ -20,10 +20,14 @@ async function backupFromExternalDatabase(sourceConnectionString, backupName) {
   console.log('Starting database backup process...');
   
   try {
-    // Connect to source database
+    // Connect to source database (PostgreSQL 16 compatible)
     const sourcePool = new Pool({
       connectionString: sourceConnectionString,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      connectionTimeoutMillis: 30000,
+      idleTimeoutMillis: 30000,
+      max: 5,
+      allowExitOnIdle: true
     });
     
     console.log('Connected to source database');
