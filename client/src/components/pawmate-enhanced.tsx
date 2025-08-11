@@ -352,30 +352,43 @@ I'm your comprehensive solution for lead generation, data analysis, and business
     loadChatHistory();
   }, [sessionId, historyInitialized]); // Only depend on sessionId to avoid reloading when name changes
 
-  // Search query detection logic
+  // Search query detection logic - only trigger for explicit search or clear contact data
   const isSearchQuery = (query: string): boolean => {
+    const lowerQuery = query.toLowerCase().trim();
+    
+    // Explicit search keywords - user must use these to trigger search
     const searchKeywords = [
-      'search', 'find', 'show', 'get', 'lookup', 'contact', 'contacts',
-      'phone', 'email', 'company', 'title', 'manager', 'ceo', 'director',
-      'vp', 'vice president', 'executive', 'list', 'all', 'who'
+      'search', 'find', 'lookup', 'show me', 'get me', 
+      'list all', 'find all', 'search for', 'who is'
     ];
     
-    const lowerQuery = query.toLowerCase();
-    
-    // Check if query contains search keywords
+    // Check for explicit search intent
     const hasSearchKeywords = searchKeywords.some(keyword => 
       lowerQuery.includes(keyword)
     );
     
-    // Check if query looks like a name, email, or company
-    const looksLikeSearchTerm = (
-      /^[a-zA-Z\s]{2,}$/.test(query.trim()) ||  // Name-like
-      /@/.test(query) ||                        // Email-like
-      /\d{3,}/.test(query) ||                   // Phone-like
-      /\b(corp|inc|llc|ltd|company|co)\b/i.test(query) // Company-like
+    // Check for identifiable personal/contact information patterns
+    const hasContactInfo = (
+      /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(query) ||  // Complete email address
+      /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(query) ||  // Phone number pattern
+      /\b[A-Z][a-z]+ [A-Z][a-z]+@/.test(query) ||  // Name with email
+      /\b(corp|corporation|inc|incorporated|llc|ltd|limited|company|co\.)\b/i.test(query) ||  // Company identifiers
+      (/\b[A-Z][a-z]+ [A-Z][a-z]+\b/.test(query) && query.split(' ').length <= 3 && query.length > 6)  // Likely full name (2-3 words, proper case)
     );
     
-    return hasSearchKeywords || looksLikeSearchTerm;
+    // Common conversational phrases should NOT trigger search
+    const conversationalPhrases = [
+      'hello', 'hi', 'hey', 'thank you', 'thanks', 'please', 'yes', 'no',
+      'how are you', 'what can you do', 'help me', 'tell me about', 'explain',
+      'i need help', 'can you help', 'what is', 'how do i', 'how to'
+    ];
+    
+    const isConversational = conversationalPhrases.some(phrase => 
+      lowerQuery === phrase || lowerQuery.startsWith(phrase + ' ')
+    );
+    
+    // Only trigger search for explicit keywords or clear contact information
+    return (hasSearchKeywords || hasContactInfo) && !isConversational;
   };
 
   const handleSendMessage = async () => {
