@@ -779,7 +779,7 @@ Your data has been securely encrypted and added to the system. You can now searc
         <div className={`flex w-full max-w-none ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start space-x-2`}>
           <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
             <AvatarFallback className={isUser ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'}>
-              {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {isUser ? <User className="w-4 h-4" /> : <Dog className="w-4 h-4" />}
             </AvatarFallback>
           </Avatar>
           

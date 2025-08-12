@@ -298,7 +298,7 @@ Never provide synthetic or made-up contact information. Only discuss actual data
         <div className={`flex max-w-[80%] ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start space-x-2`}>
           <Avatar className="w-8 h-8 mt-1">
             <AvatarFallback className={isUser ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'}>
-              {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {isUser ? <User className="w-4 h-4" /> : <Dog className="w-4 h-4" />}
             </AvatarFallback>
           </Avatar>
           
