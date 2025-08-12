@@ -7,9 +7,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   X, Send, Database, User, Mail, Phone, Building, 
-  Target, Bot, Search, MessageSquare, Sparkles 
+  Target, Bot, Search, MessageSquare, Sparkles, Download 
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import { ContactCards } from './contact-cards';
+import { ContactCanvas } from './contact-canvas';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface UnifiedChatbotProps {
   isOpen: boolean;
@@ -304,19 +307,123 @@ How can I help you today?`,
             )}
             
             {msg.type === 'search-results' && msg.searchResults && (
-              <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
-                <div className="flex items-center space-x-4 text-xs text-green-700 dark:text-green-300">
-                  <div className="flex items-center">
-                    <Database className="w-3 h-3 mr-1" />
-                    {msg.searchResults.total} total results
-                  </div>
-                  {msg.searchResults.campaignData?.length > 0 && (
+              <div className="mt-4 space-y-4">
+                {/* Search Results Header */}
+                <div className="flex items-center justify-between border-t border-green-200 dark:border-green-700 pt-3">
+                  <div className="flex items-center space-x-4 text-sm text-green-700 dark:text-green-300">
                     <div className="flex items-center">
-                      <Target className="w-3 h-3 mr-1" />
-                      {msg.searchResults.campaignData.length} campaigns
+                      <Database className="w-4 h-4 mr-1" />
+                      {msg.searchResults.total} total results
                     </div>
-                  )}
+                    {msg.searchResults.campaignData?.length > 0 && (
+                      <div className="flex items-center">
+                        <Target className="w-4 h-4 mr-1" />
+                        {msg.searchResults.campaignData.length} campaigns
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Enhanced Visual Results */}
+                {(msg.searchResults.contacts?.length > 0 || msg.searchResults.campaignData?.length > 0) && (
+                  <Tabs defaultValue="cards" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="cards" data-testid="tab-cards">Contact Cards</TabsTrigger>
+                      <TabsTrigger value="canvas" data-testid="tab-canvas">Network View</TabsTrigger>
+                      <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="cards" className="mt-4">
+                      {msg.searchResults.contacts?.length > 0 && (
+                        <ContactCards 
+                          contacts={msg.searchResults.contacts}
+                          campaignName="Direct Contacts"
+                          showActions={true}
+                          className="mb-4"
+                        />
+                      )}
+                      
+                      {msg.searchResults.campaignData?.map((campaignData: any, index: number) => (
+                        <ContactCards 
+                          key={index}
+                          contacts={campaignData.matches || []}
+                          campaignName={campaignData.campaignName}
+                          showActions={true}
+                          className="mb-4"
+                        />
+                      ))}
+                    </TabsContent>
+
+                    <TabsContent value="canvas" className="mt-4">
+                      {(() => {
+                        const allContacts = [
+                          ...(msg.searchResults.contacts || []),
+                          ...(msg.searchResults.campaignData?.flatMap((cd: any) => cd.matches || []) || [])
+                        ];
+                        return allContacts.length > 0 ? (
+                          <ContactCanvas 
+                            contacts={allContacts}
+                            width={700}
+                            height={500}
+                            className="rounded-lg border"
+                          />
+                        ) : (
+                          <div className="text-center py-8 text-gray-500">
+                            No contacts to visualize
+                          </div>
+                        );
+                      })()}
+                    </TabsContent>
+
+                    <TabsContent value="summary" className="mt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <Card className="p-4 text-center bg-blue-50 dark:bg-blue-950">
+                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                            {msg.searchResults.contacts?.length || 0}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Direct Contacts</div>
+                        </Card>
+                        
+                        <Card className="p-4 text-center bg-green-50 dark:bg-green-950">
+                          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                            {msg.searchResults.campaignData?.reduce((acc: number, cd: any) => acc + (cd.matches?.length || 0), 0) || 0}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Campaign Contacts</div>
+                        </Card>
+                        
+                        <Card className="p-4 text-center bg-purple-50 dark:bg-purple-950">
+                          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                            {msg.searchResults.campaignData?.length || 0}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Campaigns</div>
+                        </Card>
+                        
+                        <Card className="p-4 text-center bg-orange-50 dark:bg-orange-950">
+                          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                            {msg.searchResults.total || 0}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Total Results</div>
+                        </Card>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="mt-6 flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" data-testid="button-export-all">
+                          <Download className="w-4 h-4 mr-1" />
+                          Export All
+                        </Button>
+                        <Button size="sm" variant="outline" data-testid="button-new-search">
+                          <Search className="w-4 h-4 mr-1" />
+                          New Search
+                        </Button>
+                        <Button size="sm" variant="outline" data-testid="button-analyze">
+                          <Sparkles className="w-4 h-4 mr-1" />
+                          AI Analysis
+                        </Button>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                )}
               </div>
             )}
           </div>

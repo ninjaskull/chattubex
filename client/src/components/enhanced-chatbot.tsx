@@ -4,7 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Search, Send, Database, Filter, Download, User, Mail, Phone, Building, Clock, Target } from "lucide-react";
+import { X, Search, Send, Database, Filter, Download, User, Mail, Phone, Building, Clock, Target, Grid3X3, List, Eye } from "lucide-react";
+import { ContactCards } from './contact-cards';
+import { ContactCanvas } from './contact-canvas';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -138,113 +141,144 @@ export default function EnhancedChatbot({ isOpen, onClose }: EnhancedChatbotProp
   };
 
   const renderSearchResults = (results: SearchResult) => {
+    const allContacts = [
+      ...(results.contacts || []),
+      ...(results.campaignData?.flatMap((cd: any) => cd.matches || []) || [])
+    ];
+
     return (
       <div className="space-y-4 mt-4">
-        {/* Direct Contacts */}
-        {results.contacts.length > 0 && (
-          <div className="border border-blue-200 rounded-lg p-4 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
-            <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
-              <User className="w-4 h-4 mr-2" />
-              Direct Contacts ({results.contacts.length})
-            </h4>
-            <div className="space-y-2">
-              {results.contacts.map((contact, index) => (
-                <div key={index} className="bg-white dark:bg-gray-800 p-3 rounded border">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{contact.name}</p>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-1">
-                        <Mail className="w-3 h-3 mr-1" />
-                        {contact.email}
-                        <Phone className="w-3 h-3 ml-3 mr-1" />
-                        {contact.mobile}
-                      </div>
-                    </div>
-                    <Badge variant={contact.emailSent ? "default" : "secondary"}>
-                      {contact.emailSent ? "Contacted" : "New"}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Enhanced Visual Results */}
+        <Tabs defaultValue="cards" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="cards" data-testid="tab-cards">
+              <Grid3X3 className="w-4 h-4 mr-1" />
+              Cards
+            </TabsTrigger>
+            <TabsTrigger value="canvas" data-testid="tab-canvas">
+              <Eye className="w-4 h-4 mr-1" />
+              Network
+            </TabsTrigger>
+            <TabsTrigger value="summary" data-testid="tab-summary">
+              <Database className="w-4 h-4 mr-1" />
+              Summary
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Campaigns */}
-        {results.campaigns.length > 0 && (
-          <div className="border border-green-200 rounded-lg p-4 bg-green-50 dark:bg-green-950 dark:border-green-800">
-            <h4 className="font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center">
-              <Database className="w-4 h-4 mr-2" />
-              Campaigns ({results.campaigns.length})
-            </h4>
-            <div className="space-y-2">
-              {results.campaigns.map((campaign, index) => (
-                <div key={index} className="bg-white dark:bg-gray-800 p-3 rounded border">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{campaign.name}</p>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-1">
-                        <Target className="w-3 h-3 mr-1" />
-                        {campaign.recordCount} contacts
-                        <Clock className="w-3 h-3 ml-3 mr-1" />
-                        {new Date(campaign.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleQuickSearch(campaign.name)}
-                    >
-                      View Data
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          <TabsContent value="cards" className="mt-4">
+            {results.contacts?.length > 0 && (
+              <ContactCards 
+                contacts={results.contacts}
+                campaignName="Direct Contacts"
+                showActions={true}
+                className="mb-4"
+              />
+            )}
+            
+            {results.campaignData?.map((campaignData: any, index: number) => (
+              <ContactCards 
+                key={index}
+                contacts={campaignData.matches || []}
+                campaignName={campaignData.campaignName}
+                showActions={true}
+                className="mb-4"
+              />
+            ))}
+          </TabsContent>
 
-        {/* Campaign Data */}
-        {results.campaignData.length > 0 && (
-          <div className="border border-purple-200 rounded-lg p-4 bg-purple-50 dark:bg-purple-950 dark:border-purple-800">
-            <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-3 flex items-center">
-              <Target className="w-4 h-4 mr-2" />
-              Contact Records
-            </h4>
-            <div className="space-y-4">
-              {results.campaignData.map((campaignData, campaignIndex) => (
-                <div key={campaignIndex}>
-                  <h5 className="font-medium text-sm text-purple-700 dark:text-purple-300 mb-2">
-                    {campaignData.campaignName} ({campaignData.totalMatches} matches)
-                  </h5>
-                  <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {campaignData.matches.slice(0, 10).map((row: any, rowIndex: number) => (
-                      <div key={rowIndex} className="bg-white dark:bg-gray-800 p-3 rounded border text-sm">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {campaignData.headers.slice(0, 6).map((header: string) => (
-                            <div key={header} className="flex">
-                              <span className="font-medium text-gray-600 dark:text-gray-400 w-20 flex-shrink-0">
-                                {header}:
-                              </span>
-                              <span className="text-gray-800 dark:text-gray-200 truncate">
-                                {row[header] || '-'}
-                              </span>
-                            </div>
-                          ))}
+          <TabsContent value="canvas" className="mt-4">
+            {allContacts.length > 0 ? (
+              <ContactCanvas 
+                contacts={allContacts}
+                width={700}
+                height={500}
+                className="rounded-lg border"
+              />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No contacts to visualize
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="summary" className="mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 text-center bg-blue-50 dark:bg-blue-950 rounded-lg border">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {results.contacts?.length || 0}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Direct Contacts</div>
+              </div>
+              
+              <div className="p-4 text-center bg-green-50 dark:bg-green-950 rounded-lg border">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {results.campaignData?.reduce((acc: number, cd: any) => acc + (cd.matches?.length || 0), 0) || 0}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Campaign Contacts</div>
+              </div>
+              
+              <div className="p-4 text-center bg-purple-50 dark:bg-purple-950 rounded-lg border">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {results.campaignData?.length || 0}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Campaigns</div>
+              </div>
+              
+              <div className="p-4 text-center bg-orange-50 dark:bg-orange-950 rounded-lg border">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {results.total || 0}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Total Results</div>
+              </div>
+            </div>
+
+            {/* Campaign Summary */}
+            {results.campaigns.length > 0 && (
+              <div className="border border-green-200 rounded-lg p-4 bg-green-50 dark:bg-green-950 dark:border-green-800 mt-4">
+                <h4 className="font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center">
+                  <Database className="w-4 h-4 mr-2" />
+                  Available Campaigns ({results.campaigns.length})
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {results.campaigns.map((campaign, index) => (
+                    <div key={index} className="bg-white dark:bg-gray-800 p-3 rounded border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{campaign.name}</p>
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-1">
+                            <Target className="w-3 h-3 mr-1" />
+                            {campaign.recordCount} contacts
+                            <Clock className="w-3 h-3 ml-3 mr-1" />
+                            {new Date(campaign.createdAt).toLocaleDateString()}
+                          </div>
                         </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleQuickSearch(campaign.name)}
+                        >
+                          View Data
+                        </Button>
                       </div>
-                    ))}
-                    {campaignData.matches.length > 10 && (
-                      <p className="text-sm text-gray-500 text-center py-2">
-                        ... and {campaignData.matches.length - 10} more results
-                      </p>
-                    )}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            )}
+
+            {/* Quick Actions */}
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" data-testid="button-export-contacts">
+                <Download className="w-4 h-4 mr-1" />
+                Export Contacts
+              </Button>
+              <Button size="sm" variant="outline" data-testid="button-new-search">
+                <Search className="w-4 h-4 mr-1" />
+                New Search
+              </Button>
             </div>
-          </div>
-        )}
+          </TabsContent>
+        </Tabs>
       </div>
     );
   };
