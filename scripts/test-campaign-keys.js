@@ -4,14 +4,13 @@
 import crypto from 'crypto';
 
 const POSSIBLE_KEYS = [
-  'default-key-32-chars-long-here!', // Current working key
-  'fallaowl-business-intelligence',   // From scripts
-  'leadiq-pro-encryption-key-here',   // Legacy variant
-  'campaign-management-key-2024',     // Another legacy
-  'sunil123',                         // Based on DB pattern
-  'admin123',                         // Simple key
-  'fallowl2024',                      // Short variant
-  'FallOwl-2024-Key',                 // Capitalized variant
+  'your-32-character-encryption-key-here', // Most likely placeholder key
+  'your-32-character-encryption-key',      // Variant without 'here'
+  'default-key-32-chars-long-here!',       // Current working key
+  'fallaowl-business-intelligence',         // From scripts
+  'leadiq-pro-encryption-key-here',         // Legacy variant
+  'campaign-management-key-2024',           // Another legacy
+  'sunil123',                               // Based on DB pattern
 ];
 
 function testDecryption(encryptedData, key) {

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-key-32-chars-long-here!';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'your-32-character-encryption-key-here';
 const ALGORITHM = 'aes-256-cbc';
 const LEGACY_ALGORITHM = 'aes-256-cbc';
 
@@ -58,12 +58,12 @@ export function decrypt(encryptedData: string): string {
       } catch (error) {
         // If current method fails, try legacy methods for old campaigns
         const legacyKeys = [
+          'your-32-character-encryption-key-here', // Placeholder from config files
           'default-key-32-chars-long-here!', // Default fallback key (currently working)
+          'your-32-character-encryption-key', // Variant without 'here'
           'fallaowl-business-intelligence', // From old server setup
           'leadiq-pro-encryption-key-here', // Legacy key variant
           'campaign-management-key-2024', // Another legacy key
-          'fallowl-encryption-key-2024!!!', // Possible old key
-          'admin123', // Simple key
           'sunil123', // Based on your DB password pattern
         ];
         
