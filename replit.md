@@ -4,7 +4,7 @@ This is a full-stack web application designed for comprehensive campaign managem
 
 # User Preferences
 
-- **Platform Branding**: FallOwl (UI branding remains)
+- **Platform Branding**: FallOwl (UI branding), zhatore (AI responses only)
 - **AI Name**: Duggu (customizable via settings, but never mentioned in responses)
 - **AI Creator**: zhatore (always use "created by zhatore" or "AI of zhatore")
 - **AI Persona**: Professional for business queries, cute/flirty pet-like for casual conversations
