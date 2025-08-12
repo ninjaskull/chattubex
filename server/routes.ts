@@ -751,7 +751,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const campaign = await storage.createCampaign({
         name,
         recordCount: recordCount || rows.length,
-        encryptedData
+        encryptedData,
+        fieldMappings: {} // Empty field mappings for search result campaigns
       });
 
       res.json({ 
