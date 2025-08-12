@@ -16,6 +16,7 @@ import {
   ExternalLink, Users, Filter, SortAsc, Grid, List, Download
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import { ModernContactCanvas } from './modern-contact-canvas';
 
 interface Message {
   id: string;
@@ -429,9 +430,9 @@ I automatically detect whether you want to search or chat - just type naturally!
           </div>
         </CardHeader>
         
-        <CardContent className="p-0">
+        <CardContent className="p-0 max-w-full">
           {/* Messages Container */}
-          <div className="h-[360px] overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50/50 to-white">
+          <div className="h-[500px] overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50/50 to-white">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -464,33 +465,59 @@ I automatically detect whether you want to search or chat - just type naturally!
                         {message.content}
                       </p>
                     ) : (
-                      <div className="text-sm text-slate-800 prose prose-sm max-w-none">
-                        <ReactMarkdown 
-                          components={{
-                            p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed text-slate-700">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-2 pl-2">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-2 pl-2">{children}</ol>,
-                            li: ({ children }) => <li className="text-sm text-slate-700 leading-relaxed">{children}</li>,
-                            strong: ({ children }) => <strong className="font-bold text-slate-900">{children}</strong>,
-                            em: ({ children }) => <em className="font-medium text-slate-800">{children}</em>,
-                            h1: ({ children }) => <h1 className="text-lg font-bold mb-3 text-slate-900 border-b border-slate-200 pb-1">{children}</h1>,
-                            h2: ({ children }) => <h2 className="text-base font-bold mb-2 text-slate-900">{children}</h2>,
-                            h3: ({ children }) => <h3 className="text-sm font-bold mb-2 text-slate-800">{children}</h3>,
-                            h4: ({ children }) => <h4 className="text-sm font-semibold mb-1 text-slate-700">{children}</h4>,
-                            code: ({ children, inline }: any) => 
-                              inline 
-                                ? <code className="bg-orange-50 text-orange-800 px-1.5 py-0.5 rounded text-xs font-mono border border-orange-200">{children}</code>
-                                : <pre className="bg-slate-100 p-3 rounded-lg mb-3 overflow-x-auto border"><code className="text-xs font-mono text-slate-800">{children}</code></pre>,
-                            blockquote: ({ children }) => <blockquote className="border-l-4 border-orange-300 pl-4 py-2 mb-3 bg-orange-50 rounded-r-lg">{children}</blockquote>,
-                            hr: () => <hr className="my-4 border-slate-200" />,
-                            table: ({ children }) => <table className="w-full border-collapse border border-slate-200 mb-3 rounded-lg overflow-hidden">{children}</table>,
-                            th: ({ children }) => <th className="border border-slate-200 px-3 py-2 bg-slate-50 font-semibold text-left text-sm">{children}</th>,
-                            td: ({ children }) => <td className="border border-slate-200 px-3 py-2 text-sm">{children}</td>,
-                            a: ({ children, href }) => <a href={href} className="text-orange-600 hover:text-orange-700 underline font-medium" target="_blank" rel="noopener noreferrer">{children}</a>
-                          }}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
+                      <div>
+                        {/* Regular chat message */}
+                        <div className="text-sm text-slate-800 prose prose-sm max-w-none">
+                          <ReactMarkdown 
+                            components={{
+                              p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed text-slate-700">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-2 pl-2">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-2 pl-2">{children}</ol>,
+                              li: ({ children }) => <li className="text-sm text-slate-700 leading-relaxed">{children}</li>,
+                              strong: ({ children }) => <strong className="font-bold text-slate-900">{children}</strong>,
+                              em: ({ children }) => <em className="font-medium text-slate-800">{children}</em>,
+                              h1: ({ children }) => <h1 className="text-lg font-bold mb-3 text-slate-900 border-b border-slate-200 pb-1">{children}</h1>,
+                              h2: ({ children }) => <h2 className="text-base font-bold mb-2 text-slate-900">{children}</h2>,
+                              h3: ({ children }) => <h3 className="text-sm font-bold mb-2 text-slate-800">{children}</h3>,
+                              h4: ({ children }) => <h4 className="text-sm font-semibold mb-1 text-slate-700">{children}</h4>,
+                              code: ({ children, inline }: any) => 
+                                inline 
+                                  ? <code className="bg-orange-50 text-orange-800 px-1.5 py-0.5 rounded text-xs font-mono border border-orange-200">{children}</code>
+                                  : <pre className="bg-slate-100 p-3 rounded-lg mb-3 overflow-x-auto border"><code className="text-xs font-mono text-slate-800">{children}</code></pre>,
+                              blockquote: ({ children }) => <blockquote className="border-l-4 border-orange-300 pl-4 py-2 mb-3 bg-orange-50 rounded-r-lg">{children}</blockquote>,
+                              hr: () => <hr className="my-4 border-slate-200" />,
+                              table: ({ children }) => <table className="w-full border-collapse border border-slate-200 mb-3 rounded-lg overflow-hidden">{children}</table>,
+                              th: ({ children }) => <th className="border border-slate-200 px-3 py-2 bg-slate-50 font-semibold text-left text-sm">{children}</th>,
+                              td: ({ children }) => <td className="border border-slate-200 px-3 py-2 text-sm">{children}</td>,
+                              a: ({ children, href }) => <a href={href} className="text-orange-600 hover:text-orange-700 underline font-medium" target="_blank" rel="noopener noreferrer">{children}</a>
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                        
+                        {/* Modern Contact Canvas for search results */}
+                        {message.type === 'search-results' && message.searchResults && (
+                          <div className="mt-4">
+                            {(() => {
+                              const allContacts = [
+                                ...(message.searchResults.contacts || []),
+                                ...(message.searchResults.campaignData?.flatMap((cd: any) => cd.matches || []) || [])
+                              ];
+                              
+                              if (allContacts.length > 0) {
+                                return (
+                                  <ModernContactCanvas 
+                                    contacts={allContacts}
+                                    campaignName={message.searchResults.campaignData?.[0]?.campaignName || 'Search Results'}
+                                    className="max-w-full"
+                                  />
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
