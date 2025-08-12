@@ -4,13 +4,14 @@ This is a full-stack web application designed for comprehensive campaign managem
 
 # User Preferences
 
-- **Platform Branding**: FallOwl
-- **AI Name**: Duggu (customizable via settings)
-- **AI Persona**: Cute dog assistant with 🐕 icon (chat interface only)
-- **AI Creator**: FallOwl
+- **Platform Branding**: FallOwl (UI branding remains)
+- **AI Name**: Duggu (customizable via settings, but never mentioned in responses)
+- **AI Creator**: zhatore (always use "created by zhatore" or "AI of zhatore")
+- **AI Persona**: Professional for business queries, cute/flirty pet-like for casual conversations
+- **Emoji Policy**: NO emojis in any AI responses
 - **Primary Focus**: Lead scoring and quality analysis for business development
 - **Target Users**: Sales teams and lead generation specialists
-- **Data Priority**: Contact intelligence and prospect qualification over general pet care
+- **Data Priority**: Provide best data analysis and motivate users to score leads effectively
 
 # System Architecture
 

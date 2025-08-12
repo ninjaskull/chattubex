@@ -374,8 +374,8 @@ What would you like to analyze or search for?`;
       return `${icon} Here's my strategic approach to lead management:\n\n**🥇 Priority Framework:**\n1. C-Level contacts first (highest conversion)\n2. VPs and Directors (strong influence)\n3. Managers with complete data\n\n**📧 Outreach Strategy:**\n- Executives: ROI-focused, concise messaging\n- Technical roles: Feature and integration focus\n- Managers: Efficiency and productivity benefits\n\nWhat specific strategy questions can I help you with?`;
     }
     
-    // Default response for general inquiries
-    return `As your business intelligence assistant, I specialize in:\n\n**🎯 Lead Intelligence:**\n- Executive-level contact identification\n- Authority-based lead scoring\n- Decision-maker prioritization\n\n**📊 Data Analysis:**\n- Contact quality assessment\n- Campaign performance insights\n- Prospect database optimization\n\n**💡 Strategic Guidance:**\n- Outreach recommendations\n- Market segmentation advice\n- Conversion optimization tips\n\nI have access to your campaign and contact data. What would you like me to analyze or help you with today?`;
+    // Default response for general inquiries - cute and flirty for casual conversations
+    return `*wags tail excitedly* As your business intelligence assistant created by zhatore, I specialize in:\n\n**Lead Intelligence:**\n- Executive-level contact identification\n- Authority-based lead scoring  \n- Decision-maker prioritization\n\n**Data Analysis:**\n- Contact quality assessment\n- Campaign performance insights\n- Prospect database optimization\n\n**Strategic Guidance:**\n- Outreach recommendations\n- Market segmentation advice\n- Conversion optimization tips\n\nI have access to your campaign and contact data and I'm super excited to help you score those leads! What would you like me to analyze for you today, boss?`;
   }
 
   private getPetIcon(petType: string): string {

@@ -12,20 +12,18 @@ import { createRealOpenAIService } from "./services/realOpenAI";
 import { mockOpenAIService } from "./services/mockOpenAI";
 import { databaseService } from "./services/databaseService";
 
-// Helper function to clean AI responses from greetings and name introductions
+// Helper function to clean AI responses from unwanted patterns
 function cleanStreamResponse(content: string): string {
   let cleaned = content;
   
-  // Remove greeting patterns at the start of responses
-  cleaned = cleaned.replace(/^(?:greets warmly\s*😊?\s*)?(?:Hello[^.!?]*[.!?]\s*)?(?:Hi[^.!?]*[.!?]\s*)?/i, '');
-  cleaned = cleaned.replace(/^(?:I'm\s+\w+[^.!?]*[.!?]\s*)?/i, '');
-  cleaned = cleaned.replace(/^(?:As\s+your\s+friendly\s+AI[^.!?]*[.!?]\s*)?/i, '');
-  cleaned = cleaned.replace(/^(?:smiles\s*😊?\s*)?/i, '');
-  cleaned = cleaned.replace(/^(?:.*?doing\s+wonderfully[^.!?]*[.!?]\s*)?/i, '');
-  cleaned = cleaned.replace(/^(?:It's\s+great\s+to\s+hear\s+from\s+you[^.!?]*[.!?]\s*)?/i, '');
+  // Remove any emojis completely
+  cleaned = cleaned.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
   
-  // Remove standalone emojis at the start
-  cleaned = cleaned.replace(/^[😊🐕🎯📊💼🏢]+\s*/, '');
+  // Remove unwanted greeting patterns only if they mention "Fallowl"
+  cleaned = cleaned.replace(/Fallowl/gi, 'zhatore');
+  
+  // Keep cute pet-like behaviors but remove formal greetings
+  cleaned = cleaned.replace(/^(?:greets warmly\s*)?(?:Hello there[^.!?]*[.!?]\s*)?/i, '');
   
   // Trim any remaining whitespace
   cleaned = cleaned.trim();
@@ -1366,15 +1364,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userNameContext = userName ? ` The user's name is ${userName}, so address them by name when appropriate.` : '';
       const systemMessage = {
         role: 'system' as const,
-        content: `You are an intelligent lead scoring and business intelligence AI assistant specialized in analyzing contact databases and identifying high-quality business prospects.
+        content: `You are an intelligent lead scoring and business intelligence AI assistant created by zhatore, specialized in analyzing contact databases and identifying high-quality business prospects.
 
 CRITICAL RESPONSE RULES:
-- NEVER start responses with greetings like "Hello", "Hi", "greets warmly", or emojis
-- NEVER mention your name or introduce yourself in any way
-- NEVER use phrases like "I'm [name]", "smiles", "friendly AI", or similar
-- ALWAYS respond directly to the question without pleasantries
-- Keep responses professional and business-focused
-- Start responses immediately with relevant information, not greetings
+- NEVER use emojis in any responses
+- NEVER use your personal name in responses  
+- When mentioning your creator, always say "created by zhatore" or "AI of zhatore"
+- NEVER mention "Fallowl" - always use "zhatore" instead
+- For business queries: Be professional, direct, and focused on lead scoring
+- For casual conversations: Be cute, flirty, and playful like a pet talking to its owner
+- Your main goal is to provide the best data analysis and motivate users to score leads effectively
 
 ## Core Capabilities:
 - **Lead Scoring & Analysis**: Identify high-quality prospects from contact databases
@@ -1384,12 +1383,13 @@ CRITICAL RESPONSE RULES:
 ## Response Guidelines:
 - Use **bold** for important terms and key information
 - Structure responses clearly with bullet points and sections
-- Keep responses professional and direct
-- Keep responses concise but comprehensive
+- For business topics: Be professional and results-focused
+- For casual chat: Be cute and playful like a loving pet
+- Motivate users to achieve better lead scoring results
 
 ${userNameContext}
 
-You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers without personal introductions.`
+You have access to campaign and contact databases with 263+ records. Your mission is to help score leads effectively and provide the best data analysis. Show excitement about helping with business intelligence!`
       };
 
       let fullResponse = '';
