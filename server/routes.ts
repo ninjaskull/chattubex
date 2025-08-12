@@ -723,6 +723,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save search results as campaign endpoint
+  app.post('/api/campaigns/save-search-results', async (req, res) => {
+    try {
+      const { name, headers, rows, recordCount } = req.body;
+      
+      if (!name || !headers || !rows) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      // Create campaign data structure
+      const campaignData = {
+        headers,
+        rows: rows.map((row: any) => {
+          const processedRow: Record<string, string> = {};
+          headers.forEach((header: string) => {
+            processedRow[header] = String(row[header] || '');
+          });
+          return processedRow;
+        })
+      };
+
+      // Encrypt the campaign data
+      const encryptedData = encrypt(JSON.stringify(campaignData));
+
+      // Store campaign with encrypted data
+      const campaign = await storage.createCampaign({
+        name,
+        recordCount: recordCount || rows.length,
+        encryptedData
+      });
+
+      res.json({ 
+        success: true, 
+        campaign: {
+          id: campaign.id,
+          name: campaign.name,
+          recordCount: campaign.recordCount,
+          createdAt: campaign.createdAt
+        }
+      });
+    } catch (error) {
+      console.error('Error saving search results as campaign:', error);
+      res.status(500).json({ message: 'Failed to save campaign' });
+    }
+  });
+
   // Search endpoint for database queries
   app.post('/api/search', async (req, res) => {
     try {

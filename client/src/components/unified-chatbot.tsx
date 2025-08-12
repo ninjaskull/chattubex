@@ -12,6 +12,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { ContactCards } from './contact-cards';
 import { ContactCanvas } from './contact-canvas';
+import { ModernContactCanvas } from './modern-contact-canvas';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface UnifiedChatbotProps {
@@ -324,121 +325,25 @@ How can I help you today?`,
                   </div>
                 </div>
 
-                {/* Detailed Text Results */}
-                {msg.searchResults.contacts?.length > 0 && (
-                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
-                      <User className="w-4 h-4 mr-2" />
-                      Direct Contacts ({msg.searchResults.contacts.length})
-                    </h4>
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {msg.searchResults.contacts.map((contact: any, index: number) => (
-                        <div key={index} className="bg-white dark:bg-gray-800 p-3 rounded border">
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100">
-                              {contact.name || 'Unknown Name'}
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                              {contact.email && (
-                                <div className="flex items-center">
-                                  <Mail className="w-3 h-3 mr-2" />
-                                  <span>Email: {contact.email}</span>
-                                </div>
-                              )}
-                              {(contact.phone || contact.mobile) && (
-                                <div className="flex items-center">
-                                  <Phone className="w-3 h-3 mr-2" />
-                                  <span>Phone: {contact.phone || contact.mobile}</span>
-                                </div>
-                              )}
-                              {contact.company && (
-                                <div className="flex items-center">
-                                  <Building className="w-3 h-3 mr-2" />
-                                  <span>Company: {contact.company}</span>
-                                </div>
-                              )}
-                              {contact.title && (
-                                <div>Title: {contact.title}</div>
-                              )}
-                              {contact.linkedin && (
-                                <div>LinkedIn: {contact.linkedin}</div>
-                              )}
-                            </div>
-                            <div className="mt-2">
-                              <Badge variant={contact.emailSent ? "default" : "secondary"}>
-                                {contact.emailSent ? "Contacted" : "New"}
-                              </Badge>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {msg.searchResults.campaignData?.map((campaignData: any, campaignIndex: number) => (
-                  <div key={campaignIndex} className="mt-4 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center">
-                      <Target className="w-4 h-4 mr-2" />
-                      {campaignData.campaignName} ({campaignData.totalMatches} matches)
-                    </h4>
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {campaignData.matches.map((contact: any, index: number) => (
-                        <div key={index} className="bg-white dark:bg-gray-800 p-3 rounded border">
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100">
-                              {contact.name || contact.Name || contact.first_name || contact['First Name'] || 'Unknown Name'}
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                              {(contact.email || contact.Email || contact['Email Address']) && (
-                                <div className="flex items-center">
-                                  <Mail className="w-3 h-3 mr-2" />
-                                  <span>Email: {contact.email || contact.Email || contact['Email Address']}</span>
-                                </div>
-                              )}
-                              {(contact.phone || contact.Phone || contact.mobile || contact.Mobile || contact['Phone Number']) && (
-                                <div className="flex items-center">
-                                  <Phone className="w-3 h-3 mr-2" />
-                                  <span>Phone: {contact.phone || contact.Phone || contact.mobile || contact.Mobile || contact['Phone Number']}</span>
-                                </div>
-                              )}
-                              {(contact.company || contact.Company || contact.organization || contact.Organization) && (
-                                <div className="flex items-center">
-                                  <Building className="w-3 h-3 mr-2" />
-                                  <span>Company: {contact.company || contact.Company || contact.organization || contact.Organization}</span>
-                                </div>
-                              )}
-                              {(contact.title || contact.Title || contact.job_title || contact['Job Title']) && (
-                                <div>Title: {contact.title || contact.Title || contact.job_title || contact['Job Title']}</div>
-                              )}
-                              {(contact.linkedin || contact.LinkedIn || contact['LinkedIn Profile']) && (
-                                <div>LinkedIn: {contact.linkedin || contact.LinkedIn || contact['LinkedIn Profile']}</div>
-                              )}
-                              {(contact.location || contact.Location || contact.city || contact.City) && (
-                                <div>Location: {contact.location || contact.Location || contact.city || contact.City}</div>
-                              )}
-                              {(contact.industry || contact.Industry) && (
-                                <div>Industry: {contact.industry || contact.Industry}</div>
-                              )}
-                              {/* Show other available fields */}
-                              {campaignData.headers.filter((header: string) => 
-                                !['name', 'Name', 'first_name', 'First Name', 'email', 'Email', 'Email Address', 
-                                  'phone', 'Phone', 'mobile', 'Mobile', 'Phone Number', 'company', 'Company', 
-                                  'organization', 'Organization', 'title', 'Title', 'job_title', 'Job Title',
-                                  'linkedin', 'LinkedIn', 'LinkedIn Profile', 'location', 'Location', 'city', 'City',
-                                  'industry', 'Industry'].includes(header) && contact[header]
-                              ).slice(0, 3).map((header: string) => (
-                                <div key={header}>
-                                  {header}: {contact[header]}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                {/* Modern Contact Canvas Results */}
+                {(() => {
+                  const allContacts = [
+                    ...(msg.searchResults.contacts || []),
+                    ...(msg.searchResults.campaignData?.flatMap((cd: any) => cd.matches || []) || [])
+                  ];
+                  
+                  if (allContacts.length > 0) {
+                    return (
+                      <div className="mt-4">
+                        <ModernContactCanvas 
+                          contacts={allContacts}
+                          campaignName={msg.searchResults.campaignData?.[0]?.campaignName || 'Search Results'}
+                        />
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             )}
           </div>

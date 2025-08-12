@@ -12,7 +12,7 @@ This is a full-stack web application designed for comprehensive campaign managem
 - **Primary Focus**: Lead scoring and quality analysis for business development
 - **Target Users**: Sales teams and lead generation specialists
 - **Data Priority**: Provide best data analysis and motivate users to score leads effectively
-- **Contact Display**: Use simple text format with full contact details instead of visual components for search results
+- **Contact Display**: Use modern AI chat interface with compact contact cards displaying all contact details in a canvas format
 - **Search Result Size**: Display up to 100 contacts in search results for comprehensive data viewing
 
 # System Architecture
