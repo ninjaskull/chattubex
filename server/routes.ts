@@ -5,7 +5,7 @@ import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { storage } from "./storage";
-import { encrypt, decrypt } from "./utils/encryption";
+import { encrypt, decrypt, decryptNote } from "./utils/encryption";
 import { deriveTimezone } from "./utils/timezone";
 import { sendContactFormEmail } from "./utils/email";
 import { createRealOpenAIService } from "./services/realOpenAI";
@@ -186,19 +186,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (ws.readyState === WebSocket.OPEN) {
         const validNotes = notes.map(note => {
           try {
-            const decryptedContent = decrypt(note.encryptedContent);
-            // Filter out corrupted notes containing campaign data
-            if (decryptedContent.includes('{"headers"') || decryptedContent.includes('"fieldMappings"')) {
-              console.warn(`WebSocket: Skipping corrupted note ${note.id}`);
-              return null;
-            }
+            const decryptedContent = decryptNote(note.encryptedContent);
             return {
               id: note.id,
               content: decryptedContent,
               createdAt: note.createdAt
             };
           } catch (error) {
-            console.error(`WebSocket: Failed to decrypt note ${note.id}:`, error);
+            console.warn(`WebSocket: Failed to decrypt note ${note.id}:`, error);
             return null;
           }
         }).filter(note => note !== null);
@@ -549,6 +544,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Note content is required' });
       }
 
+      // Validate content - reject if it contains campaign data structure
+      if (typeof content === 'string' && (content.includes('{"headers"') || content.includes('"fieldMappings"') || content.includes('"rows"'))) {
+        console.warn('Rejected note creation with invalid campaign data:', content);
+        return res.status(400).json({ message: 'Invalid note content detected' });
+      }
+
+      // Additional validation for objects that might be sent instead of strings
+      if (typeof content === 'object' && content !== null) {
+        console.warn('Rejected note creation with object content:', content);
+        return res.status(400).json({ message: 'Note content must be a string' });
+      }
+
       const encryptedContent = encrypt(content);
       
       const note = await storage.createNote({
@@ -558,7 +565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const noteData = {
         id: note.id,
-        content: decrypt(note.encryptedContent),
+        content: decryptNote(note.encryptedContent),
         createdAt: note.createdAt
       };
 
@@ -579,17 +586,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(notes.map(note => {
         let decryptedContent;
         try {
-          // Try to decrypt the encrypted content
-          decryptedContent = decrypt(note.encryptedContent);
-          
-          // Check if it's valid note content (not campaign data)
-          if (decryptedContent.includes('{"headers"') || decryptedContent.includes('"fieldMappings"')) {
-            console.warn(`Note ${note.id} contains invalid campaign data, skipping`);
-            return null;
-          }
+          // Try to decrypt the encrypted content using note-specific decryption
+          decryptedContent = decryptNote(note.encryptedContent);
         } catch (error) {
-          console.error(`Failed to decrypt note ${note.id}:`, error);
-          decryptedContent = 'Unable to decrypt note content';
+          console.warn(`Failed to decrypt note ${note.id}:`, error);
+          return null; // Skip corrupted notes
         }
         
         return {

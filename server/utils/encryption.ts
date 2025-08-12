@@ -124,3 +124,54 @@ export function decrypt(encryptedData: string): string {
   console.warn(`Could not decrypt campaign data, returning empty structure: ${encryptedData.substring(0, 50)}...`);
   return JSON.stringify({ headers: [], rows: [], fieldMappings: {} });
 }
+
+// New function specifically for notes that doesn't require JSON validation
+export function decryptNote(encryptedData: string): string {
+  if (!encryptedData) {
+    throw new Error('No encrypted data provided');
+  }
+  
+  // Check if it contains colon (IV:encrypted format)
+  if (encryptedData.includes(':')) {
+    const parts = encryptedData.split(':');
+    if (parts.length === 2) {
+      const iv = Buffer.from(parts[0], 'hex');
+      const encrypted = parts[1];
+      
+      // Try with current key
+      try {
+        const key = getKey();
+        const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+      } catch (error) {
+        // If current method fails, try legacy methods
+        const legacyKeys = [
+          'your-32-character-encryption-key-here',
+          'default-key-32-chars-long-here!',
+          'your-32-character-encryption-key',
+          'fallaowl-business-intelligence',
+          'leadiq-pro-encryption-key-here',
+          'campaign-management-key-2024',
+          'sunil123',
+        ];
+        
+        for (const legacyKey of legacyKeys) {
+          try {
+            const key = crypto.createHash('sha256').update(legacyKey).digest();
+            const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+            let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+            return decrypted;
+          } catch (e) {
+            continue;
+          }
+        }
+      }
+    }
+  }
+  
+  // If decryption fails, throw error instead of returning empty structure
+  throw new Error(`Unable to decrypt note content: ${encryptedData.substring(0, 50)}...`);
+}
