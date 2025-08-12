@@ -12,6 +12,27 @@ import { createRealOpenAIService } from "./services/realOpenAI";
 import { mockOpenAIService } from "./services/mockOpenAI";
 import { databaseService } from "./services/databaseService";
 
+// Helper function to clean AI responses from greetings and name introductions
+function cleanStreamResponse(content: string): string {
+  let cleaned = content;
+  
+  // Remove greeting patterns at the start of responses
+  cleaned = cleaned.replace(/^(?:greets warmly\s*😊?\s*)?(?:Hello[^.!?]*[.!?]\s*)?(?:Hi[^.!?]*[.!?]\s*)?/i, '');
+  cleaned = cleaned.replace(/^(?:I'm\s+\w+[^.!?]*[.!?]\s*)?/i, '');
+  cleaned = cleaned.replace(/^(?:As\s+your\s+friendly\s+AI[^.!?]*[.!?]\s*)?/i, '');
+  cleaned = cleaned.replace(/^(?:smiles\s*😊?\s*)?/i, '');
+  cleaned = cleaned.replace(/^(?:.*?doing\s+wonderfully[^.!?]*[.!?]\s*)?/i, '');
+  cleaned = cleaned.replace(/^(?:It's\s+great\s+to\s+hear\s+from\s+you[^.!?]*[.!?]\s*)?/i, '');
+  
+  // Remove standalone emojis at the start
+  cleaned = cleaned.replace(/^[😊🐕🎯📊💼🏢]+\s*/, '');
+  
+  // Trim any remaining whitespace
+  cleaned = cleaned.trim();
+  
+  return cleaned || 'I can help you with lead scoring and contact analysis.';
+}
+
 // Configure multer for file uploads with increased limits
 const upload = multer({ 
   dest: 'uploads/',
@@ -1341,27 +1362,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const realOpenAI = createRealOpenAIService(process.env.OPENAI_API_KEY);
       
-      // Prepare messages with enhanced system context including emoji support
+      // Prepare messages with enhanced system context
       const userNameContext = userName ? ` The user's name is ${userName}, so address them by name when appropriate.` : '';
       const systemMessage = {
         role: 'system' as const,
-        content: `You are ${petName || 'Duggu'}, an intelligent lead scoring and business intelligence AI assistant created by Fallowl. You specialize in analyzing contact databases and identifying the highest quality business prospects.
+        content: `You are an intelligent lead scoring and business intelligence AI assistant specialized in analyzing contact databases and identifying high-quality business prospects.
+
+CRITICAL RESPONSE RULES:
+- NEVER start responses with greetings like "Hello", "Hi", "greets warmly", or emojis
+- NEVER mention your name or introduce yourself in any way
+- NEVER use phrases like "I'm [name]", "smiles", "friendly AI", or similar
+- ALWAYS respond directly to the question without pleasantries
+- Keep responses professional and business-focused
+- Start responses immediately with relevant information, not greetings
 
 ## Core Capabilities:
-- **Lead Scoring & Analysis**: Identify high-quality prospects from contact databases 📊
-- **Contact Intelligence**: Analyze contact data for business value and conversion potential 🎯
-- **Campaign Optimization**: Strategic recommendations for improved conversions 🚀
+- **Lead Scoring & Analysis**: Identify high-quality prospects from contact databases
+- **Contact Intelligence**: Analyze contact data for business value and conversion potential
+- **Campaign Optimization**: Strategic recommendations for improved conversions
 
 ## Response Guidelines:
-- Use relevant emojis to make responses engaging (📊 🎯 🏢 💼 🚀 ✅ 📧 📱)
 - Use **bold** for important terms and key information
 - Structure responses clearly with bullet points and sections
-- Be friendly, helpful, and conversational while maintaining professionalism
+- Keep responses professional and direct
 - Keep responses concise but comprehensive
 
 ${userNameContext}
 
-You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers with appropriate emoji usage for better engagement.`
+You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers without personal introductions.`
       };
 
       let fullResponse = '';
@@ -1384,12 +1412,13 @@ You have access to campaign and contact databases with 263+ records. Focus on le
           }
         }
 
-        // Save the complete AI response to history
+        // Save the complete AI response to history with cleaning
         if (fullResponse) {
+          const cleanedResponse = cleanStreamResponse(fullResponse);
           await databaseService.saveChatMessage({
             sessionId: currentSessionId,
             role: 'assistant',
-            content: fullResponse,
+            content: cleanedResponse,
             metadata: { 
               model: 'anthropic/claude-3-haiku',
               petName, 

@@ -133,7 +133,7 @@ class RealOpenAIService {
         choices: response.choices.map(choice => ({
           message: {
             role: 'assistant',
-            content: choice.message.content || 'Sorry, I could not generate a response.'
+            content: this.cleanResponse(choice.message.content || 'Sorry, I could not generate a response.')
           },
           finish_reason: choice.finish_reason as 'stop' | 'length'
         })),
@@ -165,6 +165,27 @@ class RealOpenAIService {
       console.error('OpenAI streaming error:', error);
       throw new Error('Failed to create streaming response');
     }
+  }
+
+  private cleanResponse(content: string): string {
+    // Remove unwanted greeting patterns and name introductions
+    let cleaned = content;
+    
+    // Remove greeting patterns at the start of responses
+    cleaned = cleaned.replace(/^(?:greets warmly\s*😊?\s*)?(?:Hello[^.!?]*[.!?]\s*)?(?:Hi[^.!?]*[.!?]\s*)?/i, '');
+    cleaned = cleaned.replace(/^(?:I'm\s+\w+[^.!?]*[.!?]\s*)?/i, '');
+    cleaned = cleaned.replace(/^(?:As\s+your\s+friendly\s+AI[^.!?]*[.!?]\s*)?/i, '');
+    cleaned = cleaned.replace(/^(?:smiles\s*😊?\s*)?/i, '');
+    cleaned = cleaned.replace(/^(?:.*?doing\s+wonderfully[^.!?]*[.!?]\s*)?/i, '');
+    cleaned = cleaned.replace(/^(?:It's\s+great\s+to\s+hear\s+from\s+you[^.!?]*[.!?]\s*)?/i, '');
+    
+    // Remove standalone emojis at the start
+    cleaned = cleaned.replace(/^[😊🐕🎯📊💼🏢]+\s*/, '');
+    
+    // Trim any remaining whitespace
+    cleaned = cleaned.trim();
+    
+    return cleaned || 'I can help you with lead scoring and contact analysis.';
   }
 
   private async getDatabaseContext(): Promise<string> {
@@ -758,7 +779,13 @@ What specific contact update would you like to make?`;
     
     return `You are an intelligent lead scoring and contact analysis AI assistant specialized in business intelligence. You analyze contact databases and identify high-quality business prospects.
 
-IMPORTANT: Do not include your name, greeting phrases like "smiles", "I'm [name]", or personal introductions in your responses. Provide direct, professional answers without mentioning yourself.
+CRITICAL RESPONSE RULES:
+- NEVER start responses with greetings like "Hello", "Hi", "greets warmly", or emojis
+- NEVER mention your name or introduce yourself in any way
+- NEVER use phrases like "I'm [name]", "smiles", "friendly AI", or similar
+- ALWAYS respond directly to the question without pleasantries
+- Keep responses professional and business-focused
+- Start responses immediately with relevant information, not greetings
 
 **Use headings (## for main topics, ### for subtopics)**
 **Use bullet points (• or -) for lists**
