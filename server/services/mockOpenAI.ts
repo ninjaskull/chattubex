@@ -359,7 +359,7 @@ What would you like to analyze or search for?`;
     const icon = '🎯';
     
     if (intents.includes('scoring')) {
-      return `${icon} I'm ${assistantName}, your lead scoring specialist! I analyze contacts based on:\n\n**Authority Level Scoring:**\n- C-Level Executives (90-95 points)\n- VPs & Directors (65-75 points)\n- Managers & Seniors (45-50 points)\n\n**Data Completeness:**\n- Complete profiles score higher\n- LinkedIn presence adds value\n- Direct contact info is crucial\n\nWant me to analyze your contacts and identify the highest-value prospects?`;
+      return `Lead scoring analysis based on:\n\n**Authority Level Scoring:**\n- C-Level Executives (90-95 points)\n- VPs & Directors (65-75 points)\n- Managers & Seniors (45-50 points)\n\n**Data Completeness:**\n- Complete profiles score higher\n- LinkedIn presence adds value\n- Direct contact info is crucial\n\nWould you like me to analyze your contacts and identify the highest-value prospects?`;
     }
     
     if (intents.includes('authority')) {
@@ -375,7 +375,7 @@ What would you like to analyze or search for?`;
     }
     
     // Default response for general inquiries
-    return `${icon} Hello! I'm ${assistantName}, your intelligent lead scoring and contact analysis assistant created by Fallowl. I specialize in:\n\n**🎯 Lead Intelligence:**\n- Executive-level contact identification\n- Authority-based lead scoring\n- Decision-maker prioritization\n\n**📊 Data Analysis:**\n- Contact quality assessment\n- Campaign performance insights\n- Prospect database optimization\n\n**💡 Strategic Guidance:**\n- Outreach recommendations\n- Market segmentation advice\n- Conversion optimization tips\n\nI have access to your campaign and contact data. What would you like me to analyze or help you with today?`;
+    return `As your business intelligence assistant, I specialize in:\n\n**🎯 Lead Intelligence:**\n- Executive-level contact identification\n- Authority-based lead scoring\n- Decision-maker prioritization\n\n**📊 Data Analysis:**\n- Contact quality assessment\n- Campaign performance insights\n- Prospect database optimization\n\n**💡 Strategic Guidance:**\n- Outreach recommendations\n- Market segmentation advice\n- Conversion optimization tips\n\nI have access to your campaign and contact data. What would you like me to analyze or help you with today?`;
   }
 
   private getPetIcon(petType: string): string {
@@ -416,7 +416,7 @@ What would you like to analyze or search for?`;
         choices: [{
           message: {
             role: 'assistant',
-            content: `I'm Duggu, your lead scoring assistant. I'm ready to help you analyze contacts and identify high-value prospects! What would you like me to help you with today?`
+            content: `Ready to help you analyze contacts and identify high-value prospects! What would you like me to help you with today?`
           },
           finish_reason: 'stop'
         }],
