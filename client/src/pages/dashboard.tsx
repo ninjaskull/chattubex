@@ -9,7 +9,9 @@ import {
   FolderOpen, 
   MessageSquare,
   Target,
-  Dog
+  Dog,
+  Home,
+  Database
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,7 +29,7 @@ export default function Dashboard() {
   const [assistantName, setAssistantName] = useState(() => 
     localStorage.getItem('pawmate_pet_name') || "Duggu"
   );
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
 
   const { data: campaigns = [] } = useQuery<any[]>({
@@ -53,29 +55,12 @@ export default function Dashboard() {
     };
   }, []);
 
-  // Scroll detection
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      setIsScrolled(scrollTop > 100); // Show sticky sidebar after 100px scroll
-    };
-
-    // Use passive scroll listener for better performance
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Also handle scroll on the main content area
-    const mainContent = document.querySelector('.main-content-area');
-    if (mainContent) {
-      mainContent.addEventListener('scroll', handleScroll, { passive: true });
-    }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (mainContent) {
-        mainContent.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, []);
+  // Navigation items configuration
+  const navigationItems = [
+    { id: "files", label: "Campaigns", icon: FolderOpen },
+    { id: "notes", label: "Documents", icon: MessageSquare },
+    { id: "pawmate", label: assistantName, icon: Dog }
+  ];
 
   const handleLogout = () => {
     clearAuth();
@@ -90,116 +75,131 @@ export default function Dashboard() {
   const totalCampaigns = campaigns.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Compact Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 px-4 py-2 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow">
-              <Target className="text-white h-3 w-3" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-900">FallOwl Dashboard</h1>
-              <p className="text-xs text-slate-500">AI-powered lead scoring and business intelligence</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
+      {/* Hover-based Sidebar Navigation */}
+      <div 
+        className="hidden md:flex flex-col fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out group"
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
+        style={{ 
+          width: isSidebarHovered ? '16rem' : '4rem',
+        }}
+      >
+        {/* Sidebar Container */}
+        <div className="bg-white/95 backdrop-blur-sm border-r border-slate-200/50 shadow-lg h-full flex flex-col">
+          {/* Sidebar Header */}
+          <div className="p-4 border-b border-slate-200/50">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow shrink-0">
+                <Target className="text-white h-4 w-4" />
+              </div>
+              <div className={`transition-all duration-300 overflow-hidden ${
+                isSidebarHovered ? 'w-auto opacity-100' : 'w-0 opacity-0'
+              }`}>
+                <h1 className="text-sm font-bold text-slate-900 whitespace-nowrap">FallOwl</h1>
+                <p className="text-xs text-slate-500 whitespace-nowrap">Dashboard</p>
+              </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs px-2 py-0">
-              {totalCampaigns} Campaigns
-            </Badge>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-600 hover:text-slate-900 text-sm h-7">
-              <LogOut className="mr-1 h-3 w-3" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-      {/* Smart Sidebar Navigation */}
-      <div className="hidden md:block shrink-0" style={{ width: isScrolled ? '3rem' : '8rem' }}>
-        <div className={`transition-all duration-500 ease-in-out ${
-          isScrolled 
-            ? 'fixed left-0 top-20 z-40 bg-white/95 backdrop-blur-sm border-r border-slate-200/50 shadow-xl h-screen w-12' 
-            : 'sticky top-20 bg-white/80 backdrop-blur-sm rounded-lg border border-slate-200/50'
-        }`}>
-          <div className={`transition-all duration-500 ease-in-out ${isScrolled ? 'p-0.5' : 'p-1.5'}`}>
-            <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="w-full">
-              <TabsList className={`grid w-full grid-rows-3 bg-transparent h-auto transition-all duration-500 ease-in-out ${isScrolled ? 'gap-0.5 p-0' : 'gap-1 p-0.5'}`}>
-                <TabsTrigger 
-                  value="files" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-500 ease-in-out text-xs ${
-                    isScrolled 
-                      ? 'justify-center p-1.5 gap-0 rounded-md' 
-                      : 'justify-start gap-1.5 p-2 rounded-md'
-                  }`}
-                  title={isScrolled ? "Campaigns" : undefined}
-                >
-                  <FolderOpen className={`transition-all duration-500 ease-in-out ${isScrolled ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
-                  <span className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                    isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'
-                  }`}>Campaigns</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="notes" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-500 ease-in-out text-xs ${
-                    isScrolled 
-                      ? 'justify-center p-1.5 gap-0 rounded-md' 
-                      : 'justify-start gap-1.5 p-2 rounded-md'
-                  }`}
-                  title={isScrolled ? "Documents" : undefined}
-                >
-                  <MessageSquare className={`transition-all duration-500 ease-in-out ${isScrolled ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
-                  <span className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                    isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'
-                  }`}>Documents</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="pawmate" 
-                  className={`flex items-center w-full text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 hover:bg-slate-50 transition-all duration-500 ease-in-out text-xs ${
-                    isScrolled 
-                      ? 'justify-center p-1.5 gap-0 rounded-md' 
-                      : 'justify-start gap-1.5 p-2 rounded-md'
-                  }`}
-                  title={isScrolled ? assistantName : undefined}
-                >
-                  <Dog className={`transition-all duration-500 ease-in-out ${isScrolled ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
-                  <span className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                    isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'
-                  }`}>{assistantName}</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+
+          {/* Navigation Items */}
+          <nav className="flex-1 p-2">
+            <div className="space-y-1">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group/item ${
+                      isActive 
+                        ? 'bg-blue-50 text-blue-700 shadow-sm' 
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                    title={!isSidebarHovered ? item.label : undefined}
+                    data-testid={`nav-${item.id}`}
+                  >
+                    <Icon className={`shrink-0 transition-all duration-200 ${
+                      isActive ? 'h-5 w-5' : 'h-4 w-4'
+                    }`} />
+                    <span className={`ml-3 text-sm font-medium transition-all duration-300 overflow-hidden whitespace-nowrap ${
+                      isSidebarHovered ? 'w-auto opacity-100' : 'w-0 opacity-0'
+                    }`}>
+                      {item.label}
+                    </span>
+                    {isActive && (
+                      <div className="ml-auto">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
+          {/* Sidebar Footer */}
+          <div className="p-3 border-t border-slate-200/50">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center px-3 py-2 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+              title={!isSidebarHovered ? "Logout" : undefined}
+              data-testid="nav-logout"
+            >
+              <LogOut className="h-4 w-4 shrink-0" />
+              <span className={`ml-3 text-sm font-medium transition-all duration-300 overflow-hidden whitespace-nowrap ${
+                isSidebarHovered ? 'w-auto opacity-100' : 'w-0 opacity-0'
+              }`}>
+                Logout
+              </span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className={`flex-1 min-w-0 transition-all duration-500 ease-in-out ${isScrolled ? 'md:ml-12' : ''}`}>
-        <div className="max-w-7xl mx-auto px-2 pt-3">
-          {/* Mobile Navigation (horizontal tabs on mobile) */}
-          <div className="md:hidden w-full mb-4">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-white/60 backdrop-blur-sm">
-                <TabsTrigger value="files" className="flex items-center gap-2">
-                  <FolderOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Campaigns</span>
-                </TabsTrigger>
-                <TabsTrigger value="notes" className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  <span className="hidden sm:inline">Documents</span>
-                </TabsTrigger>
-                <TabsTrigger value="pawmate" className="flex items-center gap-2">
-                  <Dog className="h-4 w-4" />
-                  <span className="hidden sm:inline">{assistantName}</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+      {/* Main Content Wrapper */}
+      <div className="flex-1 flex flex-col" style={{ marginLeft: '4rem' }}>
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 px-6 py-3 sticky top-0 z-40">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">FallOwl Dashboard</h1>
+              <p className="text-sm text-slate-500">AI-powered lead scoring and business intelligence</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-sm px-3 py-1">
+                {totalCampaigns} Campaigns
+              </Badge>
+            </div>
           </div>
-          
-          {/* Content for all screen sizes */}
-          <div className="main-content-area">
-            {activeTab === "files" && <CampaignList />}
-            {activeTab === "notes" && <NotesDocuments />}
-            {activeTab === "pawmate" && <PawMate />}
+        </header>
+
+        {/* Mobile Navigation (horizontal tabs on mobile) */}
+        <div className="md:hidden w-full p-4 bg-white/60 backdrop-blur-sm border-b border-slate-200/50">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-white/80">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <TabsTrigger key={item.id} value={item.id} className="flex items-center gap-2" data-testid={`mobile-nav-${item.id}`}>
+                    <Icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{item.label}</span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+          </Tabs>
+        </div>
+        
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto px-6 py-6">
+            <div className="main-content-area">
+              {activeTab === "files" && <CampaignList />}
+              {activeTab === "notes" && <NotesDocuments />}
+              {activeTab === "pawmate" && <PawMate />}
+            </div>
           </div>
         </div>
       </div>
