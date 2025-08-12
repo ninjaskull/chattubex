@@ -79,12 +79,18 @@ class RealOpenAIService {
         }
       }
 
-      // Check if user wants database operations (only for simple local searches)
-      const isSimpleSearch = lowerUserMessage.includes('search') && 
+      // Check if user wants database operations (including job title searches)
+      const isJobTitleSearch = /\b(manager|director|analyst|specialist|coordinator|supervisor|executive|officer|lead|head|chief|president|vice|senior|junior|assistant|ceo|cfo|cto|cmo|vp|founder|owner|partner)\b/i.test(lowerUserMessage);
+      const isLocalSearch = lowerUserMessage.includes('search') || 
+                           lowerUserMessage.includes('find') || 
+                           lowerUserMessage.includes('show me') ||
+                           lowerUserMessage.includes('contacts') ||
+                           isJobTitleSearch;
+      
+      const isSimpleSearch = isLocalSearch && 
                             !lowerUserMessage.includes('api') && 
-                            !lowerUserMessage.includes('director') &&
-                            !lowerUserMessage.includes('manufacturing') &&
-                            !lowerUserMessage.includes('industry');
+                            !(lowerUserMessage.includes('director') && lowerUserMessage.includes('finance') && lowerUserMessage.includes('manufacturing')) &&
+                            !lowerUserMessage.includes('apollo');
                             
       if (isSimpleSearch) {
         const databaseResponse = await this.handleDatabaseOperations(lowerUserMessage, aiName, aiType);
@@ -439,8 +445,8 @@ What specific analysis would you like me to perform on your data?`;
         }
       }
 
-      // Advanced search operations
-      if (message.includes('search') || message.includes('find')) {
+      // Advanced search operations - including job title searches
+      if (message.includes('search') || message.includes('find') || isJobTitleSearch) {
         return await this.performAdvancedSearch(message);
       }
 
@@ -475,30 +481,71 @@ What specific analysis would you like me to perform on your data?`;
       const matchingContacts = [];
       const leadScores = new Map();
       
-      // Search through campaign data with lead scoring
-      for (const campaign of campaigns) {
-        try {
-          const campaignData = await storage.getCampaignData(campaign.id);
-          if (campaignData && campaignData.data) {
-            const contactRecords = campaignData.data.filter((record: any) => {
-              const searchFields = [
-                record.firstName, record.lastName, record.email, 
-                record.company, record.mobilePhone, record.otherPhone, 
-                record.corporatePhone, record.website, record.title
-              ];
-              return searchFields.some(field => 
-                field && field.toString().toLowerCase().includes(searchTerm)
-              );
-            }).map((record: any) => {
-              // Calculate lead score
-              let score = this.calculateLeadScore(record);
-              leadScores.set(record.email, score);
-              return { ...record, leadScore: score };
-            });
-            matchingContacts.push(...contactRecords);
+      // Use the enhanced search API for better job title matching
+      try {
+        const searchResponse = await fetch(`http://localhost:${process.env.PORT || 3000}/api/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: searchTerm,
+            searchType: 'campaign-data',
+            limit: 50
+          })
+        });
+        
+        if (searchResponse.ok) {
+          const searchResults = await searchResponse.json();
+          
+          // Process campaign data results with lead scoring
+          if (searchResults.campaignData && searchResults.campaignData.length > 0) {
+            for (const campaignResult of searchResults.campaignData) {
+              const campaignContacts = campaignResult.matches.map((record: any) => {
+                const score = this.calculateLeadScore(record);
+                leadScores.set(record.Email || record.email, score);
+                return { 
+                  ...record, 
+                  leadScore: score,
+                  firstName: record['First Name'] || record.firstName,
+                  lastName: record['Last Name'] || record.lastName,
+                  email: record.Email || record.email,
+                  company: record.Company || record.company,
+                  title: record.Title || record.title,
+                  mobilePhone: record['Mobile Phone'] || record.mobilePhone,
+                  otherPhone: record['Other Phone'] || record.otherPhone,
+                  corporatePhone: record['Corporate Phone'] || record.corporatePhone
+                };
+              });
+              matchingContacts.push(...campaignContacts);
+            }
           }
-        } catch (err) {
-          console.log(`Could not search campaign ${campaign.name}:`, err);
+        }
+      } catch (err) {
+        console.log('Search API error, falling back to basic search:', err);
+        
+        // Fallback to basic search if API fails
+        for (const campaign of campaigns) {
+          try {
+            const campaignData = await storage.getCampaignData(campaign.id);
+            if (campaignData && campaignData.data) {
+              const contactRecords = campaignData.data.filter((record: any) => {
+                const searchFields = [
+                  record.firstName, record.lastName, record.email, 
+                  record.company, record.mobilePhone, record.otherPhone, 
+                  record.corporatePhone, record.website, record.title
+                ];
+                return searchFields.some(field => 
+                  field && field.toString().toLowerCase().includes(searchTerm)
+                );
+              }).map((record: any) => {
+                const score = this.calculateLeadScore(record);
+                leadScores.set(record.email, score);
+                return { ...record, leadScore: score };
+              });
+              matchingContacts.push(...contactRecords);
+            }
+          } catch (err) {
+            console.log(`Could not search campaign ${campaign.name}:`, err);
+          }
         }
       }
 
