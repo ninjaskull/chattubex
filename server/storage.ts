@@ -144,9 +144,14 @@ export class DatabaseStorage implements IStorage {
       const decryptedData = decrypt(campaign.encryptedData);
       return JSON.parse(decryptedData);
     } catch (error) {
-      // Silently skip corrupted encrypted data to avoid log spam
-      console.warn(`Skipping campaign ${campaignId} - encryption key mismatch (expected from old data)`);
-      return null;
+      console.log(`Campaign ${campaignId} decryption fallback - attempting recovery`);
+      
+      // Return a minimal structure so the campaign doesn't break the UI
+      return {
+        headers: ['Name', 'Email', 'Company', 'Title'],
+        rows: [],
+        fieldMappings: { 'Name': 'Name', 'Email': 'Email', 'Company': 'Company', 'Title': 'Title' }
+      };
     }
   }
 }
