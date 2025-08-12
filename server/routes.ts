@@ -184,13 +184,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Send initial notes data to newly connected client
     storage.getNotes().then(notes => {
       if (ws.readyState === WebSocket.OPEN) {
+        const validNotes = notes.map(note => {
+          try {
+            const decryptedContent = decrypt(note.encryptedContent);
+            // Filter out corrupted notes containing campaign data
+            if (decryptedContent.includes('{"headers"') || decryptedContent.includes('"fieldMappings"')) {
+              console.warn(`WebSocket: Skipping corrupted note ${note.id}`);
+              return null;
+            }
+            return {
+              id: note.id,
+              content: decryptedContent,
+              createdAt: note.createdAt
+            };
+          } catch (error) {
+            console.error(`WebSocket: Failed to decrypt note ${note.id}:`, error);
+            return null;
+          }
+        }).filter(note => note !== null);
+        
         ws.send(JSON.stringify({
           type: 'notes_init',
-          data: notes.map(note => ({
-            id: note.id,
-            content: decrypt(note.encryptedContent),
-            createdAt: note.createdAt
-          }))
+          data: validNotes
         }));
       }
     }).catch(console.error);
@@ -561,11 +576,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/notes', async (req, res) => {
     try {
       const notes = await storage.getNotes();
-      res.json(notes.map(note => ({
-        id: note.id,
-        content: decrypt(note.encryptedContent),
-        createdAt: note.createdAt
-      })));
+      res.json(notes.map(note => {
+        let decryptedContent;
+        try {
+          // Try to decrypt the encrypted content
+          decryptedContent = decrypt(note.encryptedContent);
+          
+          // Check if it's valid note content (not campaign data)
+          if (decryptedContent.includes('{"headers"') || decryptedContent.includes('"fieldMappings"')) {
+            console.warn(`Note ${note.id} contains invalid campaign data, skipping`);
+            return null;
+          }
+        } catch (error) {
+          console.error(`Failed to decrypt note ${note.id}:`, error);
+          decryptedContent = 'Unable to decrypt note content';
+        }
+        
+        return {
+          id: note.id,
+          content: decryptedContent,
+          createdAt: note.createdAt
+        };
+      }).filter(note => note !== null));
     } catch (error) {
       console.error('Get notes error:', error);
       res.status(500).json({ message: 'Failed to fetch notes' });
