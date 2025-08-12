@@ -726,7 +726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Search endpoint for database queries
   app.post('/api/search', async (req, res) => {
     try {
-      const { query, searchType = 'all', limit = 50 } = req.body;
+      const { query, searchType = 'all', limit = 100 } = req.body;
       
       if (!query || typeof query !== 'string' || query.trim().length < 1) {
         return res.status(400).json({ message: 'Search query is required' });
