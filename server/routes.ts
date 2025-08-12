@@ -19,8 +19,8 @@ function cleanStreamResponse(content: string): string {
   // Remove any emojis completely
   cleaned = cleaned.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
   
-  // Remove unwanted greeting patterns only if they mention "Fallowl"
-  cleaned = cleaned.replace(/Fallowl/gi, 'zhatore');
+  // Keep Fallowl references as they are
+  // cleaned = cleaned.replace(/Fallowl/gi, 'zhatore');
   
   // Keep cute pet-like behaviors but remove formal greetings
   cleaned = cleaned.replace(/^(?:greets warmly\s*)?(?:Hello there[^.!?]*[.!?]\s*)?/i, '');
@@ -1540,7 +1540,7 @@ CRITICAL RESPONSE RULES:
 - NEVER use emojis in any responses
 - NEVER use your personal name in responses  
 - When mentioning your creator, always say "created by zhatore" or "AI of zhatore"
-- NEVER mention "Fallowl" - always use "zhatore" instead
+- You can mention "Fallowl" as the platform name when appropriate
 - For business queries: Be professional, direct, and focused on lead scoring
 - For casual conversations: Be cute, flirty, and playful like a pet talking to its owner
 - Your main goal is to provide the best data analysis and motivate users to score leads effectively

@@ -194,11 +194,11 @@ export default function Landing() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 pulse-glow">
-                <Dog className="w-6 h-6 text-white" />
+                <Cpu className="w-6 h-6 text-white" />
               </div>
               <div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  zhatore
+                  FallOwl
                 </span>
                 <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Smart IT Solutions</p>
               </div>
@@ -344,7 +344,7 @@ export default function Landing() {
               
               {/* Floating Elements */}
               <div className="absolute top-4 -right-4 w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg floating-animation" style={{animationDelay: '1s'}}>
-                <Dog className="w-8 h-8 text-white" />
+                <Cpu className="w-8 h-8 text-white" />
               </div>
               <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg floating-animation" style={{animationDelay: '2s'}}>
                 <Rocket className="w-6 h-6 text-white" />
@@ -360,7 +360,7 @@ export default function Landing() {
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Why Choose </span>
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">zhatore</span>
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">FallOwl</span>
             </h2>
             <p className={`text-xl max-w-3xl mx-auto ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
               We partner with visionary startups to transform ideas into scalable, 
@@ -576,10 +576,10 @@ export default function Landing() {
             <div>
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Dog className="w-5 h-5 text-white" />
+                  <Cpu className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  zhatore
+                  FallOwl
                 </span>
               </div>
               <p className={`mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
