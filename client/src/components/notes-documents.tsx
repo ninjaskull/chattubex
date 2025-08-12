@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,14 +14,40 @@ export default function NotesDocuments() {
   const [noteContent, setNoteContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isConnected, typingUsers, handleTyping } = useWebSocket();
 
-  // Auto-scroll when typing users change
+  // Check if user is near bottom of scroll area
+  const isNearBottom = useCallback(() => {
+    if (!messagesContainerRef.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    return scrollHeight - scrollTop - clientHeight < 100; // 100px threshold
+  }, []);
+
+  // Handle scroll events to detect user scrolling
+  const handleScroll = useCallback(() => {
+    if (!messagesContainerRef.current) return;
+    
+    const nearBottom = isNearBottom();
+    setShouldAutoScroll(nearBottom);
+    
+    // Clear user scrolling flag after a short delay
+    if (!isUserScrolling) {
+      setIsUserScrolling(true);
+      setTimeout(() => setIsUserScrolling(false), 1000);
+    }
+  }, [isNearBottom, isUserScrolling]);
+
+  // Auto-scroll when typing users change (only if user is near bottom)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [typingUsers]);
+    if (shouldAutoScroll && !isUserScrolling) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [typingUsers, shouldAutoScroll, isUserScrolling]);
 
   const { data: notes = [] } = useQuery({
     queryKey: ['/api/notes'],
@@ -37,10 +63,12 @@ export default function NotesDocuments() {
     ...(documents as any[]).map((doc: any) => ({ ...doc, type: 'document' }))
   ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (only if user is near bottom)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [allMessages]);
+    if (shouldAutoScroll && !isUserScrolling) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [allMessages, shouldAutoScroll, isUserScrolling]);
 
   const saveNoteMutation = useMutation({
     mutationFn: async (content: string) => {
@@ -214,7 +242,11 @@ export default function NotesDocuments() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        onScroll={handleScroll}
+      >
         {allMessages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
