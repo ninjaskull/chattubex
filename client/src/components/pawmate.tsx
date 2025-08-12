@@ -235,7 +235,19 @@ I automatically detect whether you want to search or chat - just type naturally!
             setIsTyping(false);
             return;
           } else {
-            console.log('❌ No search results found, falling back to AI chat');
+            console.log('❌ No search results found, checking if this was a specific contact search');
+            // If this looks like a specific contact search (email, name), inform user about not found
+            if (/@/.test(query) || /^[a-zA-Z\s]{2,}$/.test(query.trim())) {
+              const notFoundMessage: Message = {
+                id: Date.now().toString(),
+                type: 'bot',
+                content: `I searched the database but couldn't find "${query}" in your contact records. Please check the spelling or try searching for a contact that exists in your uploaded campaign data.`,
+                timestamp: new Date()
+              };
+              setMessages(prev => prev.slice(0, -1).concat([notFoundMessage]));
+              setIsTyping(false);
+              return;
+            }
           }
         } else {
           console.log('❌ Search API failed, falling back to AI chat');
@@ -252,7 +264,11 @@ I automatically detect whether you want to search or chat - just type naturally!
 
       const systemMessage = {
         role: 'system' as const,
-        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. Focus exclusively on lead analysis, contact intelligence, and campaign optimization. Provide direct, actionable business insights without generic recommendations.`
+        content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. Focus exclusively on lead analysis, contact intelligence, and campaign optimization. Provide direct, actionable business insights without generic recommendations.
+
+IMPORTANT: When users ask about specific contacts, emails, or companies that you don't have database access to verify, you must respond with: "I searched the database but couldn't find that contact/email/company. Please verify the details or try searching for a contact that exists in your uploaded campaign data."
+
+Never provide synthetic or made-up contact information. Only discuss actual data from the user's database.`
       };
 
       const response = await fetch('/api/pawmate/chat', {

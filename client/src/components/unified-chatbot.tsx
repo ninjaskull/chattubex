@@ -130,7 +130,11 @@ How can I help you today?`,
           messages: [
             {
               role: 'system',
-              content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers without generic recommendations. If the user wants to search for specific contacts, suggest they use search commands like "search for [name]" or "find [company]".`
+              content: `You are Duggu, an expert lead scoring and business intelligence AI assistant created by Fallowl. You have access to campaign and contact databases with 263+ records. Focus on lead analysis, contact intelligence, and campaign optimization. Provide helpful, direct answers without generic recommendations.
+
+IMPORTANT: When users ask about specific contacts, emails, or companies that you don't have database access to verify, you must respond with: "I searched the database but couldn't find that contact/email/company. Please verify the details or try searching for a contact that exists in your uploaded campaign data."
+
+Never provide synthetic or made-up contact information. Only discuss actual data from the user's database.`
             },
             ...conversationHistory,
             {
@@ -237,14 +241,24 @@ How can I help you today?`,
             timestamp: new Date()
           }]));
         } else {
-          // No search results, fall back to AI
-          const aiResponse = await performAIChat(`No direct results found for "${query}". ${query}`);
-          setMessages(prev => prev.slice(0, -1).concat([{
-            id: Date.now().toString(),
-            type: 'assistant',
-            content: aiResponse,
-            timestamp: new Date()
-          }]));
+          // No search results found - return "not found" message for specific contact searches
+          if (/@/.test(query) || /^[a-zA-Z\s]{2,}$/.test(query.trim())) {
+            setMessages(prev => prev.slice(0, -1).concat([{
+              id: Date.now().toString(),
+              type: 'assistant',
+              content: `I searched the database but couldn't find "${query}" in your contact records. Please check the spelling or try searching for a contact that exists in your uploaded campaign data.`,
+              timestamp: new Date()
+            }]));
+          } else {
+            // For general queries, use AI chat
+            const aiResponse = await performAIChat(`No direct results found for "${query}". ${query}`);
+            setMessages(prev => prev.slice(0, -1).concat([{
+              id: Date.now().toString(),
+              type: 'assistant', 
+              content: aiResponse,
+              timestamp: new Date()
+            }]));
+          }
         }
       } else {
         // Use AI chat for general conversation
