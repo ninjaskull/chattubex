@@ -770,7 +770,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search endpoint for database queries
+  // Enhanced search endpoint with job title fuzzy matching and domain search
   app.post('/api/search', async (req, res) => {
     try {
       const { query, searchType = 'all', limit = 100 } = req.body;
@@ -779,6 +779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Search query is required' });
       }
 
+      const Fuse = (await import('fuse.js')).default;
       const searchQuery = query.toLowerCase().trim();
       const results: {
         contacts: any[];
@@ -790,6 +791,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         campaigns: [],
         campaignData: [],
         total: 0
+      };
+
+      // Helper function to check if query looks like a domain
+      const isDomainQuery = (q: string): boolean => {
+        return /\w+\.\w+/.test(q) && !/@/.test(q);
+      };
+
+      // Helper function to extract domain from email/website
+      const extractDomain = (value: string): string => {
+        if (value.includes('@')) {
+          return value.split('@')[1] || '';
+        }
+        if (value.startsWith('http')) {
+          try {
+            return new URL(value).hostname.replace('www.', '');
+          } catch {
+            return value;
+          }
+        }
+        return value.replace('www.', '');
       };
 
       // Search direct contacts table
@@ -810,7 +831,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ).slice(0, limit);
       }
 
-      // Search within campaign data (decrypted contact records)
+      // Search within campaign data with enhanced matching
       if (searchType === 'all' || searchType === 'campaign-data') {
         const campaigns = await storage.getCampaigns();
         for (const campaign of campaigns) {
@@ -818,15 +839,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const campaignData = await storage.getCampaignData(campaign.id);
             
             if (campaignData && campaignData.rows && Array.isArray(campaignData.rows)) {
-              const matchingRows = campaignData.rows.filter((row: any) => {
-                if (!row || typeof row !== 'object') return false;
-                
-                return Object.values(row).some((value: any) => {
-                  if (value === null || value === undefined) return false;
-                  const stringValue = String(value).toLowerCase();
-                  return stringValue.includes(searchQuery);
+              let matchingRows: any[] = [];
+              
+              // Domain-specific search for company domains
+              if (isDomainQuery(searchQuery)) {
+                matchingRows = campaignData.rows.filter((row: any) => {
+                  if (!row || typeof row !== 'object') return false;
+                  
+                  // Check email domains
+                  const email = row['Email'] || row['email'] || '';
+                  if (email && extractDomain(email.toLowerCase()).includes(searchQuery)) {
+                    return true;
+                  }
+                  
+                  // Check website domains
+                  const website = row['Website'] || row['website'] || row['Company Website'] || '';
+                  if (website && extractDomain(website.toLowerCase()).includes(searchQuery)) {
+                    return true;
+                  }
+                  
+                  // Check company name for domain patterns
+                  const company = row['Company'] || row['company'] || '';
+                  if (company && company.toLowerCase().includes(searchQuery.replace(/\.\w+$/, ''))) {
+                    return true;
+                  }
+                  
+                  return false;
                 });
-              });
+              } else {
+                // Job title fuzzy matching + general search
+                const jobTitleFields = ['Title', 'title', 'Job Title', 'Position', 'Role'];
+                const jobTitles = campaignData.rows.map((row: any, index: number) => {
+                  const titleField = jobTitleFields.find(field => row[field]);
+                  const title = titleField ? row[titleField] : '';
+                  return { title: String(title), index, row };
+                }).filter((item: any) => item.title.trim().length > 0);
+                
+                let fuzzyMatches: any[] = [];
+                
+                // Fuzzy search for job titles if available
+                if (jobTitles.length > 0) {
+                  const titleFuse = new Fuse(jobTitles, {
+                    keys: ['title'],
+                    threshold: 0.4,
+                    distance: 100,
+                    includeScore: true
+                  });
+                  
+                  const titleMatches = titleFuse.search(searchQuery);
+                  fuzzyMatches = titleMatches.map((match: any) => match.item.row);
+                }
+                
+                // Regular text search for all fields
+                const regularMatches = campaignData.rows.filter((row: any) => {
+                  if (!row || typeof row !== 'object') return false;
+                  
+                  return Object.values(row).some((value: any) => {
+                    if (value === null || value === undefined) return false;
+                    const stringValue = String(value).toLowerCase();
+                    return stringValue.includes(searchQuery);
+                  });
+                });
+                
+                // Combine results, fuzzy matches first, then unique regular matches
+                const combined = [...fuzzyMatches];
+                regularMatches.forEach((row: any) => {
+                  if (!combined.some((existingRow: any) => existingRow === row)) {
+                    combined.push(row);
+                  }
+                });
+                
+                matchingRows = combined;
+              }
               
               if (matchingRows.length > 0) {
                 results.campaignData.push({
@@ -839,7 +923,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
           } catch (error) {
-            // Silently skip campaigns that can't be decrypted - don't log to avoid spam
+            // Skip campaigns that can't be decrypted
             continue;
           }
         }
