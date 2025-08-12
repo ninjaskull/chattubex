@@ -161,10 +161,19 @@ I automatically detect whether you want to search or chat - just type naturally!
       /^[a-zA-Z\s]{2,}$/.test(query.trim()) ||  // Name-like
       /@/.test(query) ||                        // Email-like
       /\d{3,}/.test(query) ||                   // Phone-like
-      /\b(corp|inc|llc|ltd|company|co)\b/i.test(query) // Company-like
+      /\b(corp|inc|llc|ltd|company|co)\b/i.test(query) || // Company-like
+      /\w+\.\w+@\w+\.\w+/.test(query)          // More specific email pattern
     );
     
-    return hasSearchKeywords || looksLikeSearchTerm;
+    const result = hasSearchKeywords || looksLikeSearchTerm;
+    console.log(`🔍 Search detection for "${query}":`, {
+      hasSearchKeywords,
+      looksLikeSearchTerm,
+      isEmail: /@/.test(query),
+      result
+    });
+    
+    return result;
   };
 
   const handleSendMessage = async () => {
@@ -195,6 +204,7 @@ I automatically detect whether you want to search or chat - just type naturally!
     try {
       // Determine if this should be a search or AI chat
       if (isSearchQuery(query)) {
+        console.log('🔍 Detected search query:', query);
         // Perform database search
         const searchResponse = await fetch('/api/search', {
           method: 'POST',
@@ -202,12 +212,13 @@ I automatically detect whether you want to search or chat - just type naturally!
           body: JSON.stringify({ 
             query, 
             searchType: 'all', 
-            limit: 50  // Increased limit for larger datasets
+            limit: 100  // Increased limit for larger datasets
           })
         });
         
         if (searchResponse.ok) {
           const searchData = await searchResponse.json();
+          console.log('📊 Search results:', searchData);
           
           if (searchData.total > 0) {
             const searchResultMessage: Message = {
@@ -223,8 +234,14 @@ I automatically detect whether you want to search or chat - just type naturally!
             setMessages(prev => prev.slice(0, -1).concat([searchResultMessage]));
             setIsTyping(false);
             return;
+          } else {
+            console.log('❌ No search results found, falling back to AI chat');
           }
+        } else {
+          console.log('❌ Search API failed, falling back to AI chat');
         }
+      } else {
+        console.log('💬 Not detected as search query, using AI chat for:', query);
       }
       
       // If no search results or not a search query, use AI chat
