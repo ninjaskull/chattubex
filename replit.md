@@ -61,6 +61,28 @@ The application features a React frontend with a TypeScript Express.js backend.
 
 # Recent Changes
 
+## Improved Fuzzy Search Precision (August 12, 2025)
+
+Fixed fuzzy search algorithm to provide more precise job title matching:
+
+### Issue Resolution
+- **Problem**: Fuzzy search for "Procurement Manager" was returning almost all manager-level titles
+- **Root Cause**: Too permissive fuzzy search settings (threshold: 0.4, distance: 100)
+- **Solution**: Implemented intelligent search logic with different parameters for specific job titles vs. general searches
+
+### Technical Improvements
+- **Stricter Fuzzy Matching**: Reduced threshold to 0.15-0.25 based on search type
+- **Smart Search Detection**: Automatically detects specific job title searches vs. general queries
+- **Exact Word Matching**: Added complementary exact word matching for specific job titles
+- **Score-based Filtering**: Only returns matches with good confidence scores
+- **Reduced Distance**: Limited character differences to improve precision
+
+### User Impact
+- More accurate search results for specific job titles like "Procurement Manager"
+- Reduced noise in search results
+- Better distinction between similar roles (e.g., "Procurement Manager" vs "Product Manager")
+- Maintained flexibility for general searches while improving precision for targeted searches
+
 ## Enhanced Contact Visualization (August 12, 2025)
 
 Added comprehensive visual components for displaying contact search results:

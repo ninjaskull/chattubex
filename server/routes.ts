@@ -877,17 +877,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 
                 let fuzzyMatches: any[] = [];
                 
+                // Check if this looks like a specific job title search
+                const isJobTitleSearch = /\b(manager|director|analyst|specialist|coordinator|supervisor|executive|officer|lead|head|chief|president|vice|senior|junior|assistant)\b/i.test(searchQuery);
+                const searchWords = searchQuery.split(/\s+/);
+                const hasSpecificRole = searchWords.length >= 2 && isJobTitleSearch;
+                
                 // Fuzzy search for job titles if available
                 if (jobTitles.length > 0) {
-                  const titleFuse = new Fuse(jobTitles, {
+                  // Use stricter settings for specific job title searches
+                  const fuseConfig = hasSpecificRole ? {
                     keys: ['title'],
-                    threshold: 0.4,
-                    distance: 100,
-                    includeScore: true
-                  });
+                    threshold: 0.15,  // Very strict for specific job titles
+                    distance: 30,
+                    includeScore: true,
+                    minMatchCharLength: Math.max(3, Math.floor(searchQuery.length * 0.4)),
+                    findAllMatches: false,
+                    location: 0,
+                    ignoreLocation: false  // Prefer matches at the beginning for job titles
+                  } : {
+                    keys: ['title'],
+                    threshold: 0.25,  // More lenient for general searches
+                    distance: 50,
+                    includeScore: true,
+                    minMatchCharLength: 3,
+                    findAllMatches: false,
+                    location: 0,
+                    ignoreLocation: true
+                  };
                   
+                  const titleFuse = new Fuse(jobTitles, fuseConfig);
                   const titleMatches = titleFuse.search(searchQuery);
-                  fuzzyMatches = titleMatches.map((match: any) => match.item.row);
+                  
+                  // Apply different score thresholds based on search type
+                  const scoreThreshold = hasSpecificRole ? 0.2 : 0.3;
+                  fuzzyMatches = titleMatches
+                    .filter((match: any) => match.score < scoreThreshold)
+                    .map((match: any) => match.item.row);
+                  
+                  // For specific job title searches, also do exact word matching
+                  if (hasSpecificRole && searchWords.length >= 2) {
+                    const exactWordMatches = jobTitles.filter((item: any) => {
+                      const titleLower = item.title.toLowerCase();
+                      return searchWords.every(word => 
+                        titleLower.includes(word.toLowerCase()) && word.length > 2
+                      );
+                    }).map((item: any) => item.row);
+                    
+                    // Combine exact word matches with fuzzy matches, prioritizing exact
+                    const exactSet = new Set(exactWordMatches);
+                    fuzzyMatches = [...exactWordMatches, ...fuzzyMatches.filter(row => !exactSet.has(row))];
+                  }
                 }
                 
                 // Regular text search for all fields
