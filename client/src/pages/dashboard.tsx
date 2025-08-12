@@ -91,7 +91,7 @@ export default function Dashboard() {
           <div className="p-4 border-b border-slate-200/50">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow shrink-0">
-                <Target className="text-white h-4 w-4" />
+                <Dog className="text-white h-4 w-4" />
               </div>
               <div className={`transition-all duration-300 overflow-hidden ${
                 isSidebarHovered ? 'w-auto opacity-100' : 'w-0 opacity-0'

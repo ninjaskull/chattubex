@@ -61,6 +61,23 @@ The application features a React frontend with a TypeScript Express.js backend.
 
 # Recent Changes
 
+## Dog Face Icon Branding Update (August 12, 2025)
+
+Updated application branding to use dog face icons throughout the interface:
+
+### Changes Made
+- **Landing Page**: Replaced CPU icon with Dog icon in main navigation header
+- **Dashboard**: Updated sidebar header to use Dog icon instead of Target icon
+- **Unified Chatbot**: Replaced Target icons with Dog icons in header and campaign displays
+- **Enhanced Chatbot**: Updated campaign listing to use Dog icons for contact counts
+- **PawMate Component**: Changed job title display icon from Target to Dog for consistency
+- **Asset Integration**: Added dog face image asset to client/src/assets/ directory
+
+### User Impact
+- Consistent dog-themed branding across all interface elements
+- Enhanced visual identity aligning with the FallOwl pet-like AI persona
+- Professional yet friendly appearance maintaining the "created by zhatore" brand identity
+
 ## Improved Fuzzy Search Precision (August 12, 2025)
 
 Fixed fuzzy search algorithm to provide more precise job title matching:

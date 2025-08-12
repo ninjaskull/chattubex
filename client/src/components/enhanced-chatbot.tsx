@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Search, Send, Database, Filter, Download, User, Mail, Phone, Building, Clock, Target, Grid3X3, List, Eye } from "lucide-react";
+import { X, Search, Send, Database, Filter, Download, User, Mail, Phone, Building, Clock, Target, Grid3X3, List, Eye, Dog } from "lucide-react";
 import { ContactCards } from './contact-cards';
 import { ContactCanvas } from './contact-canvas';
 import { ModernContactCanvas } from './modern-contact-canvas';
@@ -180,7 +180,7 @@ export default function EnhancedChatbot({ isOpen, onClose }: EnhancedChatbotProp
                         <div>
                           <p className="font-medium">{campaign.name}</p>
                           <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-1">
-                            <Target className="w-3 h-3 mr-1" />
+                            <Dog className="w-3 h-3 mr-1" />
                             {campaign.recordCount} contacts
                             <Clock className="w-3 h-3 ml-3 mr-1" />
                             {new Date(campaign.createdAt).toLocaleDateString()}

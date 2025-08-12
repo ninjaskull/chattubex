@@ -62,7 +62,7 @@ const ContactCard = ({ contact, source }: ContactCardProps) => {
                 <span>{source === 'campaign' ? contact.Company : contact.company || 'N/A'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-muted-foreground" />
+                <Dog className="w-4 h-4 text-muted-foreground" />
                 <span>{source === 'campaign' ? contact.Title : contact.title || 'N/A'}</span>
               </div>
               <div className="flex items-center gap-2">

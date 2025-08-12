@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   X, Send, Database, User, Mail, Phone, Building, 
-  Target, Bot, Search, MessageSquare, Sparkles, Download 
+  Target, Bot, Search, MessageSquare, Sparkles, Download, Dog 
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { ContactCards } from './contact-cards';
@@ -332,7 +332,7 @@ Never provide synthetic or made-up contact information. Only discuss actual data
                     </div>
                     {msg.searchResults.campaignData?.length > 0 && (
                       <div className="flex items-center">
-                        <Target className="w-4 h-4 mr-1" />
+                        <Dog className="w-4 h-4 mr-1" />
                         {msg.searchResults.campaignData.length} campaigns
                       </div>
                     )}
@@ -374,7 +374,7 @@ Never provide synthetic or made-up contact information. Only discuss actual data
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-              <Target className="w-5 h-5 text-white" />
+              <Dog className="w-5 h-5 text-white" />
             </div>
             <div>
               <CardTitle className="text-xl">Duggu AI Assistant</CardTitle>
