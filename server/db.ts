@@ -39,13 +39,38 @@ function getDatabaseUrl(): string {
 
 // Function to get read-only database URL for Duggu chatbot
 function getReadOnlyDatabaseUrl(): string {
-  // For the read-only database, we'll use the same main database but with read-only configuration
-  // In a production environment, you would typically create a separate read replica
-  const mainUrl = getDatabaseUrl();
+  // Use the external Neon database specifically for Duggu chatbot contacts
+  let dugguConnectionUrl = process.env.DUGGU_DATABASE_CONNECTION_URL;
   
-  // For now, use the same database URL but we'll configure the pool with read-only settings
-  console.log('Using main database URL for read-only Duggu chatbot access');
-  return mainUrl;
+  if (dugguConnectionUrl) {
+    // Clean up the connection URL - remove any psql command prefixes
+    if (dugguConnectionUrl.includes("'postgresql://")) {
+      dugguConnectionUrl = dugguConnectionUrl.match(/'(postgresql:\/\/[^']+)'/)?.[1] || dugguConnectionUrl;
+    } else if (dugguConnectionUrl.includes('"postgresql://')) {
+      dugguConnectionUrl = dugguConnectionUrl.match(/"(postgresql:\/\/[^"]+)"/)?.[1] || dugguConnectionUrl;
+    }
+    
+    if (dugguConnectionUrl.startsWith('postgresql://') || dugguConnectionUrl.startsWith('postgres://')) {
+      console.log('Using external Neon database for Duggu chatbot contacts access');
+      return dugguConnectionUrl;
+    }
+  }
+  
+  // If the new connection URL is not available, check the old API key variable
+  const dugguApiKey = process.env.DUGGU_NEON_DATABASE_URL;
+  
+  if (dugguApiKey) {
+    if (dugguApiKey.startsWith('postgresql://') || dugguApiKey.startsWith('postgres://')) {
+      console.log('Using external Neon database for Duggu chatbot contacts access (from legacy variable)');
+      return dugguApiKey;
+    }
+    
+    console.log('DUGGU_NEON_DATABASE_URL appears to be an API key. Please provide the full database connection URL instead.');
+  }
+  
+  // For now, fallback to main database to keep the service running
+  console.log('Falling back to main database for Duggu chatbot until proper connection URL is provided');
+  return getDatabaseUrl();
 }
 
 const databaseUrl = getDatabaseUrl();
