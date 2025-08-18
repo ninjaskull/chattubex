@@ -103,18 +103,27 @@ const upload = multer({
         'text/html',
         'text/css',
         'application/xml',
-        'text/xml'
+        'text/xml',
+        'text/markdown',
+        'application/octet-stream', // For various file types that browsers can't identify
+        'text/x-markdown'
       ];
       
       // Check by MIME type or file extension for broader compatibility
       const fileExtension = file.originalname.toLowerCase().split('.').pop();
       const allowedExtensions = [
-        'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'rtf',
-        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'tiff', 'tif',
-        'mp4', 'mpeg', 'mpg', 'mov', 'avi', 'webm', 'ogg', '3gp',
-        'mp3', 'wav', 'ogg', 'aac', 'webm',
-        'zip', 'rar', '7z', 'tar', 'gz',
-        'json', 'js', 'html', 'css', 'xml'
+        // Documents
+        'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'rtf', 'md', 'markdown',
+        // Images  
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'tiff', 'tif', 'ico',
+        // Videos
+        'mp4', 'mpeg', 'mpg', 'mov', 'avi', 'webm', 'ogg', '3gp', 'mkv', 'flv',
+        // Audio
+        'mp3', 'wav', 'ogg', 'aac', 'webm', 'flac', 'm4a',
+        // Archives
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2',
+        // Code and data
+        'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'xml', 'yaml', 'yml', 'sql', 'py', 'java', 'cpp', 'c', 'h'
       ];
       
       if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(fileExtension || '')) {
