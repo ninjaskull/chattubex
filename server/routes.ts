@@ -5,7 +5,7 @@ import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { storage } from "./storage";
-import { encrypt, decrypt, decryptNote } from "./utils/encryption";
+import { encrypt, decrypt, decryptNote, decryptFilePath } from "./utils/encryption";
 import { deriveTimezone } from "./utils/timezone";
 import { sendContactFormEmail } from "./utils/email";
 import { createRealOpenAIService } from "./services/realOpenAI";
@@ -686,12 +686,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Document not found' });
       }
 
-      // Decrypt file path
-      const filePath = decrypt(document.encryptedPath);
+      // Debug document info
+      console.log(`=== DOCUMENT DOWNLOAD DEBUG - Document ${id} ===`);
+      console.log('Document filename:', document.filename);
+      console.log('Document original name:', document.originalName);
+      console.log('Encrypted path:', document.encryptedPath);
+      
+      // Decrypt file path using the dedicated file path decryption function
+      let filePath: string;
+      try {
+        const decryptedPath = decryptFilePath(document.encryptedPath);
+        console.log('Decrypted file path:', decryptedPath);
+        
+        // Handle path conversion - extract filename from decrypted path and use current uploads directory
+        const fileName = path.basename(decryptedPath);
+        filePath = path.join('uploads', fileName);
+        console.log('Constructed local path:', filePath);
+        
+      } catch (decryptError) {
+        console.error('File path decryption failed:', decryptError);
+        
+        // Fallback: construct path from filename (which is the actual uploaded filename)
+        filePath = path.join('uploads', document.filename);
+        console.log('Using fallback path:', filePath);
+      }
       
       if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ message: 'Document file not found' });
+        console.error('File does not exist at path:', filePath);
+        console.log('Attempting to find file in uploads directory...');
+        
+        // Try to find a matching file by size and creation date
+        const uploadFiles = fs.readdirSync('uploads');
+        console.log('Available files in uploads:', uploadFiles.slice(0, 5));
+        
+        // For now, return a helpful error message
+        return res.status(404).json({ 
+          message: 'Document file not found - database and file system are out of sync',
+          details: 'The file reference in the database does not match any files in the uploads directory'
+        });
       }
+      
+      console.log('Final file path used for download:', filePath);
+      console.log('==================================================')
 
       res.download(filePath, document.originalName);
     } catch (error) {
