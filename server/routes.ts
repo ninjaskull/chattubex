@@ -12,6 +12,8 @@ import { createRealOpenAIService } from "./services/realOpenAI";
 import { mockOpenAIService } from "./services/mockOpenAI";
 import { databaseService } from "./services/databaseService";
 import { dugguChatbotService } from "./services/dugguChatbotService";
+import { externalDbInspector } from "./services/externalDbInspector";
+import { externalDugguService } from "./services/externalDugguService";
 
 // Helper function to clean AI responses from unwanted patterns
 function cleanStreamResponse(content: string): string {
@@ -2143,6 +2145,55 @@ You have access to campaign and contact databases with 263+ records. Your missio
 
   // Import the Duggu chatbot service for read-only database access
 
+  // External Database Schema Inspection Routes
+  
+  // Get all tables in the external database
+  app.get('/api/duggu/inspect/tables', async (req, res) => {
+    try {
+      const tables = await externalDbInspector.getTables();
+      res.json({ tables });
+    } catch (error) {
+      console.error('Error getting tables:', error);
+      res.status(500).json({ message: 'Failed to get tables' });
+    }
+  });
+
+  // Get schema for a specific table
+  app.get('/api/duggu/inspect/schema/:tableName', async (req, res) => {
+    try {
+      const { tableName } = req.params;
+      const schema = await externalDbInspector.getTableSchema(tableName);
+      res.json({ tableName, schema });
+    } catch (error) {
+      console.error('Error getting table schema:', error);
+      res.status(500).json({ message: 'Failed to get table schema' });
+    }
+  });
+
+  // Find tables that likely contain contact information
+  app.get('/api/duggu/inspect/contact-tables', async (req, res) => {
+    try {
+      const contactTables = await externalDbInspector.findContactTables();
+      res.json({ contactTables });
+    } catch (error) {
+      console.error('Error finding contact tables:', error);
+      res.status(500).json({ message: 'Failed to find contact tables' });
+    }
+  });
+
+  // Get sample data from a table
+  app.get('/api/duggu/inspect/sample/:tableName', async (req, res) => {
+    try {
+      const { tableName } = req.params;
+      const limit = parseInt(req.query.limit as string) || 3;
+      const sampleData = await externalDbInspector.getSampleData(tableName, limit);
+      res.json({ tableName, sampleData });
+    } catch (error) {
+      console.error('Error getting sample data:', error);
+      res.status(500).json({ message: 'Failed to get sample data' });
+    }
+  });
+
   // Duggu Chatbot API Routes - Read-only database access
   
   // Search contacts (read-only for chatbot)
@@ -2154,8 +2205,8 @@ You have access to campaign and contact databases with 263+ records. Your missio
         return res.status(400).json({ message: 'Search query is required' });
       }
 
-      const contacts = await dugguChatbotService.searchContacts(query, parseInt(limit as string));
-      res.json({ contacts, total: contacts.length });
+      const result = await externalDugguService.searchContacts(query, parseInt(limit as string));
+      res.json(result);
     } catch (error) {
       console.error('Duggu chatbot contact search error:', error);
       res.status(500).json({ message: 'Failed to search contacts' });
@@ -2165,9 +2216,9 @@ You have access to campaign and contact databases with 263+ records. Your missio
   // Get all contacts (read-only for chatbot)
   app.get('/api/duggu/contacts', async (req, res) => {
     try {
-      const { limit = 100 } = req.query;
-      const contacts = await dugguChatbotService.getAllContacts(parseInt(limit as string));
-      res.json({ contacts, total: contacts.length });
+      const { limit = 100, offset = 0 } = req.query;
+      const result = await externalDugguService.getAllContacts(parseInt(limit as string), parseInt(offset as string));
+      res.json(result);
     } catch (error) {
       console.error('Duggu chatbot get contacts error:', error);
       res.status(500).json({ message: 'Failed to get contacts' });
@@ -2177,8 +2228,8 @@ You have access to campaign and contact databases with 263+ records. Your missio
   // Get contact by ID (read-only for chatbot)
   app.get('/api/duggu/contacts/:id', async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const contact = await dugguChatbotService.getContactById(id);
+      const { id } = req.params;
+      const contact = await externalDugguService.getContactById(id);
       
       if (!contact) {
         return res.status(404).json({ message: 'Contact not found' });
@@ -2320,7 +2371,7 @@ You have access to campaign and contact databases with 263+ records. Your missio
   // Get contact statistics (read-only for chatbot)
   app.get('/api/duggu/statistics/contacts', async (req, res) => {
     try {
-      const stats = await dugguChatbotService.getContactStatistics();
+      const stats = await externalDugguService.getContactStatistics();
       res.json(stats);
     } catch (error) {
       console.error('Duggu chatbot get contact statistics error:', error);
@@ -2331,11 +2382,64 @@ You have access to campaign and contact databases with 263+ records. Your missio
   // Get general statistics (read-only for chatbot)
   app.get('/api/duggu/statistics/general', async (req, res) => {
     try {
-      const stats = await dugguChatbotService.getGeneralStatistics();
+      const stats = await externalDugguService.getContactStatistics();
       res.json(stats);
     } catch (error) {
       console.error('Duggu chatbot get general statistics error:', error);
       res.status(500).json({ message: 'Failed to get general statistics' });
+    }
+  });
+
+  // Additional External Database Endpoints for Duggu
+  
+  // Get contacts by company
+  app.get('/api/duggu/contacts/company/:company', async (req, res) => {
+    try {
+      const { company } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const result = await externalDugguService.getContactsByCompany(company, limit);
+      res.json(result);
+    } catch (error) {
+      console.error('Duggu chatbot get contacts by company error:', error);
+      res.status(500).json({ message: 'Failed to get contacts by company' });
+    }
+  });
+
+  // Get contacts by industry
+  app.get('/api/duggu/contacts/industry/:industry', async (req, res) => {
+    try {
+      const { industry } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const result = await externalDugguService.getContactsByIndustry(industry, limit);
+      res.json(result);
+    } catch (error) {
+      console.error('Duggu chatbot get contacts by industry error:', error);
+      res.status(500).json({ message: 'Failed to get contacts by industry' });
+    }
+  });
+
+  // Get high-value contacts (lead score based)
+  app.get('/api/duggu/contacts/high-value', async (req, res) => {
+    try {
+      const minScore = parseFloat(req.query.minScore as string) || 7.0;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const result = await externalDugguService.getHighValueContacts(minScore, limit);
+      res.json(result);
+    } catch (error) {
+      console.error('Duggu chatbot get high-value contacts error:', error);
+      res.status(500).json({ message: 'Failed to get high-value contacts' });
+    }
+  });
+
+  // Get top companies by contact count
+  app.get('/api/duggu/companies/top', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const companies = await externalDugguService.getTopCompanies(limit);
+      res.json({ companies, total: companies.length });
+    } catch (error) {
+      console.error('Duggu chatbot get top companies error:', error);
+      res.status(500).json({ message: 'Failed to get top companies' });
     }
   });
 

@@ -1,6 +1,6 @@
 # Project Overview
 
-This is a full-stack web application designed for comprehensive campaign management, focusing on secure data handling and advanced lead scoring. The platform aims to empower sales teams and lead generation specialists by providing tools for contact intelligence, prospect qualification, and business intelligence. Its core capabilities include secure authentication, campaign and contact management, file uploads, and robust data encryption, all delivered through a modern, responsive user interface.
+This is a full-stack web application for comprehensive campaign management, focusing on secure data handling and advanced lead scoring. The platform empowers sales teams and lead generation specialists with tools for contact intelligence, prospect qualification, and business intelligence. Key capabilities include secure authentication, campaign and contact management, file uploads, and robust data encryption, all delivered through a modern, responsive user interface.
 
 # User Preferences
 
@@ -26,7 +26,7 @@ The application features a React frontend with a TypeScript Express.js backend.
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **State Management**: TanStack Query (React Query)
 - **Forms**: React Hook Form with Zod validation
-- **UI/UX**: Professional design with blue-to-purple gradients, light mode default, professional avatar system with initials, and paw icon branding.
+- **UI/UX**: Professional design with blue-to-purple gradients, light mode default, professional avatar system with initials, and paw icon branding. Enhanced contact visualization with professional contact cards, interactive network canvas, and tabbed display modes for search results (Cards, Network View, Summary).
 
 ## Backend
 
@@ -39,165 +39,23 @@ The application features a React frontend with a TypeScript Express.js backend.
 - **AI Integration**: Advanced AI capabilities for lead scoring and business intelligence, transforming from a general assistant to a specialist.
 - **Data Migration**: Comprehensive system for database backup and import (JSON/SQL), including conflict resolution and secure encryption for imported data.
 - **CSV Operations**: Advanced CSV export/import module with direct save-to-records functionality and integrated workflow within the AI chat interface.
+- **Database Architecture**: Dual database architecture with a main database pool for write operations and a dedicated read-only database pool for chatbot data access, ensuring data isolation and optimized performance. The chatbot uses an external, read-only database connection with dynamic schema discovery for real contact data.
 
 ## Core Features
 
 - Secure Authentication
-- Campaign Management with encrypted data
+- Campaign Management with encrypted data, including saving search results as campaigns.
 - File Upload (CSV, documents)
-- Contact Management
+- Contact Management with advanced search capabilities integrated into the AI chat interface.
 - Data Encryption
-- Responsive UI with dark/light theme support
+- Responsive UI with dark/light theme support.
 - AI Lead Scoring System with title-based authority scoring, contact intelligence, and decision-maker identification.
 - Real-time Updates for note creation, updates, and deletion.
-- Advanced Search integrated into the AI chat interface with data visualization and quick action buttons.
+- Advanced Search integrated into the AI chat interface with data visualization and quick action buttons, featuring improved fuzzy search precision for job titles.
 - Enhanced Contact Visualization with contact cards, interactive network canvas, and tabbed display modes for search results.
 
 # External Dependencies
 
 - **Database**: Neon (PostgreSQL)
-- **AI Services**: OpenRouter API (using Claude-3-Haiku for improved response times)
-- **Third-party APIs**: Apollo.io API (integrated for advanced business intelligence, lead scoring, and prospecting)
-
-# Recent Changes
-
-## Read-Only Database for Duggu Chatbot (August 18, 2025)
-
-Implemented a dedicated read-only database configuration specifically for the Duggu chatbot to ensure secure, isolated data access:
-
-### Technical Implementation
-- **Dual Database Architecture**: Added a separate read-only database pool (`readOnlyPool`) alongside the main database pool
-- **Dedicated Service Layer**: Created `DugguChatbotService` (`server/services/dugguChatbotService.ts`) with comprehensive read-only operations
-- **API Endpoints**: Added 12 new API endpoints under `/api/duggu/` for secure chatbot data access
-- **Connection Isolation**: Read-only pool uses optimized settings (smaller pool size, shorter timeouts) for search operations
-
-### Database Configuration (`server/db.ts`)
-- **Main Database Pool**: For write operations with 10 max connections and 30-second timeouts
-- **Read-Only Database Pool**: For chatbot searches with 5 max connections and 15-second timeouts
-- **Dual Connection Testing**: Both pools are tested independently on startup for reliability
-- **Enhanced Error Handling**: Graceful failure handling allows application to start even if one pool fails
-
-### Duggu Chatbot Service Features
-- **Contact Operations**: Search, get all, get by ID with fuzzy matching capabilities
-- **Pet Management**: Search pets by name/type/breed, get all pets, get by ID
-- **Health Records**: Get pet health records with optional pet filtering
-- **Activity Tracking**: Get pet activities with optional pet filtering
-- **Chat Management**: Access chat sessions and messages for conversation history
-- **Campaign Access**: Read-only access to campaign data for business intelligence
-- **Statistics**: Contact statistics (sent/pending emails) and general system statistics
-
-### API Endpoints for Chatbot
-- `GET /api/duggu/contacts/search` - Search contacts with query parameter
-- `GET /api/duggu/contacts` - Get all contacts
-- `GET /api/duggu/contacts/:id` - Get specific contact
-- `GET /api/duggu/pets/search` - Search pets
-- `GET /api/duggu/pets` - Get all pets
-- `GET /api/duggu/pets/:id` - Get specific pet
-- `GET /api/duggu/health-records` - Get health records (optionally filtered by pet)
-- `GET /api/duggu/activities` - Get pet activities (optionally filtered by pet)
-- `GET /api/duggu/chat-sessions` - Get chat sessions
-- `GET /api/duggu/chat-sessions/:sessionId/messages` - Get messages for session
-- `GET /api/duggu/campaigns` - Get campaigns
-- `GET /api/duggu/campaigns/:id` - Get specific campaign
-- `GET /api/duggu/statistics/contacts` - Get contact statistics
-- `GET /api/duggu/statistics/general` - Get general system statistics
-
-### Security and Performance Benefits
-- **Data Isolation**: Chatbot operations cannot affect main database transactions
-- **Read-Only Access**: All chatbot operations are strictly read-only, preventing data corruption
-- **Optimized Performance**: Separate connection pool optimized for search and read operations
-- **Error Isolation**: Issues with chatbot database access don't affect main application functionality
-- **Scalable Architecture**: Foundation for future read replica implementation
-
-### User Impact
-- Duggu chatbot now has secure, dedicated database access for advanced AI capabilities
-- Faster response times for chatbot queries through optimized read-only operations
-- Enhanced data security with isolated access patterns
-- Foundation for advanced AI features like lead scoring and business intelligence analysis
-
-## Improved Fuzzy Search Precision (August 12, 2025)
-
-Fixed fuzzy search algorithm to provide more precise job title matching:
-
-### Issue Resolution
-- **Problem**: Fuzzy search for "Procurement Manager" was returning almost all manager-level titles
-- **Root Cause**: Too permissive fuzzy search settings (threshold: 0.4, distance: 100)
-- **Solution**: Implemented intelligent search logic with different parameters for specific job titles vs. general searches
-
-### Technical Improvements
-- **Stricter Fuzzy Matching**: Reduced threshold to 0.15-0.25 based on search type
-- **Smart Search Detection**: Automatically detects specific job title searches vs. general queries
-- **Exact Word Matching**: Added complementary exact word matching for specific job titles
-- **Score-based Filtering**: Only returns matches with good confidence scores
-- **Reduced Distance**: Limited character differences to improve precision
-
-### User Impact
-- More accurate search results for specific job titles like "Procurement Manager"
-- Reduced noise in search results
-- Better distinction between similar roles (e.g., "Procurement Manager" vs "Product Manager")
-- Maintained flexibility for general searches while improving precision for targeted searches
-
-## Enhanced Contact Visualization (August 12, 2025)
-
-Added comprehensive visual components for displaying contact search results:
-
-### New Components
-- **ContactCards Component** (`client/src/components/contact-cards.tsx`):
-  - Professional contact cards with avatars, company info, contact details
-  - Grid and list view modes with sorting and filtering
-  - Score-based color coding and status badges
-  - Copy-to-clipboard functionality and action buttons
-  - Summary statistics and export capabilities
-
-- **ContactCanvas Component** (`client/src/components/contact-canvas.tsx`):
-  - Interactive network visualization using HTML5 Canvas
-  - Force-directed layout algorithm for contact relationships
-  - Company/industry-based grouping and color coding
-  - Zoom, pan, and click interactions
-  - Hover details and connection mapping
-  - Real-time sidebar with contact information
-
-### Integration
-- Updated unified chatbot (`unified-chatbot.tsx`) with tabbed results display
-- Enhanced search chatbot (`enhanced-chatbot.tsx`) with visual result modes
-- Added tabs for Cards, Network View, and Summary for all search results
-- Replaced text-based contact display with rich visual components
-
-### User Impact
-- Contact search results now display as professional cards instead of plain text
-- Interactive network view shows relationships between contacts and companies
-- Improved user experience with visual data exploration
-- Better data comprehension through multiple view modes
-
-## Modern Contact Canvas Implementation (August 12, 2025)
-
-Implemented a comprehensive modern AI chat interface with advanced contact management capabilities:
-
-### Features
-- **Modern Contact Canvas** (`client/src/components/modern-contact-canvas.tsx`):
-  - Compact contact cards with professional design and hover effects
-  - Complete contact details: name, email, phone, company, title, location, industry, LinkedIn
-  - Contact selection with individual and bulk selection options
-  - Copy-to-clipboard functionality for email and phone numbers
-  - Score-based visual indicators and contact status badges
-  - Responsive grid layout with smooth animations
-
-- **Save as Campaign Functionality**:
-  - Backend API endpoint (`/api/campaigns/save-search-results`) for converting search results to campaigns
-  - Dialog interface for naming new campaigns
-  - Ability to save selected contacts or all search results
-  - Integration with existing campaign management system
-  - Encrypted data storage maintaining security standards
-
-- **Enhanced Search Experience**:
-  - Increased search result limit to 100 contacts
-  - Modern AI chat interface replacing text-based displays
-  - Real-time contact statistics and summary metrics
-  - Professional contact cards with all relevant business information
-
-### Technical Implementation
-- React-based modern UI with Tailwind CSS styling
-- TypeScript for type safety and better development experience
-- Integration with existing encryption and storage systems
-- Mutation-based API calls with error handling and user feedback
-- Responsive design supporting various screen sizes
+- **AI Services**: OpenRouter API (using Claude-3-Haiku)
+- **Third-party APIs**: Apollo.io API (for advanced business intelligence, lead scoring, and prospecting)
