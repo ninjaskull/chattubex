@@ -11,6 +11,7 @@ import { sendContactFormEmail } from "./utils/email";
 import { createRealOpenAIService } from "./services/realOpenAI";
 import { mockOpenAIService } from "./services/mockOpenAI";
 import { databaseService } from "./services/databaseService";
+import { dugguChatbotService } from "./services/dugguChatbotService";
 
 // Helper function to clean AI responses from unwanted patterns
 function cleanStreamResponse(content: string): string {
@@ -2137,6 +2138,204 @@ You have access to campaign and contact databases with 263+ records. Your missio
     } catch (error) {
       console.error('Single recovery error:', error);
       res.status(500).json({ message: 'Failed to recover campaign' });
+    }
+  });
+
+  // Import the Duggu chatbot service for read-only database access
+
+  // Duggu Chatbot API Routes - Read-only database access
+  
+  // Search contacts (read-only for chatbot)
+  app.get('/api/duggu/contacts/search', async (req, res) => {
+    try {
+      const { q: query, limit = 100 } = req.query;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: 'Search query is required' });
+      }
+
+      const contacts = await dugguChatbotService.searchContacts(query, parseInt(limit as string));
+      res.json({ contacts, total: contacts.length });
+    } catch (error) {
+      console.error('Duggu chatbot contact search error:', error);
+      res.status(500).json({ message: 'Failed to search contacts' });
+    }
+  });
+
+  // Get all contacts (read-only for chatbot)
+  app.get('/api/duggu/contacts', async (req, res) => {
+    try {
+      const { limit = 100 } = req.query;
+      const contacts = await dugguChatbotService.getAllContacts(parseInt(limit as string));
+      res.json({ contacts, total: contacts.length });
+    } catch (error) {
+      console.error('Duggu chatbot get contacts error:', error);
+      res.status(500).json({ message: 'Failed to get contacts' });
+    }
+  });
+
+  // Get contact by ID (read-only for chatbot)
+  app.get('/api/duggu/contacts/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const contact = await dugguChatbotService.getContactById(id);
+      
+      if (!contact) {
+        return res.status(404).json({ message: 'Contact not found' });
+      }
+      
+      res.json(contact);
+    } catch (error) {
+      console.error('Duggu chatbot get contact error:', error);
+      res.status(500).json({ message: 'Failed to get contact' });
+    }
+  });
+
+  // Search pets (read-only for chatbot)
+  app.get('/api/duggu/pets/search', async (req, res) => {
+    try {
+      const { q: query, limit = 50 } = req.query;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: 'Search query is required' });
+      }
+
+      const pets = await dugguChatbotService.searchPets(query, parseInt(limit as string));
+      res.json({ pets, total: pets.length });
+    } catch (error) {
+      console.error('Duggu chatbot pet search error:', error);
+      res.status(500).json({ message: 'Failed to search pets' });
+    }
+  });
+
+  // Get all pets (read-only for chatbot)
+  app.get('/api/duggu/pets', async (req, res) => {
+    try {
+      const { limit = 50 } = req.query;
+      const pets = await dugguChatbotService.getAllPets(parseInt(limit as string));
+      res.json({ pets, total: pets.length });
+    } catch (error) {
+      console.error('Duggu chatbot get pets error:', error);
+      res.status(500).json({ message: 'Failed to get pets' });
+    }
+  });
+
+  // Get pet by ID (read-only for chatbot)
+  app.get('/api/duggu/pets/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const pet = await dugguChatbotService.getPetById(id);
+      
+      if (!pet) {
+        return res.status(404).json({ message: 'Pet not found' });
+      }
+      
+      res.json(pet);
+    } catch (error) {
+      console.error('Duggu chatbot get pet error:', error);
+      res.status(500).json({ message: 'Failed to get pet' });
+    }
+  });
+
+  // Get pet health records (read-only for chatbot)
+  app.get('/api/duggu/health-records', async (req, res) => {
+    try {
+      const { petId, limit = 50 } = req.query;
+      const petIdNum = petId ? parseInt(petId as string) : undefined;
+      const records = await dugguChatbotService.getPetHealthRecords(petIdNum, parseInt(limit as string));
+      res.json({ healthRecords: records, total: records.length });
+    } catch (error) {
+      console.error('Duggu chatbot get health records error:', error);
+      res.status(500).json({ message: 'Failed to get health records' });
+    }
+  });
+
+  // Get pet activities (read-only for chatbot)
+  app.get('/api/duggu/activities', async (req, res) => {
+    try {
+      const { petId, limit = 50 } = req.query;
+      const petIdNum = petId ? parseInt(petId as string) : undefined;
+      const activities = await dugguChatbotService.getPetActivities(petIdNum, parseInt(limit as string));
+      res.json({ activities, total: activities.length });
+    } catch (error) {
+      console.error('Duggu chatbot get activities error:', error);
+      res.status(500).json({ message: 'Failed to get activities' });
+    }
+  });
+
+  // Get chat sessions (read-only for chatbot)
+  app.get('/api/duggu/chat-sessions', async (req, res) => {
+    try {
+      const { limit = 50 } = req.query;
+      const sessions = await dugguChatbotService.getChatSessions(parseInt(limit as string));
+      res.json({ chatSessions: sessions, total: sessions.length });
+    } catch (error) {
+      console.error('Duggu chatbot get chat sessions error:', error);
+      res.status(500).json({ message: 'Failed to get chat sessions' });
+    }
+  });
+
+  // Get chat messages for a session (read-only for chatbot)
+  app.get('/api/duggu/chat-sessions/:sessionId/messages', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const { limit = 100 } = req.query;
+      const messages = await dugguChatbotService.getChatMessages(sessionId, parseInt(limit as string));
+      res.json({ messages, total: messages.length });
+    } catch (error) {
+      console.error('Duggu chatbot get messages error:', error);
+      res.status(500).json({ message: 'Failed to get chat messages' });
+    }
+  });
+
+  // Get campaigns (read-only for chatbot)
+  app.get('/api/duggu/campaigns', async (req, res) => {
+    try {
+      const { limit = 50 } = req.query;
+      const campaigns = await dugguChatbotService.getAllCampaigns(parseInt(limit as string));
+      res.json({ campaigns, total: campaigns.length });
+    } catch (error) {
+      console.error('Duggu chatbot get campaigns error:', error);
+      res.status(500).json({ message: 'Failed to get campaigns' });
+    }
+  });
+
+  // Get campaign by ID (read-only for chatbot)
+  app.get('/api/duggu/campaigns/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const campaign = await dugguChatbotService.getCampaignById(id);
+      
+      if (!campaign) {
+        return res.status(404).json({ message: 'Campaign not found' });
+      }
+      
+      res.json(campaign);
+    } catch (error) {
+      console.error('Duggu chatbot get campaign error:', error);
+      res.status(500).json({ message: 'Failed to get campaign' });
+    }
+  });
+
+  // Get contact statistics (read-only for chatbot)
+  app.get('/api/duggu/statistics/contacts', async (req, res) => {
+    try {
+      const stats = await dugguChatbotService.getContactStatistics();
+      res.json(stats);
+    } catch (error) {
+      console.error('Duggu chatbot get contact statistics error:', error);
+      res.status(500).json({ message: 'Failed to get contact statistics' });
+    }
+  });
+
+  // Get general statistics (read-only for chatbot)
+  app.get('/api/duggu/statistics/general', async (req, res) => {
+    try {
+      const stats = await dugguChatbotService.getGeneralStatistics();
+      res.json(stats);
+    } catch (error) {
+      console.error('Duggu chatbot get general statistics error:', error);
+      res.status(500).json({ message: 'Failed to get general statistics' });
     }
   });
 

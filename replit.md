@@ -61,7 +61,59 @@ The application features a React frontend with a TypeScript Express.js backend.
 
 # Recent Changes
 
+## Read-Only Database for Duggu Chatbot (August 18, 2025)
 
+Implemented a dedicated read-only database configuration specifically for the Duggu chatbot to ensure secure, isolated data access:
+
+### Technical Implementation
+- **Dual Database Architecture**: Added a separate read-only database pool (`readOnlyPool`) alongside the main database pool
+- **Dedicated Service Layer**: Created `DugguChatbotService` (`server/services/dugguChatbotService.ts`) with comprehensive read-only operations
+- **API Endpoints**: Added 12 new API endpoints under `/api/duggu/` for secure chatbot data access
+- **Connection Isolation**: Read-only pool uses optimized settings (smaller pool size, shorter timeouts) for search operations
+
+### Database Configuration (`server/db.ts`)
+- **Main Database Pool**: For write operations with 10 max connections and 30-second timeouts
+- **Read-Only Database Pool**: For chatbot searches with 5 max connections and 15-second timeouts
+- **Dual Connection Testing**: Both pools are tested independently on startup for reliability
+- **Enhanced Error Handling**: Graceful failure handling allows application to start even if one pool fails
+
+### Duggu Chatbot Service Features
+- **Contact Operations**: Search, get all, get by ID with fuzzy matching capabilities
+- **Pet Management**: Search pets by name/type/breed, get all pets, get by ID
+- **Health Records**: Get pet health records with optional pet filtering
+- **Activity Tracking**: Get pet activities with optional pet filtering
+- **Chat Management**: Access chat sessions and messages for conversation history
+- **Campaign Access**: Read-only access to campaign data for business intelligence
+- **Statistics**: Contact statistics (sent/pending emails) and general system statistics
+
+### API Endpoints for Chatbot
+- `GET /api/duggu/contacts/search` - Search contacts with query parameter
+- `GET /api/duggu/contacts` - Get all contacts
+- `GET /api/duggu/contacts/:id` - Get specific contact
+- `GET /api/duggu/pets/search` - Search pets
+- `GET /api/duggu/pets` - Get all pets
+- `GET /api/duggu/pets/:id` - Get specific pet
+- `GET /api/duggu/health-records` - Get health records (optionally filtered by pet)
+- `GET /api/duggu/activities` - Get pet activities (optionally filtered by pet)
+- `GET /api/duggu/chat-sessions` - Get chat sessions
+- `GET /api/duggu/chat-sessions/:sessionId/messages` - Get messages for session
+- `GET /api/duggu/campaigns` - Get campaigns
+- `GET /api/duggu/campaigns/:id` - Get specific campaign
+- `GET /api/duggu/statistics/contacts` - Get contact statistics
+- `GET /api/duggu/statistics/general` - Get general system statistics
+
+### Security and Performance Benefits
+- **Data Isolation**: Chatbot operations cannot affect main database transactions
+- **Read-Only Access**: All chatbot operations are strictly read-only, preventing data corruption
+- **Optimized Performance**: Separate connection pool optimized for search and read operations
+- **Error Isolation**: Issues with chatbot database access don't affect main application functionality
+- **Scalable Architecture**: Foundation for future read replica implementation
+
+### User Impact
+- Duggu chatbot now has secure, dedicated database access for advanced AI capabilities
+- Faster response times for chatbot queries through optimized read-only operations
+- Enhanced data security with isolated access patterns
+- Foundation for advanced AI features like lead scoring and business intelligence analysis
 
 ## Improved Fuzzy Search Precision (August 12, 2025)
 
