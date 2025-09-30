@@ -33,7 +33,24 @@ import {
   Upload,
   Clock,
   Target,
-  Award
+  Award,
+  Voicemail,
+  Radio,
+  PhoneIncoming,
+  PhoneOutgoing,
+  PhoneForwarded,
+  Volume2,
+  Wifi,
+  Activity,
+  Layers,
+  GitBranch,
+  Database,
+  Code,
+  Smartphone,
+  Laptop,
+  CloudLightning,
+  AlertCircle,
+  BarChart2
 } from "lucide-react";
 import { setAuthenticated } from "@/lib/auth";
 import { useLocation } from "wouter";
@@ -46,6 +63,7 @@ export default function Landing() {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [password, setPassword] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
 
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -66,6 +84,13 @@ export default function Landing() {
     },
   });
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 6);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleYearClick = () => {
     const newCount = clickCount + 1;
     setClickCount(newCount);
@@ -84,25 +109,26 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl flex items-center justify-center animate-pulse">
                 <PhoneCall className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-slate-900">FallOwl</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">FallOwl</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" data-testid="link-features">Features</a>
-              <a href="#integrations" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" data-testid="link-integrations">Integrations</a>
-              <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" data-testid="link-pricing">Pricing</a>
+              <a href="#features" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" data-testid="link-features">Features</a>
+              <a href="#capabilities" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
+              <a href="#integrations" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" data-testid="link-integrations">Integrations</a>
+              <a href="#testimonials" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
               <Button variant="ghost" size="sm" className="text-sm" data-testid="button-signin">Sign in</Button>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white text-sm" data-testid="button-get-started">Get Started</Button>
+              <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm" data-testid="button-get-started">Get Started</Button>
             </div>
 
             <Button 
@@ -117,14 +143,15 @@ export default function Landing() {
           </div>
 
           {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-slate-200">
+            <div className="md:hidden py-4 border-t border-slate-200 animate-in slide-in-from-top">
               <div className="flex flex-col space-y-3">
-                <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900" data-testid="link-mobile-features">Features</a>
-                <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900" data-testid="link-mobile-integrations">Integrations</a>
-                <a href="#pricing" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900" data-testid="link-mobile-pricing">Pricing</a>
+                <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600" data-testid="link-mobile-features">Features</a>
+                <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600" data-testid="link-mobile-capabilities">Capabilities</a>
+                <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600" data-testid="link-mobile-integrations">Integrations</a>
+                <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600" data-testid="link-mobile-testimonials">Testimonials</a>
                 <div className="px-4 pt-2 flex flex-col space-y-2">
                   <Button variant="ghost" size="sm" className="w-full justify-start" data-testid="button-mobile-signin">Sign in</Button>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white w-full" data-testid="button-mobile-get-started">Get Started</Button>
+                  <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white w-full" data-testid="button-mobile-get-started">Get Started</Button>
                 </div>
               </div>
             </div>
@@ -133,42 +160,49 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 lg:px-8">
+      <section className="pt-32 pb-24 px-6 lg:px-8 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-20 left-1/2 w-80 h-80 bg-pink-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        </div>
+
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-50 rounded-full text-sm font-medium text-blue-600 mb-8">
-              <Sparkles className="w-4 h-4" />
-              <span>Powered by Twilio</span>
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-full text-sm font-medium text-blue-600 mb-8 animate-in fade-in slide-in-from-top duration-500">
+              <Sparkles className="w-4 h-4 animate-spin" style={{animationDuration: '3s'}} />
+              <span>Powered by Twilio's Enterprise Infrastructure</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              Call smarter.
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Close faster.</span>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom duration-700">
+              The Future of
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-in fade-in duration-1000">Cloud Communications</span>
             </h1>
             
-            <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-              The CRM with HD calling and automatic recording. Built for modern sales teams.
+            <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom duration-1000">
+              Enterprise-grade CRM with HD calling, automatic recording, voicemail, and programmable voice—all in one platform.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 h-12 text-base" data-testid="button-hero-trial">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-in fade-in slide-in-from-bottom duration-1000">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 h-12 text-base shadow-lg hover:shadow-xl transform hover:scale-105 transition-all" data-testid="button-hero-trial">
                 Start Free Trial
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button variant="outline" size="lg" className="px-8 h-12 text-base" data-testid="button-hero-demo">
+              <Button variant="outline" size="lg" className="px-8 h-12 text-base border-2 hover:bg-slate-50" data-testid="button-hero-demo">
                 <Play className="w-4 h-4 mr-2" />
                 Watch Demo
               </Button>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
+            <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600 animate-in fade-in duration-1000">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>No credit card</span>
+                <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>14-day trial</span>
+                <span>14-day free trial</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
@@ -177,98 +211,185 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Hero Visual */}
-          <div className="mt-20 relative">
-            <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border border-slate-200 p-8 shadow-2xl">
+          {/* Hero Dashboard Preview */}
+          <div className="mt-20 relative animate-in fade-in slide-in-from-bottom duration-1000" style={{animationDelay: '300ms'}}>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur-xl opacity-20 animate-pulse"></div>
+            <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl border-2 border-slate-200 p-8 shadow-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="bg-white border-slate-200">
+                <Card className="bg-white border-slate-200 hover:shadow-lg transition-all transform hover:scale-105">
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                      <PhoneCall className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                      <PhoneCall className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="font-semibold mb-2">HD Calling</h3>
-                    <p className="text-sm text-slate-600">Crystal-clear voice quality</p>
-                    <div className="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 w-4/5"></div>
+                    <h3 className="font-semibold mb-2">HD Voice Calling</h3>
+                    <p className="text-sm text-slate-600 mb-4">Crystal-clear voice quality with Twilio</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-slate-600">
+                        <span>Quality</span>
+                        <span className="font-medium">99.9%</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 w-[99%] animate-in slide-in-from-left duration-1000"></div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="bg-white border-slate-200">
+
+                <Card className="bg-white border-slate-200 hover:shadow-lg transition-all transform hover:scale-105" style={{animationDelay: '100ms'}}>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                      <Mic className="w-6 h-6 text-purple-600" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                      <Mic className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="font-semibold mb-2">Auto Recording</h3>
-                    <p className="text-sm text-slate-600">Every call saved instantly</p>
-                    <div className="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 w-3/5"></div>
+                    <p className="text-sm text-slate-600 mb-4">Every call captured automatically</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-slate-600">
+                        <span>Storage</span>
+                        <span className="font-medium">Unlimited</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 w-[85%] animate-in slide-in-from-left duration-1000"></div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="bg-white border-slate-200">
+
+                <Card className="bg-white border-slate-200 hover:shadow-lg transition-all transform hover:scale-105" style={{animationDelay: '200ms'}}>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                      <BarChart3 className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+                      <BarChart3 className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="font-semibold mb-2">Analytics</h3>
-                    <p className="text-sm text-slate-600">Real-time insights</p>
-                    <div className="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-green-500 to-green-600 w-5/6"></div>
+                    <h3 className="font-semibold mb-2">Real-time Analytics</h3>
+                    <p className="text-sm text-slate-600 mb-4">Track every metric that matters</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-slate-600">
+                        <span>Insights</span>
+                        <span className="font-medium">Live</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-pink-500 to-pink-600 w-[92%] animate-in slide-in-from-left duration-1000"></div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
             </div>
             
-            {/* Floating badges */}
-            <div className="absolute -top-6 -left-6 bg-white rounded-xl shadow-lg px-4 py-3 border border-slate-200 hidden lg:block">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>10M+ Calls Made</span>
+            {/* Floating stats */}
+            <div className="absolute -top-8 -left-8 bg-white rounded-2xl shadow-xl px-6 py-4 border border-slate-200 hidden lg:block animate-in fade-in duration-1000" style={{animationDelay: '500ms'}}>
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <div>
+                  <div className="text-2xl font-bold text-slate-900">10M+</div>
+                  <div className="text-xs text-slate-600">Calls Made</div>
+                </div>
               </div>
             </div>
-            <div className="absolute -top-6 -right-6 bg-white rounded-xl shadow-lg px-4 py-3 border border-slate-200 hidden lg:block">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                <span>4.9/5 Rating</span>
+            
+            <div className="absolute -top-8 -right-8 bg-white rounded-2xl shadow-xl px-6 py-4 border border-slate-200 hidden lg:block animate-in fade-in duration-1000" style={{animationDelay: '700ms'}}>
+              <div className="flex items-center gap-3">
+                <Star className="w-5 h-5 text-yellow-500 fill-current" />
+                <div>
+                  <div className="text-2xl font-bold text-slate-900">4.9/5</div>
+                  <div className="text-xs text-slate-600">User Rating</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="py-20 bg-slate-50">
+      {/* Core Features Section */}
+      <section id="features" className="py-24 bg-gradient-to-b from-white to-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Everything you need
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+              Complete Communication Platform
             </h2>
             <p className="text-lg text-slate-600">
-              Powerful features to help your team perform at their best
+              Everything you need for modern business communications
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: PhoneCall, title: "Twilio Dialer", desc: "Enterprise-grade calling infrastructure" },
-              { icon: Mic, title: "Call Recording", desc: "Automatic recording with transcription" },
-              { icon: Users, title: "Contact Management", desc: "Smart organization and segmentation" },
-              { icon: BarChart3, title: "Analytics Dashboard", desc: "Real-time performance metrics" },
-              { icon: Calendar, title: "Call Scheduling", desc: "Schedule calls with one click" },
-              { icon: FileText, title: "Call Notes", desc: "Take notes during calls automatically" },
-              { icon: MessageSquare, title: "SMS Integration", desc: "Send follow-up messages instantly" },
-              { icon: Search, title: "Advanced Search", desc: "Find any contact or call in seconds" },
-              { icon: Zap, title: "Workflow Automation", desc: "Automate repetitive tasks" }
+              { 
+                icon: PhoneOutgoing, 
+                title: "Outbound Calling", 
+                desc: "Make unlimited high-quality calls to any number worldwide",
+                color: "from-blue-500 to-blue-600",
+                delay: "0ms"
+              },
+              { 
+                icon: PhoneIncoming, 
+                title: "Inbound Calling", 
+                desc: "Receive calls with intelligent routing and forwarding",
+                color: "from-purple-500 to-purple-600",
+                delay: "100ms"
+              },
+              { 
+                icon: Mic, 
+                title: "Call Recording", 
+                desc: "Automatic recording with searchable transcriptions",
+                color: "from-pink-500 to-pink-600",
+                delay: "200ms"
+              },
+              { 
+                icon: Voicemail, 
+                title: "Voicemail", 
+                desc: "Professional voicemail with instant notifications",
+                color: "from-green-500 to-green-600",
+                delay: "300ms"
+              },
+              { 
+                icon: Radio, 
+                title: "Programmable Voice", 
+                desc: "Build custom voice workflows with our API",
+                color: "from-orange-500 to-orange-600",
+                delay: "400ms"
+              },
+              { 
+                icon: PhoneForwarded, 
+                title: "Call Forwarding", 
+                desc: "Route calls intelligently based on your rules",
+                color: "from-cyan-500 to-cyan-600",
+                delay: "500ms"
+              },
+              { 
+                icon: Volume2, 
+                title: "Interactive Voice Response", 
+                desc: "Create custom IVR menus for better call routing",
+                color: "from-indigo-500 to-indigo-600",
+                delay: "600ms"
+              },
+              { 
+                icon: Users, 
+                title: "Conference Calling", 
+                desc: "Host multi-party calls with up to 100 participants",
+                color: "from-red-500 to-red-600",
+                delay: "700ms"
+              },
+              { 
+                icon: MessageSquare, 
+                title: "SMS Integration", 
+                desc: "Send and receive text messages alongside calls",
+                color: "from-yellow-500 to-yellow-600",
+                delay: "800ms"
+              }
             ].map((feature, index) => {
               const IconComponent = feature.icon;
               return (
-                <Card key={index} className="bg-white border-slate-200 hover:shadow-lg transition-shadow" data-testid={`card-feature-${index}`}>
+                <Card 
+                  key={index} 
+                  className="bg-white border-slate-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group animate-in fade-in slide-in-from-bottom" 
+                  style={{animationDelay: feature.delay}}
+                  data-testid={`card-feature-${index}`}
+                >
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
-                      <IconComponent className="w-6 h-6 text-blue-600" />
+                    <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <IconComponent className="w-7 h-7 text-white" />
                     </div>
-                    <h3 className="font-semibold mb-2" data-testid={`text-feature-title-${index}`}>{feature.title}</h3>
+                    <h3 className="font-semibold text-lg mb-2" data-testid={`text-feature-title-${index}`}>{feature.title}</h3>
                     <p className="text-sm text-slate-600" data-testid={`text-feature-desc-${index}`}>{feature.desc}</p>
                   </CardContent>
                 </Card>
@@ -278,80 +399,306 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+      {/* Technical Capabilities Section */}
+      <section id="capabilities" className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Built for Developers
+            </h2>
+            <p className="text-lg text-slate-600">
+              Powerful APIs and SDKs for custom integrations
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+            <div>
+              <div className="space-y-8">
+                {[
+                  { icon: Code, title: "RESTful API", desc: "Simple, well-documented API for all features" },
+                  { icon: Smartphone, title: "Mobile SDKs", desc: "Native iOS and Android development kits" },
+                  { icon: Laptop, title: "Web SDK", desc: "JavaScript SDK for browser-based calling" },
+                  { icon: Database, title: "Webhooks", desc: "Real-time event notifications for your app" }
+                ].map((item, index) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <div key={index} className="flex items-start gap-4 group" data-testid={`capability-${index}`}>
+                      <div className="w-12 h-12 bg-white rounded-xl border-2 border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-blue-500 transition-colors">
+                        <IconComponent className="w-6 h-6 text-slate-700 group-hover:text-blue-600 transition-colors" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">{item.title}</h3>
+                        <p className="text-sm text-slate-600">{item.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-700">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  </div>
+                  <span className="text-slate-400 text-sm ml-4">api.fallowl.com</span>
+                </div>
+                <pre className="text-sm text-green-400 font-mono overflow-x-auto">
+{`const client = new FallOwl({
+  apiKey: process.env.FALLOWL_API_KEY
+});
+
+// Make an outbound call
+await client.calls.create({
+  to: '+1234567890',
+  from: '+0987654321',
+  record: true,
+  voicemail: {
+    enabled: true,
+    greeting: 'custom-greeting.mp3'
+  }
+});`}
+                </pre>
+              </div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl opacity-50"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Feature Showcase */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-bold mb-6">
+                Intelligent Call Management
+              </h2>
+              <p className="text-lg text-slate-600 mb-8">
+                Advanced features that help you manage calls more efficiently
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  { icon: Wifi, title: "Auto-reconnect", desc: "Never lose a call due to network issues", active: activeFeature === 0 },
+                  { icon: Activity, title: "Call Quality Monitoring", desc: "Real-time quality metrics and alerts", active: activeFeature === 1 },
+                  { icon: Lock, title: "End-to-End Encryption", desc: "Bank-grade security for all communications", active: activeFeature === 2 },
+                  { icon: CloudLightning, title: "Global Infrastructure", desc: "Low latency with 200+ edge locations", active: activeFeature === 3 },
+                  { icon: AlertCircle, title: "Smart Notifications", desc: "Intelligent alerts for important calls", active: activeFeature === 4 },
+                  { icon: BarChart2, title: "Advanced Analytics", desc: "Deep insights into call patterns", active: activeFeature === 5 }
+                ].map((feature, index) => {
+                  const IconComponent = feature.icon;
+                  return (
+                    <div 
+                      key={index}
+                      className={`p-4 rounded-xl transition-all duration-300 cursor-pointer ${
+                        feature.active 
+                          ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-500' 
+                          : 'bg-slate-50 border-2 border-transparent hover:border-slate-300'
+                      }`}
+                      onMouseEnter={() => setActiveFeature(index)}
+                      data-testid={`interactive-feature-${index}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          feature.active ? 'bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-white'
+                        }`}>
+                          <IconComponent className={`w-5 h-5 ${feature.active ? 'text-white' : 'text-slate-600'}`} />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm">{feature.title}</h4>
+                          <p className="text-xs text-slate-600">{feature.desc}</p>
+                        </div>
+                        {feature.active && (
+                          <ChevronRight className="w-5 h-5 text-blue-600 animate-pulse" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-xl">
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: "Uptime", value: "99.99%", color: "green" },
+                    { label: "Avg Latency", value: "45ms", color: "blue" },
+                    { label: "Success Rate", value: "98.5%", color: "purple" },
+                    { label: "Calls/Month", value: "10M+", color: "pink" }
+                  ].map((stat, index) => (
+                    <div key={index} className="bg-white rounded-xl p-4 border border-slate-200">
+                      <div className="text-xs text-slate-600 mb-1">{stat.label}</div>
+                      <div className={`text-2xl font-bold bg-gradient-to-r from-${stat.color}-600 to-${stat.color}-700 bg-clip-text text-transparent`}>
+                        {stat.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6">
+                  <div className="flex justify-between text-xs text-slate-600 mb-2">
+                    <span>System Health</span>
+                    <span>Excellent</span>
+                  </div>
+                  <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 animate-pulse" style={{width: '95%'}}></div>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  {[...Array(12)].map((_, i) => (
+                    <div 
+                      key={i} 
+                      className="h-16 bg-gradient-to-t from-blue-500 to-blue-600 rounded opacity-70"
+                      style={{
+                        height: `${Math.random() * 40 + 30}px`,
+                        animation: 'pulse 2s infinite',
+                        animationDelay: `${i * 0.1}s`
+                      }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Trusted by Thousands
+            </h2>
+            <p className="text-blue-100 text-lg">
+              Join the fastest-growing communication platform
+            </p>
+          </div>
+          
           <div className="grid md:grid-cols-4 gap-12">
             {[
-              { number: "10M+", label: "Calls Made" },
-              { number: "5K+", label: "Active Users" },
-              { number: "99.9%", label: "Uptime" },
-              { number: "45%", label: "Avg. Increase in Sales" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center" data-testid={`stat-${index}`}>
-                <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
-                <div className="text-blue-100">{stat.label}</div>
-              </div>
-            ))}
+              { number: "10M+", label: "Calls Made", icon: PhoneCall },
+              { number: "5,000+", label: "Active Users", icon: Users },
+              { number: "99.99%", label: "Uptime SLA", icon: Shield },
+              { number: "200+", label: "Countries", icon: Globe }
+            ].map((stat, index) => {
+              const IconComponent = stat.icon;
+              return (
+                <div key={index} className="text-center group" data-testid={`stat-${index}`}>
+                  <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <IconComponent className="w-8 h-8" />
+                  </div>
+                  <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
+                  <div className="text-blue-100">{stat.label}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Integrations */}
-      <section id="integrations" className="py-20">
+      <section id="integrations" className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Integrates with your stack
+              Seamless Integrations
             </h2>
             <p className="text-lg text-slate-600">
-              Connect with tools you already use
+              Connect with your favorite tools and platforms
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
             {[
-              "Salesforce", "HubSpot", "Zapier", "Slack", "Google", "Microsoft",
-              "Stripe", "Intercom", "Zendesk", "Pipedrive", "Zoom", "Calendly"
+              "Salesforce", "HubSpot", "Zapier", "Slack", "Google Workspace", "Microsoft 365",
+              "Stripe", "Intercom", "Zendesk", "Pipedrive", "Zoom", "Calendly",
+              "Notion", "Airtable", "Trello", "Asana", "Monday.com", "ClickUp"
             ].map((integration, index) => (
-              <div key={index} className="bg-slate-50 rounded-xl p-6 flex items-center justify-center h-24 border border-slate-200 hover:border-blue-300 transition-colors" data-testid={`integration-${index}`}>
-                <span className="font-semibold text-slate-700">{integration}</span>
+              <div 
+                key={index} 
+                className="bg-white rounded-xl p-6 flex items-center justify-center h-24 border-2 border-slate-200 hover:border-blue-500 hover:shadow-lg transition-all transform hover:-translate-y-1 group" 
+                data-testid={`integration-${index}`}
+              >
+                <span className="font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">{integration}</span>
               </div>
             ))}
+          </div>
+
+          <div className="text-center">
+            <Button size="lg" variant="outline" className="border-2">
+              View All Integrations
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-slate-50">
+      <section id="testimonials" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Loved by sales teams
+              Loved by Sales Teams Worldwide
             </h2>
+            <p className="text-lg text-slate-600">
+              See what our customers have to say
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { quote: "Call quality is outstanding. We've increased connect rates by 45%.", author: "Sarah Chen", role: "Head of Sales, TechCorp" },
-              { quote: "Auto recording saved us hours. Best CRM investment we made.", author: "Marcus Lee", role: "Sales Director, GrowthHub" },
-              { quote: "Analytics helped us double conversion rate in 3 months.", author: "Emily Watson", role: "VP Sales, LeadGen" }
+              { 
+                quote: "Call quality is outstanding. We increased our connect rates by 45% within the first month.", 
+                author: "Sarah Chen", 
+                role: "VP of Sales", 
+                company: "TechCorp",
+                rating: 5 
+              },
+              { 
+                quote: "The automatic recording and transcription features saved us countless hours. Best investment we've made.", 
+                author: "Marcus Rodriguez", 
+                role: "Sales Director", 
+                company: "GrowthHub",
+                rating: 5 
+              },
+              { 
+                quote: "Real-time analytics helped us optimize our process. Conversion rate doubled in just 3 months.", 
+                author: "Emily Watson", 
+                role: "Head of Business Development", 
+                company: "LeadGen Masters",
+                rating: 5 
+              }
             ].map((testimonial, index) => (
-              <Card key={index} className="bg-white border-slate-200" data-testid={`testimonial-${index}`}>
-                <CardContent className="p-6">
+              <Card key={index} className="bg-gradient-to-br from-slate-50 to-white border-slate-200 hover:shadow-2xl transition-all transform hover:-translate-y-2" data-testid={`testimonial-${index}`}>
+                <CardContent className="p-8">
                   <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-500 fill-current" />
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
                     ))}
                   </div>
-                  <p className="text-slate-700 mb-6">"{testimonial.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  <p className="text-slate-700 mb-6 leading-relaxed">"{testimonial.quote}"</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-semibold">
                       {testimonial.author.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <div className="font-semibold text-sm">{testimonial.author}</div>
-                      <div className="text-xs text-slate-600">{testimonial.role}</div>
+                      <div className="font-semibold">{testimonial.author}</div>
+                      <div className="text-sm text-slate-600">{testimonial.role}</div>
+                      <div className="text-xs text-slate-500">{testimonial.company}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -361,77 +708,66 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20">
+      {/* Security & Compliance */}
+      <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, transparent pricing
+              Enterprise-Grade Security
             </h2>
             <p className="text-lg text-slate-600">
-              Start free, upgrade as you grow
+              Your data is protected with industry-leading security
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8">
             {[
-              { name: "Starter", price: "$29", features: ["Up to 1,000 calls/mo", "Call recording", "Basic analytics", "Email support"] },
-              { name: "Professional", price: "$99", features: ["Unlimited calls", "Advanced analytics", "Team collaboration", "Priority support"], popular: true },
-              { name: "Enterprise", price: "Custom", features: ["Custom volume", "Dedicated support", "SLA guarantee", "Custom integrations"] }
-            ].map((plan, index) => (
-              <Card key={index} className={`${plan.popular ? 'border-blue-600 shadow-xl' : 'border-slate-200'} bg-white relative`} data-testid={`card-pricing-${index}`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
-                    Most Popular
+              { icon: Shield, title: "SOC 2 Compliant", desc: "Annual audits" },
+              { icon: Lock, title: "256-bit Encryption", desc: "End-to-end security" },
+              { icon: Globe, title: "GDPR Ready", desc: "EU data protection" },
+              { icon: Award, title: "HIPAA Compatible", desc: "Healthcare ready" }
+            ].map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <div key={index} className="text-center" data-testid={`security-${index}`}>
+                  <div className="w-16 h-16 bg-white rounded-2xl border-2 border-slate-200 flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-8 h-8 text-slate-700" />
                   </div>
-                )}
-                <CardContent className="p-8">
-                  <div className="text-center mb-6">
-                    <h3 className="font-semibold text-lg mb-2">{plan.name}</h3>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      {plan.price !== "Custom" && <span className="text-slate-600">/month</span>}
-                    </div>
-                  </div>
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, fIndex) => (
-                      <li key={fIndex} className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-600">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    className={`w-full ${plan.popular ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-900'}`}
-                    data-testid={`button-pricing-${index}`}
-                  >
-                    {plan.price === "Custom" ? "Contact Sales" : "Start Free Trial"}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                  <h3 className="font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-slate-600">{item.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      {/* Final CTA */}
+      <section className="py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to transform your sales?
+            Start Making Better Calls Today
           </h2>
-          <p className="text-xl text-blue-100 mb-10">
-            Join thousands of teams making better calls with FallOwl
+          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            Join thousands of teams using FallOwl to transform their communications
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-8 h-12" data-testid="button-cta-trial">
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-10 h-14 text-lg shadow-xl transform hover:scale-105 transition-all" data-testid="button-cta-trial">
               Start Free Trial
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 h-12" data-testid="button-cta-sales">
-              Talk to Sales
+            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 px-10 h-14 text-lg" data-testid="button-cta-demo">
+              Schedule a Demo
             </Button>
           </div>
+          <p className="text-sm text-blue-100 mt-6">
+            No credit card required • 14-day free trial • Cancel anytime
+          </p>
         </div>
       </section>
 
@@ -441,19 +777,19 @@ export default function Landing() {
           <div className="grid md:grid-cols-5 gap-12 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <PhoneCall className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <PhoneCall className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-lg font-bold text-white">FallOwl</span>
+                <span className="text-xl font-bold text-white">FallOwl</span>
               </div>
-              <p className="text-sm mb-6">
-                The modern CRM with Twilio-powered calling and automatic recording.
+              <p className="text-sm mb-6 text-slate-400">
+                The modern CRM with Twilio-powered calling, automatic recording, and enterprise-grade features.
               </p>
               <div className="flex gap-4">
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white" data-testid="button-footer-email">
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-email">
                   <Mail className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white" data-testid="button-footer-phone">
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-phone">
                   <Phone className="w-5 h-5" />
                 </Button>
               </div>
@@ -463,9 +799,9 @@ export default function Landing() {
               <h4 className="font-semibold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#features" className="hover:text-white transition-colors" data-testid="link-footer-features">Features</a></li>
+                <li><a href="#capabilities" className="hover:text-white transition-colors" data-testid="link-footer-capabilities">Capabilities</a></li>
                 <li><a href="#integrations" className="hover:text-white transition-colors" data-testid="link-footer-integrations">Integrations</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors" data-testid="link-footer-pricing">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-updates">Updates</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-api">API Docs</a></li>
               </ul>
             </div>
 
@@ -485,24 +821,25 @@ export default function Landing() {
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-privacy">Privacy</a></li>
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-terms">Terms</a></li>
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-security">Security</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-compliance">Compliance</a></li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm">
+            <p className="text-sm text-slate-400">
               © <span onClick={handleYearClick} className="cursor-pointer hover:text-white transition-colors" data-testid="text-footer-year">2025</span> FallOwl. All rights reserved.
             </p>
             
             {showPasswordField && (
-              <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
+              <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 animate-in fade-in slide-in-from-bottom">
                 <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
                   <Input 
                     type="password"
                     placeholder="Admin access" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-28 h-7 text-xs bg-slate-700 border-slate-600 text-white"
+                    className="w-32 h-8 text-xs bg-slate-700 border-slate-600 text-white placeholder-slate-400"
                     autoFocus
                     data-testid="input-admin-password"
                   />
@@ -510,21 +847,21 @@ export default function Landing() {
                     type="submit"
                     size="sm"
                     variant="ghost"
-                    className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                    className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
                     disabled={authMutation.isPending}
                     data-testid="button-admin-submit"
                   >
                     {authMutation.isPending ? (
-                      <div className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <ArrowRight className="w-3 h-3" />
+                      <ArrowRight className="w-4 h-4" />
                     )}
                   </Button>
                 </form>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 text-slate-500 hover:text-slate-300"
+                  className="h-7 w-7 p-0 text-slate-500 hover:text-slate-300"
                   onClick={() => setShowPasswordField(false)}
                   data-testid="button-admin-close"
                 >
