@@ -5,7 +5,7 @@ import { neonConfig } from '@neondatabase/serverless';
 neonConfig.webSocketConstructor = ws;
 
 // Get the external database URL
-function getExternalDatabaseUrl(): string {
+function getExternalDatabaseUrl(): string | null {
   let dugguConnectionUrl = process.env.DUGGU_DATABASE_CONNECTION_URL;
   
   if (dugguConnectionUrl) {
@@ -21,21 +21,34 @@ function getExternalDatabaseUrl(): string {
     }
   }
   
-  throw new Error('External database connection URL not found');
+  return null;
 }
 
-// Create a read-only connection pool for external database
-const externalReadOnlyPool = new Pool({
-  connectionString: getExternalDatabaseUrl(),
-  ssl: { rejectUnauthorized: false },
-  max: 5,
-  min: 1,
-  idleTimeoutMillis: 15000,
-  connectionTimeoutMillis: 10000,
-  allowExitOnIdle: false,
-  query_timeout: 15000,
-  statement_timeout: 15000,
-});
+// Lazy-load the connection pool only when needed
+let externalReadOnlyPool: Pool | null = null;
+
+function getExternalReadOnlyPool(): Pool {
+  if (!externalReadOnlyPool) {
+    const url = getExternalDatabaseUrl();
+    if (!url) {
+      throw new Error('External database connection URL not found. Please configure DUGGU_DATABASE_CONNECTION_URL environment variable.');
+    }
+    
+    externalReadOnlyPool = new Pool({
+      connectionString: url,
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      min: 1,
+      idleTimeoutMillis: 15000,
+      connectionTimeoutMillis: 10000,
+      allowExitOnIdle: false,
+      query_timeout: 15000,
+      statement_timeout: 15000,
+    });
+  }
+  
+  return externalReadOnlyPool;
+}
 
 // Interface for external contact data
 interface ExternalContact {
@@ -89,7 +102,8 @@ export class ExternalDugguService {
     try {
       const searchQuery = `%${query.toLowerCase()}%`;
       
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT * FROM contacts 
         WHERE is_deleted = false 
           AND (
@@ -116,7 +130,7 @@ export class ExternalDugguService {
         LIMIT $2;
       `, [searchQuery, limit]);
 
-      const countResult = await externalReadOnlyPool.query(`
+      const countResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts 
         WHERE is_deleted = false 
           AND (
@@ -151,14 +165,15 @@ export class ExternalDugguService {
    */
   async getAllContacts(limit: number = 50, offset: number = 0): Promise<{ contacts: ExternalContact[], total: number }> {
     try {
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT * FROM contacts 
         WHERE is_deleted = false 
         ORDER BY lead_score DESC NULLS LAST, full_name
         LIMIT $1 OFFSET $2;
       `, [limit, offset]);
 
-      const countResult = await externalReadOnlyPool.query(`
+      const countResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts WHERE is_deleted = false;
       `);
 
@@ -179,7 +194,8 @@ export class ExternalDugguService {
    */
   async getContactById(id: string): Promise<ExternalContact | null> {
     try {
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT * FROM contacts 
         WHERE id = $1 AND is_deleted = false;
       `, [id]);
@@ -201,14 +217,15 @@ export class ExternalDugguService {
     try {
       const searchQuery = `%${company.toLowerCase()}%`;
       
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT * FROM contacts 
         WHERE is_deleted = false AND LOWER(company) LIKE $1
         ORDER BY lead_score DESC NULLS LAST, full_name
         LIMIT $2;
       `, [searchQuery, limit]);
 
-      const countResult = await externalReadOnlyPool.query(`
+      const countResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts 
         WHERE is_deleted = false AND LOWER(company) LIKE $1;
       `, [searchQuery]);
@@ -233,14 +250,15 @@ export class ExternalDugguService {
     try {
       const searchQuery = `%${industry.toLowerCase()}%`;
       
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT * FROM contacts 
         WHERE is_deleted = false AND LOWER(industry) LIKE $1
         ORDER BY lead_score DESC NULLS LAST, full_name
         LIMIT $2;
       `, [searchQuery, limit]);
 
-      const countResult = await externalReadOnlyPool.query(`
+      const countResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts 
         WHERE is_deleted = false AND LOWER(industry) LIKE $1;
       `, [searchQuery]);
@@ -261,21 +279,22 @@ export class ExternalDugguService {
    */
   async getContactStatistics(): Promise<{ total: number, withEmail: number, withPhone: number, withScore: number, avgScore: number }> {
     try {
-      const totalResult = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const totalResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts WHERE is_deleted = false;
       `);
 
-      const emailResult = await externalReadOnlyPool.query(`
+      const emailResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts WHERE is_deleted = false AND email IS NOT NULL AND email != '';
       `);
 
-      const phoneResult = await externalReadOnlyPool.query(`
+      const phoneResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts 
         WHERE is_deleted = false 
           AND (mobile_phone IS NOT NULL OR other_phone IS NOT NULL OR home_phone IS NOT NULL OR corporate_phone IS NOT NULL);
       `);
 
-      const scoreResult = await externalReadOnlyPool.query(`
+      const scoreResult = await pool.query(`
         SELECT 
           COUNT(*) as count_with_score,
           AVG(lead_score) as avg_score
@@ -303,7 +322,8 @@ export class ExternalDugguService {
    */
   async getTopCompanies(limit: number = 10): Promise<{ company: string, count: number, avgScore: number }[]> {
     try {
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT 
           company,
           COUNT(*) as count,
@@ -334,14 +354,15 @@ export class ExternalDugguService {
    */
   async getHighValueContacts(minScore: number = 7.0, limit: number = 50): Promise<{ contacts: ExternalContact[], total: number }> {
     try {
-      const result = await externalReadOnlyPool.query(`
+      const pool = getExternalReadOnlyPool();
+      const result = await pool.query(`
         SELECT * FROM contacts 
         WHERE is_deleted = false AND lead_score >= $1
         ORDER BY lead_score DESC, full_name
         LIMIT $2;
       `, [minScore, limit]);
 
-      const countResult = await externalReadOnlyPool.query(`
+      const countResult = await pool.query(`
         SELECT COUNT(*) as count FROM contacts 
         WHERE is_deleted = false AND lead_score >= $1;
       `, [minScore]);

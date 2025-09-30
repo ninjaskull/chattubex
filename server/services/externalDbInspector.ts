@@ -5,7 +5,7 @@ import { neonConfig } from '@neondatabase/serverless';
 neonConfig.webSocketConstructor = ws;
 
 // Get the external database URL for inspection
-function getExternalDatabaseUrl(): string {
+function getExternalDatabaseUrl(): string | null {
   let dugguConnectionUrl = process.env.DUGGU_DATABASE_CONNECTION_URL;
   
   if (dugguConnectionUrl) {
@@ -21,21 +21,34 @@ function getExternalDatabaseUrl(): string {
     }
   }
   
-  throw new Error('External database connection URL not found');
+  return null;
 }
 
-// Create a connection pool for external database inspection
-const externalPool = new Pool({
-  connectionString: getExternalDatabaseUrl(),
-  ssl: { rejectUnauthorized: false },
-  max: 2,
-  min: 1,
-  idleTimeoutMillis: 15000,
-  connectionTimeoutMillis: 10000,
-  allowExitOnIdle: false,
-  query_timeout: 10000,
-  statement_timeout: 10000,
-});
+// Lazy-load the connection pool only when needed
+let externalPool: Pool | null = null;
+
+function getExternalPool(): Pool {
+  if (!externalPool) {
+    const url = getExternalDatabaseUrl();
+    if (!url) {
+      throw new Error('External database connection URL not found. Please configure DUGGU_DATABASE_CONNECTION_URL environment variable.');
+    }
+    
+    externalPool = new Pool({
+      connectionString: url,
+      ssl: { rejectUnauthorized: false },
+      max: 2,
+      min: 1,
+      idleTimeoutMillis: 15000,
+      connectionTimeoutMillis: 10000,
+      allowExitOnIdle: false,
+      query_timeout: 10000,
+      statement_timeout: 10000,
+    });
+  }
+  
+  return externalPool;
+}
 
 export class ExternalDbInspector {
   /**
@@ -43,7 +56,8 @@ export class ExternalDbInspector {
    */
   async getTables(): Promise<string[]> {
     try {
-      const result = await externalPool.query(`
+      const pool = getExternalPool();
+      const result = await pool.query(`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public' 
@@ -62,7 +76,8 @@ export class ExternalDbInspector {
    */
   async getTableSchema(tableName: string): Promise<any[]> {
     try {
-      const result = await externalPool.query(`
+      const pool = getExternalPool();
+      const result = await pool.query(`
         SELECT 
           column_name,
           data_type,
@@ -87,7 +102,8 @@ export class ExternalDbInspector {
    */
   async getSampleData(tableName: string, limit: number = 3): Promise<any[]> {
     try {
-      const result = await externalPool.query(`
+      const pool = getExternalPool();
+      const result = await pool.query(`
         SELECT * FROM ${tableName} LIMIT $1;
       `, [limit]);
       
@@ -103,7 +119,8 @@ export class ExternalDbInspector {
    */
   async getTableCount(tableName: string): Promise<number> {
     try {
-      const result = await externalPool.query(`
+      const pool = getExternalPool();
+      const result = await pool.query(`
         SELECT COUNT(*) as count FROM ${tableName};
       `);
       

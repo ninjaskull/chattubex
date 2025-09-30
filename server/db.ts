@@ -4,14 +4,13 @@ import * as schema from "@shared/schema";
 
 // Function to get database URL with proper fallback
 function getDatabaseUrl(): string {
-  // Debug environment variables
-  console.log('Environment variables check:');
-  console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
-  console.log('NEON_DATABASE_URL:', process.env.NEON_DATABASE_URL ? 'SET' : 'NOT SET'); 
-  console.log('NEON_DATABASE_URL_WITH_BRANCH:', process.env.NEON_DATABASE_URL_WITH_BRANCH ? 'SET' : 'NOT SET');
-  
   // Use Neon database with branch if available, then fallback to regular Neon, then local DATABASE_URL
   let databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+  
+  // Filter out empty strings
+  if (databaseUrl && databaseUrl.trim() === '') {
+    databaseUrl = undefined;
+  }
   
   // If no database URL is found, try to construct one from individual postgres env vars
   if (!databaseUrl && process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER) {
@@ -21,7 +20,7 @@ function getDatabaseUrl(): string {
     const pgUser = process.env.PGUSER;
     const pgPassword = process.env.PGPASSWORD || '';
     
-    databaseUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}?sslmode=require`;
+    databaseUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
   }
 
