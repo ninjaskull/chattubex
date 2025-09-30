@@ -160,53 +160,88 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 px-6 lg:px-8 relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute bottom-20 left-1/2 w-80 h-80 bg-pink-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto">
+      <section className="pt-32 pb-24 px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-full text-sm font-medium text-blue-600 mb-8 animate-in fade-in slide-in-from-top duration-500">
-              <Sparkles className="w-4 h-4 animate-spin" style={{animationDuration: '3s'}} />
-              <span>Powered by Twilio's Enterprise Infrastructure</span>
-            </div>
+            {/* Top badge text */}
+            <p className="text-sm text-slate-600 mb-8 animate-in fade-in slide-in-from-top duration-500">
+              Powered by Twilio's Enterprise Infrastructure
+            </p>
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom duration-700">
-              The Future of
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-in fade-in duration-1000">Cloud Communications</span>
+            {/* Main heading with colored text */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-tight animate-in fade-in slide-in-from-bottom duration-700">
+              The Future of{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-600">
+                Cloud
+              </span>{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-cyan-600">
+                Communications
+              </span>
             </h1>
             
-            <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom duration-1000">
+            {/* Subheading */}
+            <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom duration-1000">
               Enterprise-grade CRM with HD calling, automatic recording, voicemail, and programmable voice—all in one platform.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-in fade-in slide-in-from-bottom duration-1000">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 h-12 text-base shadow-lg hover:shadow-xl transform hover:scale-105 transition-all" data-testid="button-hero-trial">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-in fade-in slide-in-from-bottom duration-1000">
+              <Button 
+                size="lg" 
+                className="bg-slate-900 hover:bg-slate-800 text-white px-8 h-12 text-base shadow-lg hover:shadow-xl transition-all rounded-lg" 
+                data-testid="button-hero-trial"
+              >
                 Start Free Trial
-                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button variant="outline" size="lg" className="px-8 h-12 text-base border-2 hover:bg-slate-50" data-testid="button-hero-demo">
-                <Play className="w-4 h-4 mr-2" />
-                Watch Demo
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="px-8 h-12 text-base border-2 border-slate-200 hover:bg-slate-50 rounded-lg" 
+                data-testid="button-hero-demo"
+              >
+                Browse Features
               </Button>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600 animate-in fade-in duration-1000">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>No credit card required</span>
+            {/* Feature Cards */}
+            <div className="grid md:grid-cols-3 gap-8 mt-16 animate-in fade-in slide-in-from-bottom duration-1000" style={{animationDelay: '200ms'}}>
+              {/* Card 1 */}
+              <div className="text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Code className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-slate-900">HD Voice Calling</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Crystal-clear voice quality with enterprise-grade infrastructure
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>14-day free trial</span>
+
+              {/* Card 2 */}
+              <div className="text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Mic className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-slate-900">Auto Recording</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Every call captured automatically with unlimited storage
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Cancel anytime</span>
+
+              {/* Card 3 */}
+              <div className="text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Layers className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-slate-900">Full Platform Access</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Complete CRM integration with all communication tools
+                </p>
               </div>
             </div>
           </div>
