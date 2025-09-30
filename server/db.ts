@@ -7,8 +7,8 @@ function getDatabaseUrl(): string {
   // Use Neon database with branch if available, then fallback to regular Neon, then local DATABASE_URL
   let databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
   
-  // Filter out empty strings
-  if (databaseUrl && databaseUrl.trim() === '') {
+  // Filter out empty strings and strings that are just whitespace
+  if (!databaseUrl || databaseUrl.trim() === '') {
     databaseUrl = undefined;
   }
   
