@@ -109,26 +109,26 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8F7F5] text-slate-900 overflow-x-hidden">
       
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
                 <PhoneCall className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">FallOwl</span>
+              <span className="text-xl font-bold text-slate-800">FallOwl</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-sm font-medium text-slate-700 hover:text-cyan-600 transition-colors" data-testid="link-features">Features</a>
-              <a href="#capabilities" className="text-sm font-medium text-slate-700 hover:text-cyan-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
-              <a href="#integrations" className="text-sm font-medium text-slate-700 hover:text-cyan-600 transition-colors" data-testid="link-integrations">Integrations</a>
-              <a href="#testimonials" className="text-sm font-medium text-slate-700 hover:text-cyan-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
-              <Button variant="ghost" size="sm" className="text-sm hover:text-cyan-600" data-testid="button-signin">Sign in</Button>
-              <Button size="sm" className="bg-black hover:bg-slate-800 text-white text-sm" data-testid="button-get-started">Get Started</Button>
+              <a href="#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</a>
+              <a href="#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
+              <a href="#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
+              <a href="#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
+              <Button variant="ghost" size="sm" className="text-sm hover:text-purple-600" data-testid="button-signin">Sign in</Button>
+              <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white text-sm" data-testid="button-get-started">Get Started</Button>
             </div>
 
             <Button 
@@ -143,15 +143,15 @@ export default function Landing() {
           </div>
 
           {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-slate-200 animate-in slide-in-from-top">
+            <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
               <div className="flex flex-col space-y-3">
-                <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-cyan-600" data-testid="link-mobile-features">Features</a>
-                <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-cyan-600" data-testid="link-mobile-capabilities">Capabilities</a>
-                <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-cyan-600" data-testid="link-mobile-integrations">Integrations</a>
-                <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-cyan-600" data-testid="link-mobile-testimonials">Testimonials</a>
+                <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-features">Features</a>
+                <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-capabilities">Capabilities</a>
+                <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-integrations">Integrations</a>
+                <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-testimonials">Testimonials</a>
                 <div className="px-4 pt-2 flex flex-col space-y-2">
-                  <Button variant="ghost" size="sm" className="w-full justify-start hover:text-cyan-600" data-testid="button-mobile-signin">Sign in</Button>
-                  <Button size="sm" className="bg-black hover:bg-slate-800 text-white w-full" data-testid="button-mobile-get-started">Get Started</Button>
+                  <Button variant="ghost" size="sm" className="w-full justify-start hover:text-purple-600" data-testid="button-mobile-signin">Sign in</Button>
+                  <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white w-full" data-testid="button-mobile-get-started">Get Started</Button>
                 </div>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+      <section className="pt-32 pb-24 px-6 lg:px-8 relative overflow-hidden bg-[#F8F7F5]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
             {/* Top badge text */}
@@ -169,12 +169,12 @@ export default function Landing() {
             </p>
             
             {/* Main heading with colored text */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-tight animate-in fade-in slide-in-from-bottom duration-700">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-tight animate-in fade-in slide-in-from-bottom duration-700 text-slate-900">
               The Future of{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-cyan-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500">
                 Cloud
               </span>{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-700">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-cyan-500">
                 Communications
               </span>
             </h1>
@@ -188,7 +188,7 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-in fade-in slide-in-from-bottom duration-1000">
               <Button 
                 size="lg" 
-                className="bg-black hover:bg-slate-800 text-white px-8 h-12 text-base shadow-lg hover:shadow-xl transition-all rounded-lg" 
+                className="bg-slate-900 hover:bg-slate-800 text-white px-8 h-12 text-base shadow-lg hover:shadow-xl transition-all rounded-lg" 
                 data-testid="button-hero-trial"
               >
                 Start Free Trial
@@ -196,7 +196,7 @@ export default function Landing() {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="px-8 h-12 text-base border-2 border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg" 
+                className="px-8 h-12 text-base border-2 border-slate-300 text-slate-700 hover:bg-white rounded-lg" 
                 data-testid="button-hero-demo"
               >
                 Browse Features
@@ -208,7 +208,7 @@ export default function Landing() {
               {/* Card 1 */}
               <div className="text-left">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Code className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-lg text-slate-900">HD Voice Calling</h3>
@@ -221,7 +221,7 @@ export default function Landing() {
               {/* Card 2 */}
               <div className="text-left">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Mic className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-lg text-slate-900">Auto Recording</h3>
@@ -234,7 +234,7 @@ export default function Landing() {
               {/* Card 3 */}
               <div className="text-left">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Layers className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-lg text-slate-900">Full Platform Access</h3>
@@ -248,12 +248,12 @@ export default function Landing() {
 
           {/* Hero Dashboard Preview */}
           <div className="mt-20 relative animate-in fade-in slide-in-from-bottom duration-1000" style={{animationDelay: '300ms'}}>
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 rounded-3xl blur-xl opacity-20 animate-pulse"></div>
-            <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl border-2 border-slate-200 p-8 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-3xl blur-xl opacity-20 animate-pulse"></div>
+            <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="bg-white border-slate-200 hover:shadow-lg transition-all transform hover:scale-105">
+                <Card className="bg-white border-gray-200 hover:shadow-lg transition-all transform hover:scale-105">
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-4">
                       <PhoneCall className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="font-semibold mb-2">HD Voice Calling</h3>
@@ -263,16 +263,16 @@ export default function Landing() {
                         <span>Quality</span>
                         <span className="font-medium">99.9%</span>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-600 to-blue-700 w-[99%] animate-in slide-in-from-left duration-1000"></div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 w-[99%] animate-in slide-in-from-left duration-1000"></div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border-slate-200 hover:shadow-lg transition-all transform hover:scale-105" style={{animationDelay: '100ms'}}>
+                <Card className="bg-white border-gray-200 hover:shadow-lg transition-all transform hover:scale-105" style={{animationDelay: '100ms'}}>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-4">
                       <Mic className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="font-semibold mb-2">Auto Recording</h3>
@@ -282,16 +282,16 @@ export default function Landing() {
                         <span>Storage</span>
                         <span className="font-medium">Unlimited</span>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-600 to-cyan-600 w-[85%] animate-in slide-in-from-left duration-1000"></div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 w-[85%] animate-in slide-in-from-left duration-1000"></div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border-slate-200 hover:shadow-lg transition-all transform hover:scale-105" style={{animationDelay: '200ms'}}>
+                <Card className="bg-white border-gray-200 hover:shadow-lg transition-all transform hover:scale-105" style={{animationDelay: '200ms'}}>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-4">
                       <BarChart3 className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="font-semibold mb-2">Real-time Analytics</h3>
@@ -301,8 +301,8 @@ export default function Landing() {
                         <span>Insights</span>
                         <span className="font-medium">Live</span>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 w-[92%] animate-in slide-in-from-left duration-1000"></div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-orange-400 to-pink-500 w-[92%] animate-in slide-in-from-left duration-1000"></div>
                       </div>
                     </div>
                   </CardContent>
@@ -311,21 +311,21 @@ export default function Landing() {
             </div>
             
             {/* Floating stats */}
-            <div className="absolute -top-8 -left-8 bg-white rounded-2xl shadow-xl px-6 py-4 border border-slate-200 hidden lg:block animate-in fade-in duration-1000" style={{animationDelay: '500ms'}}>
+            <div className="absolute -top-8 -left-8 bg-white rounded-2xl shadow-xl px-6 py-4 border border-gray-200 hidden lg:block animate-in fade-in duration-1000" style={{animationDelay: '500ms'}}>
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-gradient-to-r from-cyan-600 to-blue-700 rounded-full animate-pulse"></div>
+                <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full animate-pulse"></div>
                 <div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">10M+</div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">10M+</div>
                   <div className="text-xs text-slate-600">Calls Made</div>
                 </div>
               </div>
             </div>
             
-            <div className="absolute -top-8 -right-8 bg-white rounded-2xl shadow-xl px-6 py-4 border border-slate-200 hidden lg:block animate-in fade-in duration-1000" style={{animationDelay: '700ms'}}>
+            <div className="absolute -top-8 -right-8 bg-white rounded-2xl shadow-xl px-6 py-4 border border-gray-200 hidden lg:block animate-in fade-in duration-1000" style={{animationDelay: '700ms'}}>
               <div className="flex items-center gap-3">
-                <Star className="w-5 h-5 text-blue-500 fill-current" />
+                <Star className="w-5 h-5 text-purple-500 fill-current" />
                 <div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">4.9/5</div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">4.9/5</div>
                   <div className="text-xs text-slate-600">User Rating</div>
                 </div>
               </div>
@@ -335,10 +335,10 @@ export default function Landing() {
       </section>
 
       {/* Core Features Section */}
-      <section id="features" className="py-24 bg-gradient-to-b from-white to-slate-50">
+      <section id="features" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
               Complete Communication Platform
             </h2>
             <p className="text-lg text-slate-600">
@@ -352,63 +352,63 @@ export default function Landing() {
                 icon: PhoneOutgoing, 
                 title: "Outbound Calling", 
                 desc: "Make unlimited high-quality calls to any number worldwide",
-                color: "from-cyan-600 to-blue-700",
+                color: "from-purple-500 to-purple-600",
                 delay: "0ms"
               },
               { 
                 icon: PhoneIncoming, 
                 title: "Inbound Calling", 
                 desc: "Receive calls with intelligent routing and forwarding",
-                color: "from-blue-600 to-cyan-600",
+                color: "from-teal-500 to-cyan-500",
                 delay: "100ms"
               },
               { 
                 icon: Mic, 
                 title: "Call Recording", 
                 desc: "Automatic recording with searchable transcriptions",
-                color: "from-cyan-500 to-blue-600",
+                color: "from-orange-400 to-pink-500",
                 delay: "200ms"
               },
               { 
                 icon: Voicemail, 
                 title: "Voicemail", 
                 desc: "Professional voicemail with instant notifications",
-                color: "from-blue-500 to-cyan-600",
+                color: "from-purple-500 to-purple-600",
                 delay: "300ms"
               },
               { 
                 icon: Radio, 
                 title: "Programmable Voice", 
                 desc: "Build custom voice workflows with our API",
-                color: "from-cyan-600 via-blue-600 to-cyan-700",
+                color: "from-teal-500 to-cyan-500",
                 delay: "400ms"
               },
               { 
                 icon: PhoneForwarded, 
                 title: "Call Forwarding", 
                 desc: "Route calls intelligently based on your rules",
-                color: "from-blue-600 via-cyan-600 to-blue-700",
+                color: "from-orange-400 to-pink-500",
                 delay: "500ms"
               },
               { 
                 icon: Volume2, 
                 title: "Interactive Voice Response", 
                 desc: "Create custom IVR menus for better call routing",
-                color: "from-cyan-500 to-blue-700",
+                color: "from-purple-500 to-purple-600",
                 delay: "600ms"
               },
               { 
                 icon: Users, 
                 title: "Conference Calling", 
                 desc: "Host multi-party calls with up to 100 participants",
-                color: "from-blue-600 to-cyan-700",
+                color: "from-teal-500 to-cyan-500",
                 delay: "700ms"
               },
               { 
                 icon: MessageSquare, 
                 title: "SMS Integration", 
                 desc: "Send and receive text messages alongside calls",
-                color: "from-cyan-600 to-blue-600",
+                color: "from-orange-400 to-pink-500",
                 delay: "800ms"
               }
             ].map((feature, index) => {
@@ -416,12 +416,12 @@ export default function Landing() {
               return (
                 <Card 
                   key={index} 
-                  className="bg-white border-slate-200 hover:shadow-2xl hover:border-cyan-300 transition-all duration-300 transform hover:-translate-y-2 group animate-in fade-in slide-in-from-bottom" 
+                  className="bg-white border-gray-200 hover:shadow-2xl hover:border-purple-300 transition-all duration-300 transform hover:-translate-y-2 group animate-in fade-in slide-in-from-bottom" 
                   style={{animationDelay: feature.delay}}
                   data-testid={`card-feature-${index}`}
                 >
                   <CardContent className="p-6">
-                    <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                       <IconComponent className="w-7 h-7 text-white" />
                     </div>
                     <h3 className="font-semibold text-lg mb-2" data-testid={`text-feature-title-${index}`}>{feature.title}</h3>
@@ -435,10 +435,10 @@ export default function Landing() {
       </section>
 
       {/* Technical Capabilities Section */}
-      <section id="capabilities" className="py-24 bg-slate-50">
+      <section id="capabilities" className="py-24 bg-[#F8F7F5]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
               Built for Developers
             </h2>
             <p className="text-lg text-slate-600">
@@ -458,8 +458,8 @@ export default function Landing() {
                   const IconComponent = item.icon;
                   return (
                     <div key={index} className="flex items-start gap-4 group" data-testid={`capability-${index}`}>
-                      <div className="w-12 h-12 bg-white rounded-xl border-2 border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-cyan-500 transition-colors">
-                        <IconComponent className="w-6 h-6 text-slate-700 group-hover:text-cyan-600 transition-colors" />
+                      <div className="w-12 h-12 bg-white rounded-xl border-2 border-gray-200 flex items-center justify-center flex-shrink-0 group-hover:border-purple-500 transition-colors">
+                        <IconComponent className="w-6 h-6 text-slate-700 group-hover:text-purple-600 transition-colors" />
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">{item.title}</h3>
@@ -481,7 +481,7 @@ export default function Landing() {
                   </div>
                   <span className="text-slate-400 text-sm ml-4">api.fallowl.com</span>
                 </div>
-                <pre className="text-sm text-cyan-400 font-mono overflow-x-auto">
+                <pre className="text-sm text-purple-400 font-mono overflow-x-auto">
 {`const client = new FallOwl({
   apiKey: process.env.FALLOWL_API_KEY
 });
@@ -498,7 +498,7 @@ await client.calls.create({
 });`}
                 </pre>
               </div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full blur-3xl opacity-50"></div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full blur-3xl opacity-50"></div>
             </div>
           </div>
         </div>
@@ -509,7 +509,7 @@ await client.calls.create({
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+              <h2 className="text-4xl font-bold mb-6 text-slate-900">
                 Intelligent Call Management
               </h2>
               <p className="text-lg text-slate-600 mb-8">
@@ -531,15 +531,15 @@ await client.calls.create({
                       key={index}
                       className={`p-4 rounded-xl transition-all duration-300 cursor-pointer ${
                         feature.active 
-                          ? 'bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-500' 
-                          : 'bg-slate-50 border-2 border-slate-200 hover:border-cyan-300'
+                          ? 'bg-purple-50 border-2 border-purple-500' 
+                          : 'bg-gray-50 border-2 border-gray-200 hover:border-purple-300'
                       }`}
                       onMouseEnter={() => setActiveFeature(index)}
                       data-testid={`interactive-feature-${index}`}
                     >
                       <div className="flex items-center gap-4">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          feature.active ? 'bg-black' : 'bg-white'
+                          feature.active ? 'bg-slate-900' : 'bg-white'
                         }`}>
                           <IconComponent className={`w-5 h-5 ${feature.active ? 'text-white' : 'text-slate-600'}`} />
                         </div>
@@ -548,7 +548,7 @@ await client.calls.create({
                           <p className="text-xs text-slate-600">{feature.desc}</p>
                         </div>
                         {feature.active && (
-                          <ChevronRight className="w-5 h-5 text-cyan-600 animate-pulse" />
+                          <ChevronRight className="w-5 h-5 text-purple-600 animate-pulse" />
                         )}
                       </div>
                     </div>
@@ -566,9 +566,9 @@ await client.calls.create({
                     { label: "Success Rate", value: "98.5%" },
                     { label: "Calls/Month", value: "10M+" }
                   ].map((stat, index) => (
-                    <div key={index} className="bg-white rounded-xl p-4 border border-slate-200">
+                    <div key={index} className="bg-white rounded-xl p-4 border border-gray-200">
                       <div className="text-xs text-slate-600 mb-1">{stat.label}</div>
-                      <div className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
                         {stat.value}
                       </div>
                     </div>
@@ -580,8 +580,8 @@ await client.calls.create({
                     <span>System Health</span>
                     <span>Excellent</span>
                   </div>
-                  <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 animate-pulse" style={{width: '95%'}}></div>
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 animate-pulse" style={{width: '95%'}}></div>
                   </div>
                 </div>
 
@@ -589,7 +589,7 @@ await client.calls.create({
                   {[...Array(12)].map((_, i) => (
                     <div 
                       key={i} 
-                      className="h-16 bg-gradient-to-t from-cyan-500 to-blue-600 rounded opacity-70"
+                      className="h-16 bg-gradient-to-t from-purple-500 to-purple-600 rounded opacity-70"
                       style={{
                         height: `${Math.random() * 40 + 30}px`,
                         animation: 'pulse 2s infinite',
@@ -633,7 +633,7 @@ await client.calls.create({
               const IconComponent = stat.icon;
               return (
                 <div key={index} className="text-center group" data-testid={`stat-${index}`}>
-                  <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <IconComponent className="w-8 h-8" />
                   </div>
                   <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
@@ -649,7 +649,7 @@ await client.calls.create({
       <section id="integrations" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
               Seamless Integrations
             </h2>
             <p className="text-lg text-slate-600">
@@ -665,16 +665,16 @@ await client.calls.create({
             ].map((integration, index) => (
               <div 
                 key={index} 
-                className="bg-white rounded-xl p-6 flex items-center justify-center h-24 border-2 border-slate-200 hover:border-cyan-500 hover:shadow-lg transition-all transform hover:-translate-y-1 group" 
+                className="bg-white rounded-xl p-6 flex items-center justify-center h-24 border-2 border-gray-200 hover:border-purple-500 hover:shadow-lg transition-all transform hover:-translate-y-1 group" 
                 data-testid={`integration-${index}`}
               >
-                <span className="font-semibold text-slate-700 group-hover:text-cyan-600 transition-colors">{integration}</span>
+                <span className="font-semibold text-slate-700 group-hover:text-purple-600 transition-colors">{integration}</span>
               </div>
             ))}
           </div>
 
           <div className="text-center">
-            <Button size="lg" variant="outline" className="border-2 border-slate-300 hover:border-cyan-600 hover:text-cyan-600">
+            <Button size="lg" variant="outline" className="border-2 border-slate-300 hover:border-purple-600 hover:text-purple-600">
               View All Integrations
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -683,10 +683,10 @@ await client.calls.create({
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-24 bg-slate-50">
+      <section id="testimonials" className="py-24 bg-[#F8F7F5]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
               Loved by Sales Teams Worldwide
             </h2>
             <p className="text-lg text-slate-600">
@@ -718,16 +718,16 @@ await client.calls.create({
                 rating: 5 
               }
             ].map((testimonial, index) => (
-              <Card key={index} className="bg-white border-slate-200 hover:shadow-2xl hover:border-cyan-300 transition-all transform hover:-translate-y-2" data-testid={`testimonial-${index}`}>
+              <Card key={index} className="bg-white border-gray-200 hover:shadow-2xl hover:border-purple-300 transition-all transform hover:-translate-y-2" data-testid={`testimonial-${index}`}>
                 <CardContent className="p-8">
                   <div className="flex mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-cyan-500 fill-current" />
+                      <Star key={i} className="w-5 h-5 text-purple-500 fill-current" />
                     ))}
                   </div>
                   <p className="text-slate-700 mb-6 leading-relaxed">"{testimonial.quote}"</p>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-white font-semibold">
                       {testimonial.author.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
@@ -747,7 +747,7 @@ await client.calls.create({
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
               Enterprise-Grade Security
             </h2>
             <p className="text-lg text-slate-600">
@@ -765,7 +765,7 @@ await client.calls.create({
               const IconComponent = item.icon;
               return (
                 <div key={index} className="text-center" data-testid={`security-${index}`}>
-                  <div className="w-16 h-16 bg-white rounded-2xl border-2 border-slate-200 flex items-center justify-center mx-auto mb-4 hover:border-cyan-500 transition-colors">
+                  <div className="w-16 h-16 bg-white rounded-2xl border-2 border-gray-200 flex items-center justify-center mx-auto mb-4 hover:border-purple-500 transition-colors">
                     <IconComponent className="w-8 h-8 text-slate-700" />
                   </div>
                   <h3 className="font-semibold mb-2">{item.title}</h3>
@@ -778,7 +778,7 @@ await client.calls.create({
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 bg-gradient-to-br from-cyan-600 to-blue-700 text-white relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-br from-purple-600 to-purple-700 text-white relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
@@ -788,11 +788,11 @@ await client.calls.create({
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Start Making Better Calls Today
           </h2>
-          <p className="text-xl text-cyan-100 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">
             Join thousands of teams using FallOwl to transform their communications
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-black hover:bg-slate-800 text-white px-10 h-14 text-lg shadow-xl transform hover:scale-105 transition-all" data-testid="button-cta-trial">
+            <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-10 h-14 text-lg shadow-xl transform hover:scale-105 transition-all" data-testid="button-cta-trial">
               Start Free Trial
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -800,7 +800,7 @@ await client.calls.create({
               Schedule a Demo
             </Button>
           </div>
-          <p className="text-sm text-cyan-100 mt-6">
+          <p className="text-sm text-purple-100 mt-6">
             No credit card required • 14-day free trial • Cancel anytime
           </p>
         </div>
@@ -812,7 +812,7 @@ await client.calls.create({
           <div className="grid md:grid-cols-5 gap-12 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
                   <PhoneCall className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-white">FallOwl</span>

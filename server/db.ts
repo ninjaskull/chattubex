@@ -13,12 +13,12 @@ function getDatabaseUrl(): string {
   }
   
   // If no database URL is found, try to construct one from individual postgres env vars
-  if (!databaseUrl && process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER) {
-    const pgHost = process.env.PGHOST;
-    const pgPort = process.env.PGPORT || '5432';
-    const pgDatabase = process.env.PGDATABASE;
-    const pgUser = process.env.PGUSER;
-    const pgPassword = process.env.PGPASSWORD || '';
+  if (!databaseUrl && process.env.PGHOST?.trim() && process.env.PGDATABASE?.trim() && process.env.PGUSER?.trim()) {
+    const pgHost = process.env.PGHOST.trim();
+    const pgPort = process.env.PGPORT?.trim() || '5432';
+    const pgDatabase = process.env.PGDATABASE.trim();
+    const pgUser = process.env.PGUSER.trim();
+    const pgPassword = process.env.PGPASSWORD?.trim() || '';
     
     databaseUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
