@@ -4,36 +4,51 @@ import * as schema from "@shared/schema";
 
 // Function to get database URL with proper fallback
 function getDatabaseUrl(): string {
-  // Use Neon database with branch if available, then fallback to regular Neon, then local DATABASE_URL
-  let databaseUrl = process.env.NEON_DATABASE_URL_WITH_BRANCH || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+  // Helper function to check if a string is valid and not empty/whitespace
+  const isValidUrl = (url: string | undefined): url is string => {
+    return !!url && url.trim() !== '';
+  };
   
-  // Filter out empty strings and strings that are just whitespace
-  if (!databaseUrl || databaseUrl.trim() === '') {
-    databaseUrl = undefined;
+  // Try environment variables in priority order
+  const neonWithBranch = process.env.NEON_DATABASE_URL_WITH_BRANCH;
+  const neonUrl = process.env.NEON_DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL;
+  
+  // Use the first valid URL found
+  if (isValidUrl(neonWithBranch)) {
+    console.log('Using NEON_DATABASE_URL_WITH_BRANCH');
+    return neonWithBranch;
+  }
+  
+  if (isValidUrl(neonUrl)) {
+    console.log('Using NEON_DATABASE_URL');
+    return neonUrl;
+  }
+  
+  if (isValidUrl(databaseUrl)) {
+    console.log('Using DATABASE_URL');
+    return databaseUrl;
   }
   
   // If no database URL is found, try to construct one from individual postgres env vars
-  if (!databaseUrl && process.env.PGHOST?.trim() && process.env.PGDATABASE?.trim() && process.env.PGUSER?.trim()) {
-    const pgHost = process.env.PGHOST.trim();
+  if (isValidUrl(process.env.PGHOST) && isValidUrl(process.env.PGDATABASE) && isValidUrl(process.env.PGUSER)) {
+    const pgHost = process.env.PGHOST!.trim();
     const pgPort = process.env.PGPORT?.trim() || '5432';
-    const pgDatabase = process.env.PGDATABASE.trim();
-    const pgUser = process.env.PGUSER.trim();
+    const pgDatabase = process.env.PGDATABASE!.trim();
+    const pgUser = process.env.PGUSER!.trim();
     const pgPassword = process.env.PGPASSWORD?.trim() || '';
     
-    databaseUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
+    const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
+    return constructedUrl;
   }
 
-  if (!databaseUrl) {
-    console.error("Database URL not found. Please ensure DATABASE_URL environment variable is set.");
-    console.error("Available env vars:", Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('NEON') || key.includes('PG')));
-    throw new Error(
-      "Database URL must be set. Did you forget to provision a database?",
-    );
-  }
-
-  console.log('Successfully found database URL');
-  return databaseUrl;
+  // If we still don't have a URL, throw an error
+  console.error("Database URL not found. Please ensure DATABASE_URL environment variable is set.");
+  console.error("Available env vars:", Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('NEON') || key.includes('PG')));
+  throw new Error(
+    "Database URL must be set. Did you forget to provision a database?",
+  );
 }
 
 // Function to get read-only database URL for Duggu chatbot
