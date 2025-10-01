@@ -191,13 +191,12 @@ POST https://api.fallowl.com/webhooks
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center">
               <img 
                 src={fallOwlLogo} 
-                alt="FallOwl Logo" 
-                className="w-10 h-10 object-contain"
+                alt="FallOwl" 
+                className="h-12 w-auto object-contain"
               />
-              <span className="text-xl font-bold text-slate-800">FallOwl</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
@@ -1088,13 +1087,12 @@ POST https://api.fallowl.com/webhooks
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid md:grid-cols-5 gap-12 mb-12">
             <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
+              <div className="mb-4">
                 <img 
                   src={fallOwlLogo} 
-                  alt="FallOwl Logo" 
-                  className="w-10 h-10 object-contain invert"
+                  alt="FallOwl" 
+                  className="h-12 w-auto object-contain invert"
                 />
-                <span className="text-xl font-bold text-white">FallOwl</span>
               </div>
               <p className="text-sm mb-6 text-slate-400">
                 The modern CRM with Twilio-powered calling, automatic recording, and enterprise-grade features.
