@@ -507,8 +507,8 @@ await client.calls.create({
       {/* Interactive Feature Showcase */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-5 gap-8 items-start">
-            <div className="lg:col-span-2">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div>
               <h2 className="text-4xl font-bold mb-6 text-slate-900">
                 Intelligent Call Management
               </h2>
@@ -557,8 +557,8 @@ await client.calls.create({
               </div>
             </div>
 
-            <div className="relative lg:col-span-3">
-              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 border border-slate-200 shadow-xl min-h-[320px] flex items-center justify-center">
+            <div className="relative">
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-xl min-h-[400px] flex items-center justify-center">
                 {/* Auto-reconnect */}
                 {activeFeature === 0 && (
                   <div key="feature-0" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
