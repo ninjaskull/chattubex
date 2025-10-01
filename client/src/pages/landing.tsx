@@ -64,6 +64,7 @@ export default function Landing() {
   const [password, setPassword] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [typedCode, setTypedCode] = useState("");
 
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -89,6 +90,34 @@ export default function Landing() {
       setActiveFeature((prev) => (prev + 1) % 6);
     }, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  const codeText = `const client = new FallOwl({
+  apiKey: process.env.FALLOWL_API_KEY
+});
+
+// Make an outbound call
+await client.calls.create({
+  to: '+1234567890',
+  from: '+0987654321',
+  record: true,
+  voicemail: {
+    enabled: true,
+    greeting: 'custom-greeting.mp3'
+  }
+});`;
+
+  useEffect(() => {
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex <= codeText.length) {
+        setTypedCode(codeText.slice(0, currentIndex));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 30);
+    return () => clearInterval(typingInterval);
   }, []);
 
   const handleYearClick = () => {
@@ -446,9 +475,9 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+          <div className="grid lg:grid-cols-2 gap-8 items-start mb-20">
             <div>
-              <div className="space-y-8">
+              <div className="space-y-3">
                 {[
                   { icon: Code, title: "RESTful API", desc: "Simple, well-documented API for all features" },
                   { icon: Smartphone, title: "Mobile SDKs", desc: "Native iOS and Android development kits" },
@@ -457,9 +486,9 @@ export default function Landing() {
                 ].map((item, index) => {
                   const IconComponent = item.icon;
                   return (
-                    <div key={index} className="flex items-start gap-4 group" data-testid={`capability-${index}`}>
-                      <div className="w-12 h-12 bg-white rounded-xl border-2 border-gray-200 flex items-center justify-center flex-shrink-0 group-hover:border-purple-500 transition-colors">
-                        <IconComponent className="w-6 h-6 text-slate-700 group-hover:text-purple-600 transition-colors" />
+                    <div key={index} className="flex items-start gap-4 group p-3 rounded-xl bg-white border-2 border-gray-200 hover:border-purple-300 transition-all" data-testid={`capability-${index}`}>
+                      <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <IconComponent className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">{item.title}</h3>
@@ -471,8 +500,8 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-700">
+            <div className="relative h-full">
+              <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-700 h-full flex flex-col">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -481,21 +510,8 @@ export default function Landing() {
                   </div>
                   <span className="text-slate-400 text-sm ml-4">api.fallowl.com</span>
                 </div>
-                <pre className="text-sm text-purple-400 font-mono overflow-x-auto">
-{`const client = new FallOwl({
-  apiKey: process.env.FALLOWL_API_KEY
-});
-
-// Make an outbound call
-await client.calls.create({
-  to: '+1234567890',
-  from: '+0987654321',
-  record: true,
-  voicemail: {
-    enabled: true,
-    greeting: 'custom-greeting.mp3'
-  }
-});`}
+                <pre className="text-sm text-purple-400 font-mono overflow-x-auto flex-1">
+{typedCode}<span className="animate-pulse">|</span>
                 </pre>
               </div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full blur-3xl opacity-50"></div>
