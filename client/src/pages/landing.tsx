@@ -67,6 +67,7 @@ export default function Landing() {
   const [activeFeature, setActiveFeature] = useState(0);
   const [typedCode, setTypedCode] = useState("");
   const [hoveredCapability, setHoveredCapability] = useState(0);
+  const [showHeader, setShowHeader] = useState(false);
 
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -92,6 +93,19 @@ export default function Landing() {
       setActiveFeature((prev) => (prev + 1) % 6);
     }, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowHeader(true);
+      } else {
+        setShowHeader(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const codeSnippets = [
@@ -188,8 +202,8 @@ POST https://api.fallowl.com/webhooks
     <div className="min-h-screen bg-[#F8F7F5] text-slate-900 overflow-x-hidden">
       
       {/* Navigation */}
-      <nav className="relative top-4 left-0 right-0 z-50 px-4 md:px-6 lg:px-8 mb-8">
-        <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg shadow-slate-900/5">
+      <nav className={`${showHeader ? 'fixed top-0 animate-in slide-in-from-top duration-300' : 'relative top-4'} left-0 right-0 z-50 px-4 md:px-6 lg:px-8 ${!showHeader && 'mb-8'} transition-all`}>
+        <div className={`max-w-7xl mx-auto bg-white/80 backdrop-blur-xl ${showHeader ? 'rounded-b-2xl mt-0' : 'rounded-2xl mt-0'} border border-gray-200/50 shadow-lg shadow-slate-900/5`}>
           <div className="px-4 md:px-6">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
