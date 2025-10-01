@@ -65,6 +65,7 @@ export default function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [typedCode, setTypedCode] = useState("");
+  const [hoveredCapability, setHoveredCapability] = useState(0);
 
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -92,7 +93,8 @@ export default function Landing() {
     return () => clearInterval(interval);
   }, []);
 
-  const codeText = `const client = new FallOwl({
+  const codeSnippets = [
+    `const client = new Fallowl({
   apiKey: process.env.FALLOWL_API_KEY
 });
 
@@ -105,20 +107,64 @@ await client.calls.create({
     enabled: true,
     greeting: 'custom-greeting.mp3'
   }
-});`;
+});`,
+    `// iOS SDK Example
+import FallowlSDK
+
+let fallowl = Fallowl(apiKey: apiKey)
+
+// Make a call
+fallowl.makeCall(
+  to: "+1234567890",
+  from: "+0987654321"
+) { result in
+  print("Call initiated")
+}`,
+    `// Web SDK for browser calling
+const fallowl = new FallowlWeb({
+  apiKey: 'your-api-key'
+});
+
+// Initialize browser calling
+await fallowl.initializeDevice();
+
+// Make a call from browser
+await fallowl.call({
+  to: '+1234567890',
+  enableVideo: false
+});`,
+    `// Webhook configuration
+POST https://api.fallowl.com/webhooks
+
+{
+  "url": "https://yourapp.com/webhook",
+  "events": [
+    "call.started",
+    "call.completed",
+    "call.failed"
+  ]
+}`
+  ];
 
   useEffect(() => {
+    const codeText = codeSnippets[hoveredCapability];
     let currentIndex = 0;
+    setTypedCode('');
+    
     const typingInterval = setInterval(() => {
       if (currentIndex <= codeText.length) {
         setTypedCode(codeText.slice(0, currentIndex));
         currentIndex++;
       } else {
-        clearInterval(typingInterval);
+        setTimeout(() => {
+          currentIndex = 0;
+          setTypedCode('');
+        }, 2000);
       }
     }, 30);
+    
     return () => clearInterval(typingInterval);
-  }, []);
+  }, [hoveredCapability]);
 
   const handleYearClick = () => {
     const newCount = clickCount + 1;
@@ -475,9 +521,9 @@ await client.calls.create({
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start mb-20">
-            <div>
-              <div className="space-y-3">
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-20">
+            <div className="flex flex-col">
+              <div className="space-y-3 flex-1">
                 {[
                   { icon: Code, title: "RESTful API", desc: "Simple, well-documented API for all features" },
                   { icon: Smartphone, title: "Mobile SDKs", desc: "Native iOS and Android development kits" },
@@ -486,22 +532,36 @@ await client.calls.create({
                 ].map((item, index) => {
                   const IconComponent = item.icon;
                   return (
-                    <div key={index} className="flex items-start gap-4 group p-3 rounded-xl bg-white border-2 border-gray-200 hover:border-purple-300 transition-all" data-testid={`capability-${index}`}>
-                      <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <div 
+                      key={index} 
+                      className={`flex items-start gap-4 group p-4 rounded-xl transition-all cursor-pointer ${
+                        hoveredCapability === index 
+                          ? 'bg-purple-50 border-2 border-purple-500 scale-[1.02]' 
+                          : 'bg-white border-2 border-gray-200 hover:border-purple-300'
+                      }`}
+                      onMouseEnter={() => setHoveredCapability(index)}
+                      data-testid={`capability-${index}`}
+                    >
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
+                        hoveredCapability === index ? 'bg-slate-900 scale-110' : 'bg-slate-900'
+                      }`}>
                         <IconComponent className="w-6 h-6 text-white" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-semibold mb-1">{item.title}</h3>
                         <p className="text-sm text-slate-600">{item.desc}</p>
                       </div>
+                      {hoveredCapability === index && (
+                        <ChevronRight className="w-4 h-4 text-purple-600 flex-shrink-0 mt-1" />
+                      )}
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            <div className="relative h-full">
-              <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-700 h-full flex flex-col">
+            <div className="relative flex flex-col">
+              <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-700 flex-1 flex flex-col min-h-[400px]">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>

@@ -4,39 +4,35 @@ import * as schema from "@shared/schema";
 
 // Function to get database URL with proper fallback
 function getDatabaseUrl(): string {
-  // Helper function to check if a string is valid and not empty/whitespace
-  const isValidUrl = (url: string | undefined): url is string => {
-    return !!url && url.trim() !== '';
-  };
-  
   // Try environment variables in priority order
   const neonWithBranch = process.env.NEON_DATABASE_URL_WITH_BRANCH;
   const neonUrl = process.env.NEON_DATABASE_URL;
   const databaseUrl = process.env.DATABASE_URL;
   
   // Use the first valid URL found
-  if (isValidUrl(neonWithBranch)) {
+  if (neonWithBranch && neonWithBranch.trim()) {
     console.log('Using NEON_DATABASE_URL_WITH_BRANCH');
-    return neonWithBranch;
+    return neonWithBranch.trim();
   }
   
-  if (isValidUrl(neonUrl)) {
+  if (neonUrl && neonUrl.trim()) {
     console.log('Using NEON_DATABASE_URL');
-    return neonUrl;
+    return neonUrl.trim();
   }
   
-  if (isValidUrl(databaseUrl)) {
+  if (databaseUrl && databaseUrl.trim()) {
     console.log('Using DATABASE_URL');
-    return databaseUrl;
+    return databaseUrl.trim();
   }
   
   // If no database URL is found, try to construct one from individual postgres env vars
-  if (isValidUrl(process.env.PGHOST) && isValidUrl(process.env.PGDATABASE) && isValidUrl(process.env.PGUSER)) {
-    const pgHost = process.env.PGHOST!.trim();
-    const pgPort = process.env.PGPORT?.trim() || '5432';
-    const pgDatabase = process.env.PGDATABASE!.trim();
-    const pgUser = process.env.PGUSER!.trim();
-    const pgPassword = process.env.PGPASSWORD?.trim() || '';
+  const pgHost = process.env.PGHOST;
+  const pgDatabase = process.env.PGDATABASE;
+  const pgUser = process.env.PGUSER;
+  
+  if (pgHost && pgDatabase && pgUser) {
+    const pgPort = process.env.PGPORT || '5432';
+    const pgPassword = process.env.PGPASSWORD || '';
     
     const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
