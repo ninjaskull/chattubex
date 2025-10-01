@@ -559,45 +559,231 @@ await client.calls.create({
 
             <div className="relative">
               <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-xl">
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { label: "Uptime", value: "99.99%" },
-                    { label: "Avg Latency", value: "45ms" },
-                    { label: "Success Rate", value: "98.5%" },
-                    { label: "Calls/Month", value: "10M+" }
-                  ].map((stat, index) => (
-                    <div key={index} className="bg-white rounded-xl p-4 border border-gray-200">
-                      <div className="text-xs text-slate-600 mb-1">{stat.label}</div>
-                      <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
-                        {stat.value}
+                {/* Auto-reconnect */}
+                {activeFeature === 0 && (
+                  <div key="feature-0" className="animate-in fade-in slide-in-from-right duration-500">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Reconnect Speed</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          &lt;2s
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Success Rate</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          99.8%
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Auto-Recovery</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          Active
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Network Fallback</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          5G/4G
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-                
-                <div className="mt-6">
-                  <div className="flex justify-between text-xs text-slate-600 mb-2">
-                    <span>System Health</span>
-                    <span>Excellent</span>
+                    <div className="mt-6 flex items-center justify-center h-32">
+                      <Wifi className="w-24 h-24 text-teal-500 animate-pulse" />
+                    </div>
                   </div>
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 animate-pulse" style={{width: '95%'}}></div>
-                  </div>
-                </div>
+                )}
 
-                <div className="mt-6 grid grid-cols-3 gap-2">
-                  {[...Array(12)].map((_, i) => (
-                    <div 
-                      key={i} 
-                      className="h-16 bg-gradient-to-t from-purple-500 to-purple-600 rounded opacity-70"
-                      style={{
-                        height: `${Math.random() * 40 + 30}px`,
-                        animation: 'pulse 2s infinite',
-                        animationDelay: `${i * 0.1}s`
-                      }}
-                    ></div>
-                  ))}
-                </div>
+                {/* Call Quality Monitoring */}
+                {activeFeature === 1 && (
+                  <div key="feature-1" className="animate-in fade-in slide-in-from-right duration-500">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Audio Quality</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          HD+
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Jitter</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          &lt;30ms
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Packet Loss</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          0.1%
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">MOS Score</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          4.5/5
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs text-slate-600">Quality Level</span>
+                        <span className="text-xs font-semibold text-purple-600">Excellent</span>
+                      </div>
+                      <div className="grid grid-cols-8 gap-2">
+                        {[...Array(8)].map((_, i) => (
+                          <div key={i} className="h-12 bg-gradient-to-t from-purple-500 to-purple-600 rounded" style={{height: `${40 + i * 5}px`}}></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* End-to-End Encryption */}
+                {activeFeature === 2 && (
+                  <div key="feature-2" className="animate-in fade-in slide-in-from-right duration-500">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Encryption</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          AES-256
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Protocol</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          TLS 1.3
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Key Exchange</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          ECDHE
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Compliance</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          SOC 2
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 flex items-center justify-center h-32">
+                      <Lock className="w-24 h-24 text-orange-500 animate-pulse" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Global Infrastructure */}
+                {activeFeature === 3 && (
+                  <div key="feature-3" className="animate-in fade-in slide-in-from-right duration-500">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Edge Locations</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          200+
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Avg Latency</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          45ms
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Coverage</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          Global
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Redundancy</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                          99.99%
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 flex items-center justify-center h-32">
+                      <CloudLightning className="w-24 h-24 text-teal-500 animate-pulse" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Smart Notifications */}
+                {activeFeature === 4 && (
+                  <div key="feature-4" className="animate-in fade-in slide-in-from-right duration-500">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Channels</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          5+
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Response Time</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          Instant
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">AI Priority</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          Smart
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Delivery</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                          100%
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 flex items-center justify-center h-32">
+                      <AlertCircle className="w-24 h-24 text-purple-500 animate-pulse" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Advanced Analytics */}
+                {activeFeature === 5 && (
+                  <div key="feature-5" className="animate-in fade-in slide-in-from-right duration-500">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Data Points</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          50+
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Real-time</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          Live
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Reports</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          Custom
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 border border-gray-200">
+                        <div className="text-xs text-slate-600 mb-1">Insights</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                          AI
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6">
+                      <div className="grid grid-cols-12 gap-1 items-end h-32">
+                        {[65, 45, 78, 90, 55, 67, 82, 48, 92, 71, 58, 85].map((height, i) => (
+                          <div 
+                            key={i} 
+                            className="bg-gradient-to-t from-orange-400 to-pink-500 rounded-sm transition-all duration-300"
+                            style={{height: `${height}%`}}
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
