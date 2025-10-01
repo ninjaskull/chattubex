@@ -507,15 +507,17 @@ await client.calls.create({
       {/* Interactive Feature Showcase */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-4xl font-bold mb-4 text-slate-900">
+              Intelligent Call Management
+            </h2>
+            <p className="text-lg text-slate-600">
+              Advanced features that help you manage calls more efficiently
+            </p>
+          </div>
+          
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
             <div>
-              <h2 className="text-4xl font-bold mb-6 text-slate-900">
-                Intelligent Call Management
-              </h2>
-              <p className="text-lg text-slate-600 mb-8">
-                Advanced features that help you manage calls more efficiently
-              </p>
-              
               <div className="space-y-3">
                 {[
                   { icon: Wifi, title: "Auto-reconnect", desc: "Never lose a call due to network issues", active: activeFeature === 0 },
@@ -557,8 +559,8 @@ await client.calls.create({
               </div>
             </div>
 
-            <div className="relative">
-              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-xl min-h-[400px] flex items-center justify-center">
+            <div className="relative h-full">
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-xl h-full flex items-center justify-center">
                 {/* Auto-reconnect */}
                 {activeFeature === 0 && (
                   <div key="feature-0" className="w-full animate-in fade-in duration-700 ease-out">
