@@ -507,7 +507,7 @@ await client.calls.create({
       {/* Interactive Feature Showcase */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold mb-6 text-slate-900">
                 Intelligent Call Management
@@ -561,7 +561,7 @@ await client.calls.create({
               <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-xl min-h-[400px] flex items-center justify-center">
                 {/* Auto-reconnect */}
                 {activeFeature === 0 && (
-                  <div key="feature-0" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
+                  <div key="feature-0" className="w-full animate-in fade-in duration-700 ease-out">
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 hover:shadow-md">
                         <div className="text-xs text-slate-500 mb-1">Reconnect Speed</div>
@@ -596,7 +596,7 @@ await client.calls.create({
 
                 {/* Call Quality Monitoring */}
                 {activeFeature === 1 && (
-                  <div key="feature-1" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
+                  <div key="feature-1" className="w-full animate-in fade-in duration-700 ease-out">
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 hover:shadow-md">
                         <div className="text-xs text-slate-500 mb-1">Audio Quality</div>
@@ -646,7 +646,7 @@ await client.calls.create({
 
                 {/* End-to-End Encryption */}
                 {activeFeature === 2 && (
-                  <div key="feature-2" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
+                  <div key="feature-2" className="w-full animate-in fade-in duration-700 ease-out">
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 hover:shadow-md">
                         <div className="text-xs text-slate-500 mb-1">Encryption</div>
@@ -681,7 +681,7 @@ await client.calls.create({
 
                 {/* Global Infrastructure */}
                 {activeFeature === 3 && (
-                  <div key="feature-3" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
+                  <div key="feature-3" className="w-full animate-in fade-in duration-700 ease-out">
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 hover:shadow-md">
                         <div className="text-xs text-slate-500 mb-1">Edge Locations</div>
@@ -716,7 +716,7 @@ await client.calls.create({
 
                 {/* Smart Notifications */}
                 {activeFeature === 4 && (
-                  <div key="feature-4" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
+                  <div key="feature-4" className="w-full animate-in fade-in duration-700 ease-out">
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 hover:shadow-md">
                         <div className="text-xs text-slate-500 mb-1">Channels</div>
@@ -751,7 +751,7 @@ await client.calls.create({
 
                 {/* Advanced Analytics */}
                 {activeFeature === 5 && (
-                  <div key="feature-5" className="w-full animate-in fade-in slide-in-from-right duration-700 ease-out">
+                  <div key="feature-5" className="w-full animate-in fade-in duration-700 ease-out">
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 hover:shadow-md">
                         <div className="text-xs text-slate-500 mb-1">Data Points</div>
