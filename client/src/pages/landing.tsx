@@ -188,51 +188,53 @@ POST https://api.fallowl.com/webhooks
     <div className="min-h-screen bg-[#F8F7F5] text-slate-900 overflow-x-hidden">
       
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <img 
-                src={fallOwlLogo} 
-                alt="FallOwl" 
-                className="h-12 w-auto object-contain"
-              />
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</a>
-              <a href="#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
-              <a href="#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
-              <a href="#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
-              <Button variant="ghost" size="sm" className="text-sm hover:text-purple-600" data-testid="button-signin">Sign in</Button>
-              <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white text-sm" data-testid="button-get-started">Get Started</Button>
+      <nav className="fixed top-4 left-0 right-0 z-50 px-4 md:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg shadow-slate-900/5">
+          <div className="px-4 md:px-6">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <img 
+                  src={fallOwlLogo} 
+                  alt="FallOwl" 
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
+              
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</a>
+                <a href="#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
+                <a href="#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
+                <a href="#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
+                <Button variant="ghost" size="sm" className="text-sm hover:text-purple-600" data-testid="button-signin">Sign in</Button>
+                <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white text-sm rounded-xl" data-testid="button-get-started">Get Started</Button>
+              </div>
+
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden"
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
             </div>
 
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden"
-              data-testid="button-mobile-menu"
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
-              <div className="flex flex-col space-y-3">
-                <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-features">Features</a>
-                <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-capabilities">Capabilities</a>
-                <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-integrations">Integrations</a>
-                <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600" data-testid="link-mobile-testimonials">Testimonials</a>
-                <div className="px-4 pt-2 flex flex-col space-y-2">
-                  <Button variant="ghost" size="sm" className="w-full justify-start hover:text-purple-600" data-testid="button-mobile-signin">Sign in</Button>
-                  <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white w-full" data-testid="button-mobile-get-started">Get Started</Button>
+            {isMenuOpen && (
+              <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
+                <div className="flex flex-col space-y-3">
+                  <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">Features</a>
+                  <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">Capabilities</a>
+                  <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">Integrations</a>
+                  <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">Testimonials</a>
+                  <div className="px-4 pt-2 flex flex-col space-y-2">
+                    <Button variant="ghost" size="sm" className="w-full justify-start hover:text-purple-600 rounded-xl" data-testid="button-mobile-signin">Sign in</Button>
+                    <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white w-full rounded-xl" data-testid="button-mobile-get-started">Get Started</Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </nav>
 
