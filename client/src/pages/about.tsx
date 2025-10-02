@@ -23,13 +23,14 @@ import {
   Mail,
   Menu
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
 
 export default function AboutUs() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
   const [showHeader, setShowHeader] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -392,18 +393,15 @@ export default function AboutUs() {
                   </div>
                 </div>
                 
-                <Link href="/demo">
-                  <a>
-                    <Button 
-                      size="lg" 
-                      className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl group mt-4"
-                      data-testid="button-get-started"
-                    >
-                      Get Started Free
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </a>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl group mt-4"
+                  data-testid="button-get-started"
+                  onClick={() => setLocation("/demo")}
+                >
+                  Get Started Free
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </div>
             </CardContent>
           </Card>

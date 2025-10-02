@@ -293,6 +293,7 @@ export default function DemoBooking() {
                                 {...register("fullName")}
                                 placeholder="John Smith"
                                 className="h-9 text-sm"
+                                autoComplete="off"
                                 data-testid="input-fullname"
                               />
                               {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName.message}</p>}
@@ -308,6 +309,7 @@ export default function DemoBooking() {
                                 {...register("email")}
                                 placeholder="john@company.com"
                                 className="h-9 text-sm"
+                                autoComplete="off"
                                 data-testid="input-email"
                               />
                               {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
@@ -322,6 +324,7 @@ export default function DemoBooking() {
                                 {...register("company")}
                                 placeholder="Acme Inc."
                                 className="h-9 text-sm"
+                                autoComplete="off"
                                 data-testid="input-company"
                               />
                               {errors.company && <p className="text-red-500 text-xs">{errors.company.message}</p>}
@@ -336,6 +339,7 @@ export default function DemoBooking() {
                                 {...register("phone")}
                                 placeholder="+1 (555) 123-4567"
                                 className="h-9 text-sm"
+                                autoComplete="off"
                                 data-testid="input-phone"
                               />
                               {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
