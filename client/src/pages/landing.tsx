@@ -1100,7 +1100,7 @@ POST https://api.fallowl.com/webhooks
               Start Free Trial
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 px-10 h-14 text-lg" data-testid="button-cta-demo">
+            <Button size="lg" variant="outline" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-purple-700 px-10 h-14 text-lg transition-all" data-testid="button-cta-demo">
               Schedule a Demo
             </Button>
           </div>
