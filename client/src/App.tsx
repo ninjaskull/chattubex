@@ -10,6 +10,10 @@ import CampaignView from "@/pages/campaign-view";
 import BackupImport from "@/pages/BackupImport";
 import DemoBooking from "@/pages/demo-booking";
 import AboutUs from "@/pages/about";
+import Privacy from "@/pages/privacy";
+import Terms from "@/pages/terms";
+import Security from "@/pages/security";
+import Compliance from "@/pages/compliance";
 import NotFound from "@/pages/not-found";
 
 // Protected Route component
@@ -30,6 +34,10 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/about" component={AboutUs} />
       <Route path="/demo" component={DemoBooking} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/security" component={Security} />
+      <Route path="/compliance" component={Compliance} />
       <Route path="/dashboard">
         <ProtectedRoute component={Dashboard} />
       </Route>
