@@ -107,7 +107,7 @@ export default function DemoBooking() {
             initial={{ scale: 0 }}
             animate={{ scale: 1, rotate: 360 }}
             transition={{ delay: 0.2, type: "spring" }}
-            className="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl"
+            className="w-20 h-20 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl"
           >
             <Check className="w-10 h-10 text-white" />
           </motion.div>
@@ -182,7 +182,7 @@ export default function DemoBooking() {
                       onClick={() => setCurrentTab("datetime")}
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                         currentTab === "datetime"
-                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md"
+                          ? "bg-slate-900 text-white shadow-md"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
@@ -194,7 +194,7 @@ export default function DemoBooking() {
                       onClick={() => canProceed ? setCurrentTab("info") : toast({ title: "Select date & time first", variant: "destructive" })}
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                         currentTab === "info"
-                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md"
+                          ? "bg-slate-900 text-white shadow-md"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
@@ -218,7 +218,7 @@ export default function DemoBooking() {
                           {/* Calendar */}
                           <div className="flex flex-col">
                             <Label className="text-xs font-semibold mb-2 flex items-center gap-1">
-                              <CalendarIcon className="w-3.5 h-3.5 text-purple-600" />
+                              <CalendarIcon className="w-3.5 h-3.5 text-slate-900" />
                               Select Date
                             </Label>
                             <div className="bg-gradient-to-br from-purple-50 to-slate-50 rounded-xl p-2 border border-purple-100 flex items-center justify-center">
@@ -236,7 +236,7 @@ export default function DemoBooking() {
                           {/* Time Slots */}
                           <div className="flex flex-col">
                             <Label className="text-xs font-semibold mb-2 flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-purple-600" />
+                              <Clock className="w-3.5 h-3.5 text-slate-900" />
                               Select Time (EST)
                             </Label>
                             <div className="bg-gradient-to-br from-slate-50 to-purple-50 rounded-xl p-3 border border-purple-100 flex-1">
@@ -250,8 +250,8 @@ export default function DemoBooking() {
                                     whileTap={{ scale: 0.95 }}
                                     className={`py-2 text-sm font-medium rounded-lg transition-all ${
                                       selectedTime === time
-                                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg"
-                                        : "bg-white hover:bg-purple-50 text-slate-700 border border-gray-200"
+                                        ? "bg-slate-900 text-white shadow-lg"
+                                        : "bg-white hover:bg-slate-50 text-slate-700 border border-gray-200"
                                     }`}
                                     data-testid={`time-${time}`}
                                   >
@@ -275,8 +275,8 @@ export default function DemoBooking() {
                         >
                           {/* Selected DateTime Display */}
                           {selectedDate && selectedTime && (
-                            <div className="bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-lg p-2 mb-3">
-                              <div className="flex items-center gap-2 text-purple-900 text-sm font-medium">
+                            <div className="bg-slate-100 border border-slate-200 rounded-lg p-2 mb-3">
+                              <div className="flex items-center gap-2 text-slate-900 text-sm font-medium">
                                 <Check className="w-4 h-4" />
                                 {format(selectedDate, "EEE, MMM d")} at {selectedTime}
                               </div>
@@ -399,7 +399,7 @@ export default function DemoBooking() {
                       <Button
                         type="button"
                         onClick={() => canProceed ? setCurrentTab("info") : toast({ title: "Select date & time", variant: "destructive" })}
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
                       >
                         Continue
                         <ArrowRight className="w-4 h-4 ml-1" />
@@ -407,7 +407,7 @@ export default function DemoBooking() {
                     ) : (
                       <Button
                         type="submit"
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
                         data-testid="button-submit"
                       >
                         <Check className="w-4 h-4 mr-1" />
