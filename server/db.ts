@@ -2,6 +2,17 @@ import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
+// Function to clean and prepare database URL
+function cleanDatabaseUrl(url: string): string {
+  // Remove channel_binding parameter which is not supported by node-postgres
+  if (url.includes('channel_binding=')) {
+    url = url.replace(/[?&]channel_binding=[^&]*/g, '');
+    // Clean up any remaining ? or & at the end
+    url = url.replace(/[?&]$/, '');
+  }
+  return url.trim();
+}
+
 // Function to get database URL with proper fallback
 function getDatabaseUrl(): string {
   // Try environment variables in priority order
@@ -12,17 +23,17 @@ function getDatabaseUrl(): string {
   // Use the first valid URL found
   if (neonWithBranch && neonWithBranch.trim()) {
     console.log('Using NEON_DATABASE_URL_WITH_BRANCH');
-    return neonWithBranch.trim();
+    return cleanDatabaseUrl(neonWithBranch);
   }
   
   if (neonUrl && neonUrl.trim()) {
     console.log('Using NEON_DATABASE_URL');
-    return neonUrl.trim();
+    return cleanDatabaseUrl(neonUrl);
   }
   
   if (databaseUrl && databaseUrl.trim()) {
     console.log('Using DATABASE_URL');
-    return databaseUrl.trim();
+    return cleanDatabaseUrl(databaseUrl);
   }
   
   // If no database URL is found, try to construct one from individual postgres env vars
@@ -34,7 +45,7 @@ function getDatabaseUrl(): string {
     const pgPort = process.env.PGPORT || '5432';
     const pgPassword = process.env.PGPASSWORD || '';
     
-    const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
+    const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}?sslmode=require`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
     return constructedUrl;
   }
@@ -62,7 +73,7 @@ function getReadOnlyDatabaseUrl(): string {
     
     if (dugguConnectionUrl.startsWith('postgresql://') || dugguConnectionUrl.startsWith('postgres://')) {
       console.log('Using external Neon database for Duggu chatbot contacts access');
-      return dugguConnectionUrl;
+      return cleanDatabaseUrl(dugguConnectionUrl);
     }
   }
   
@@ -72,7 +83,7 @@ function getReadOnlyDatabaseUrl(): string {
   if (dugguApiKey) {
     if (dugguApiKey.startsWith('postgresql://') || dugguApiKey.startsWith('postgres://')) {
       console.log('Using external Neon database for Duggu chatbot contacts access (from legacy variable)');
-      return dugguApiKey;
+      return cleanDatabaseUrl(dugguApiKey);
     }
     
     console.log('DUGGU_NEON_DATABASE_URL appears to be an API key. Please provide the full database connection URL instead.');
