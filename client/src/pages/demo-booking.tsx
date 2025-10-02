@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,13 +24,9 @@ import {
   Phone,
   MessageSquare,
   Check,
-  Sparkles,
   Users,
-  Video,
   ChevronLeft,
-  Zap,
-  TrendingUp,
-  Award
+  ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -39,20 +35,18 @@ import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
 import { format } from "date-fns";
 
 const bookingSchema = z.object({
-  fullName: z.string().min(2, "Name required"),
-  email: z.string().email("Invalid email"),
-  company: z.string().min(2, "Company required"),
-  phone: z.string().min(10, "Phone required"),
-  teamSize: z.string().min(1, "Team size required"),
+  fullName: z.string().min(2, "Required"),
+  email: z.string().email("Invalid"),
+  company: z.string().min(2, "Required"),
+  phone: z.string().min(10, "Required"),
+  teamSize: z.string().min(1, "Required"),
   message: z.string().optional(),
 });
 
 type BookingFormData = z.infer<typeof bookingSchema>;
 
 const timeSlots = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-  "15:00", "15:30", "16:00", "16:30", "17:00"
+  "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"
 ];
 
 const teamSizes = ["1-10", "11-50", "51-200", "201-500", "500+"];
@@ -60,18 +54,17 @@ const teamSizes = ["1-10", "11-50", "51-200", "201-500", "500+"];
 export default function DemoBooking() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [currentTab, setCurrentTab] = useState<"datetime" | "info">("datetime");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [focusedField, setFocusedField] = useState<string>("");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     setValue,
-    watch,
-    trigger
+    watch
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     mode: "onChange",
@@ -86,17 +79,11 @@ export default function DemoBooking() {
   });
 
   const formValues = watch();
-  const completedFields = Object.entries(formValues).filter(([key, value]) => 
-    key !== "message" && value && value.length > 0
-  ).length;
-  const totalFields = 5;
-  const progress = (completedFields / totalFields) * 100;
 
   const onSubmit = (data: BookingFormData) => {
     if (!selectedDate || !selectedTime) {
       toast({
-        title: "Missing Information",
-        description: "Please select date and time",
+        title: "Missing date/time",
         variant: "destructive"
       });
       return;
@@ -106,9 +93,11 @@ export default function DemoBooking() {
     setIsSubmitted(true);
   };
 
+  const canProceed = selectedDate && selectedTime;
+
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -117,23 +106,22 @@ export default function DemoBooking() {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1, rotate: 360 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl"
+            transition={{ delay: 0.2, type: "spring" }}
+            className="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl"
           >
             <Check className="w-10 h-10 text-white" />
           </motion.div>
-          <h1 className="text-3xl font-bold text-white mb-3">Demo Confirmed!</h1>
+          <h1 className="text-3xl font-bold text-white mb-3">Confirmed!</h1>
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 mb-6">
             <div className="flex items-center justify-center gap-2 text-purple-200 mb-2">
               <CalendarIcon className="w-4 h-4" />
               <span className="font-medium">
-                {selectedDate && format(selectedDate, "EEE, MMM d")} • {selectedTime}
+                {selectedDate && format(selectedDate, "MMM d")} • {selectedTime}
               </span>
             </div>
-            <p className="text-sm text-purple-300">Calendar invite sent to your email</p>
+            <p className="text-sm text-purple-300">Check your email</p>
           </div>
           <Button
-            size="lg"
             className="bg-white text-purple-900 hover:bg-purple-50"
             onClick={() => setLocation("/")}
             data-testid="button-back-home"
@@ -146,319 +134,292 @@ export default function DemoBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-slate-50">
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-slate-50 flex flex-col overflow-hidden">
       {/* Compact Header */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <div className="flex-none bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/")}
-              className="text-slate-700 hover:text-purple-600 h-8"
+              className="text-slate-700 hover:text-purple-600 h-7 px-2"
               data-testid="button-back"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <img src={fallOwlLogo} alt="FallOwl" className="h-8 w-auto" />
+            <img src={fallOwlLogo} alt="FallOwl" className="h-7 w-auto" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-2 text-sm text-slate-600">
-              <div className="w-32 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                <motion.div 
-                  className="h-full bg-gradient-to-r from-purple-500 to-purple-600"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-              <span className="text-xs font-medium">{Math.round(progress)}%</span>
-            </div>
-          </div>
+          <div className="text-sm font-medium text-slate-700">Book Demo</div>
         </div>
-      </nav>
+      </div>
 
-      {/* Main Content - Compact Single Column */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Hero Section - Compact */}
-          <div className="text-center mb-6">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 bg-clip-text text-transparent">
-              Schedule Your Demo
-            </h1>
-            <p className="text-slate-600 text-lg mb-4">
-              30-minute personalized walkthrough with our team
-            </p>
-            
-            {/* Compact Benefits Bar */}
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-              {[
-                { icon: Video, text: "Live Demo" },
-                { icon: Zap, text: "Instant Setup" },
-                { icon: Award, text: "Expert Guide" }
-              ].map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div key={i} className="flex items-center gap-1.5 text-slate-700">
-                    <Icon className="w-4 h-4 text-purple-600" />
-                    <span>{item.text}</span>
-                  </div>
-                );
-              })}
+      {/* Main Content - Full Height */}
+      <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-full max-w-5xl h-full max-h-[calc(100vh-8rem)] flex flex-col">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex-1 flex flex-col"
+          >
+            {/* Title */}
+            <div className="text-center mb-4 flex-none">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 bg-clip-text text-transparent mb-1">
+                Schedule Your Demo
+              </h1>
+              <p className="text-slate-600 text-sm">30-minute personalized session</p>
             </div>
-          </div>
 
-          {/* Main Card - Compact Design */}
-          <Card className="bg-white/80 backdrop-blur-xl border-gray-200 shadow-2xl overflow-hidden">
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                
-                {/* Date & Time Selection - Horizontal Layout */}
-                <div className="grid lg:grid-cols-2 gap-4">
-                  {/* Calendar Section */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-semibold flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 text-purple-600" />
-                      Select Date
-                    </Label>
-                    <div className="bg-gradient-to-br from-purple-50 to-slate-50 rounded-xl p-3 border border-purple-100">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={setSelectedDate}
-                        disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
-                        className="rounded-lg border-0"
-                        data-testid="calendar-demo"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Time Slots - Compact Grid */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-semibold flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-purple-600" />
-                      Select Time (EST)
-                    </Label>
-                    <div className="bg-gradient-to-br from-slate-50 to-purple-50 rounded-xl p-3 border border-purple-100 max-h-[340px] overflow-y-auto">
-                      <div className="grid grid-cols-3 gap-2">
-                        {timeSlots.map((time) => (
-                          <motion.button
-                            key={time}
-                            type="button"
-                            onClick={() => setSelectedTime(time)}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all ${
-                              selectedTime === time
-                                ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg"
-                                : "bg-white hover:bg-purple-50 text-slate-700 border border-gray-200"
-                            }`}
-                            data-testid={`time-${time}`}
-                          >
-                            {time}
-                          </motion.button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Selected DateTime Display */}
-                {selectedDate && selectedTime && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-xl p-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-purple-900 font-medium">
-                        <Check className="w-4 h-4" />
-                        <span className="text-sm">
-                          {format(selectedDate, "EEEE, MMMM d")} at {selectedTime}
-                        </span>
-                      </div>
-                      <Sparkles className="w-4 h-4 text-purple-600" />
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Form Fields - Compact 2 Column Layout */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="fullName" className="text-xs font-medium flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5" />
-                      Full Name
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="fullName"
-                        {...register("fullName")}
-                        placeholder="John Smith"
-                        className={`h-10 ${errors.fullName ? "border-red-500" : focusedField === "fullName" ? "border-purple-500" : ""} transition-all`}
-                        onFocus={() => setFocusedField("fullName")}
-                        onBlur={() => setFocusedField("")}
-                        data-testid="input-fullname"
-                      />
-                      {!errors.fullName && formValues.fullName && (
-                        <Check className="absolute right-3 top-2.5 w-5 h-5 text-green-500" />
-                      )}
-                    </div>
-                    {errors.fullName && (
-                      <p className="text-red-500 text-xs">{errors.fullName.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email" className="text-xs font-medium flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5" />
-                      Email
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="email"
-                        type="email"
-                        {...register("email")}
-                        placeholder="john@company.com"
-                        className={`h-10 ${errors.email ? "border-red-500" : focusedField === "email" ? "border-purple-500" : ""} transition-all`}
-                        onFocus={() => setFocusedField("email")}
-                        onBlur={() => setFocusedField("")}
-                        data-testid="input-email"
-                      />
-                      {!errors.email && formValues.email && formValues.email.includes("@") && (
-                        <Check className="absolute right-3 top-2.5 w-5 h-5 text-green-500" />
-                      )}
-                    </div>
-                    {errors.email && (
-                      <p className="text-red-500 text-xs">{errors.email.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="company" className="text-xs font-medium flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5" />
-                      Company
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="company"
-                        {...register("company")}
-                        placeholder="Acme Inc."
-                        className={`h-10 ${errors.company ? "border-red-500" : focusedField === "company" ? "border-purple-500" : ""} transition-all`}
-                        onFocus={() => setFocusedField("company")}
-                        onBlur={() => setFocusedField("")}
-                        data-testid="input-company"
-                      />
-                      {!errors.company && formValues.company && (
-                        <Check className="absolute right-3 top-2.5 w-5 h-5 text-green-500" />
-                      )}
-                    </div>
-                    {errors.company && (
-                      <p className="text-red-500 text-xs">{errors.company.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="phone" className="text-xs font-medium flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5" />
-                      Phone
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="phone"
-                        {...register("phone")}
-                        placeholder="+1 (555) 123-4567"
-                        className={`h-10 ${errors.phone ? "border-red-500" : focusedField === "phone" ? "border-purple-500" : ""} transition-all`}
-                        onFocus={() => setFocusedField("phone")}
-                        onBlur={() => setFocusedField("")}
-                        data-testid="input-phone"
-                      />
-                      {!errors.phone && formValues.phone && formValues.phone.length >= 10 && (
-                        <Check className="absolute right-3 top-2.5 w-5 h-5 text-green-500" />
-                      )}
-                    </div>
-                    {errors.phone && (
-                      <p className="text-red-500 text-xs">{errors.phone.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <Label htmlFor="teamSize" className="text-xs font-medium flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5" />
-                      Team Size
-                    </Label>
-                    <Select
-                      value={formValues.teamSize}
-                      onValueChange={(value) => setValue("teamSize", value, { shouldValidate: true })}
+            {/* Main Card - Takes remaining space */}
+            <Card className="flex-1 bg-white/80 backdrop-blur-xl border-gray-200 shadow-2xl flex flex-col overflow-hidden">
+              <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
+                  
+                  {/* Tab Navigation */}
+                  <div className="flex gap-2 mb-3 flex-none">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTab("datetime")}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        currentTab === "datetime"
+                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
                     >
-                      <SelectTrigger className={`h-10 ${errors.teamSize ? "border-red-500" : ""}`} data-testid="select-teamsize">
-                        <SelectValue placeholder="Select team size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teamSizes.map((size) => (
-                          <SelectItem key={size} value={size}>
-                            {size} employees
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.teamSize && (
-                      <p className="text-red-500 text-xs">{errors.teamSize.message}</p>
+                      <CalendarIcon className="w-4 h-4 inline mr-1" />
+                      Date & Time
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => canProceed ? setCurrentTab("info") : toast({ title: "Select date & time first", variant: "destructive" })}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        currentTab === "info"
+                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
+                    >
+                      <User className="w-4 h-4 inline mr-1" />
+                      Your Info
+                    </button>
+                  </div>
+
+                  {/* Content Area - Scrollable if needed */}
+                  <div className="flex-1 overflow-y-auto">
+                    <AnimatePresence mode="wait">
+                      {currentTab === "datetime" && (
+                        <motion.div
+                          key="datetime"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          transition={{ duration: 0.2 }}
+                          className="grid lg:grid-cols-2 gap-4 h-full"
+                        >
+                          {/* Calendar */}
+                          <div className="flex flex-col">
+                            <Label className="text-xs font-semibold mb-2 flex items-center gap-1">
+                              <CalendarIcon className="w-3.5 h-3.5 text-purple-600" />
+                              Select Date
+                            </Label>
+                            <div className="bg-gradient-to-br from-purple-50 to-slate-50 rounded-xl p-2 border border-purple-100 flex items-center justify-center">
+                              <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={setSelectedDate}
+                                disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
+                                className="rounded-lg border-0 scale-90"
+                                data-testid="calendar-demo"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Time Slots */}
+                          <div className="flex flex-col">
+                            <Label className="text-xs font-semibold mb-2 flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5 text-purple-600" />
+                              Select Time (EST)
+                            </Label>
+                            <div className="bg-gradient-to-br from-slate-50 to-purple-50 rounded-xl p-3 border border-purple-100 flex-1">
+                              <div className="grid grid-cols-3 gap-2">
+                                {timeSlots.map((time) => (
+                                  <motion.button
+                                    key={time}
+                                    type="button"
+                                    onClick={() => setSelectedTime(time)}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className={`py-2 text-sm font-medium rounded-lg transition-all ${
+                                      selectedTime === time
+                                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg"
+                                        : "bg-white hover:bg-purple-50 text-slate-700 border border-gray-200"
+                                    }`}
+                                    data-testid={`time-${time}`}
+                                  >
+                                    {time}
+                                  </motion.button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {currentTab === "info" && (
+                        <motion.div
+                          key="info"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-3"
+                        >
+                          {/* Selected DateTime Display */}
+                          {selectedDate && selectedTime && (
+                            <div className="bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-lg p-2 mb-3">
+                              <div className="flex items-center gap-2 text-purple-900 text-sm font-medium">
+                                <Check className="w-4 h-4" />
+                                {format(selectedDate, "EEE, MMM d")} at {selectedTime}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="grid sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label htmlFor="fullName" className="text-xs flex items-center gap-1">
+                                <User className="w-3 h-3" /> Name
+                              </Label>
+                              <Input
+                                id="fullName"
+                                {...register("fullName")}
+                                placeholder="John Smith"
+                                className="h-9 text-sm"
+                                data-testid="input-fullname"
+                              />
+                              {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName.message}</p>}
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label htmlFor="email" className="text-xs flex items-center gap-1">
+                                <Mail className="w-3 h-3" /> Email
+                              </Label>
+                              <Input
+                                id="email"
+                                type="email"
+                                {...register("email")}
+                                placeholder="john@company.com"
+                                className="h-9 text-sm"
+                                data-testid="input-email"
+                              />
+                              {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label htmlFor="company" className="text-xs flex items-center gap-1">
+                                <Building2 className="w-3 h-3" /> Company
+                              </Label>
+                              <Input
+                                id="company"
+                                {...register("company")}
+                                placeholder="Acme Inc."
+                                className="h-9 text-sm"
+                                data-testid="input-company"
+                              />
+                              {errors.company && <p className="text-red-500 text-xs">{errors.company.message}</p>}
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label htmlFor="phone" className="text-xs flex items-center gap-1">
+                                <Phone className="w-3 h-3" /> Phone
+                              </Label>
+                              <Input
+                                id="phone"
+                                {...register("phone")}
+                                placeholder="+1 (555) 123-4567"
+                                className="h-9 text-sm"
+                                data-testid="input-phone"
+                              />
+                              {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
+                            </div>
+
+                            <div className="space-y-1 sm:col-span-2">
+                              <Label htmlFor="teamSize" className="text-xs flex items-center gap-1">
+                                <Users className="w-3 h-3" /> Team Size
+                              </Label>
+                              <Select
+                                value={formValues.teamSize}
+                                onValueChange={(value) => setValue("teamSize", value, { shouldValidate: true })}
+                              >
+                                <SelectTrigger className="h-9 text-sm" data-testid="select-teamsize">
+                                  <SelectValue placeholder="Select team size" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {teamSizes.map((size) => (
+                                    <SelectItem key={size} value={size}>
+                                      {size} employees
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              {errors.teamSize && <p className="text-red-500 text-xs">{errors.teamSize.message}</p>}
+                            </div>
+
+                            <div className="space-y-1 sm:col-span-2">
+                              <Label htmlFor="message" className="text-xs flex items-center gap-1">
+                                <MessageSquare className="w-3 h-3" /> Notes <span className="text-slate-400">(Optional)</span>
+                              </Label>
+                              <Textarea
+                                id="message"
+                                {...register("message")}
+                                placeholder="Your specific needs..."
+                                rows={2}
+                                className="resize-none text-sm"
+                                data-testid="input-message"
+                              />
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2 mt-3 flex-none">
+                    {currentTab === "info" && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setCurrentTab("datetime")}
+                        className="flex-1"
+                      >
+                        <ChevronLeft className="w-4 h-4 mr-1" />
+                        Back
+                      </Button>
+                    )}
+                    {currentTab === "datetime" ? (
+                      <Button
+                        type="button"
+                        onClick={() => canProceed ? setCurrentTab("info") : toast({ title: "Select date & time", variant: "destructive" })}
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                      >
+                        Continue
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                        data-testid="button-submit"
+                      >
+                        <Check className="w-4 h-4 mr-1" />
+                        Confirm Booking
+                      </Button>
                     )}
                   </div>
-
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <Label htmlFor="message" className="text-xs font-medium flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      Additional Notes <span className="text-slate-400">(Optional)</span>
-                    </Label>
-                    <Textarea
-                      id="message"
-                      {...register("message")}
-                      placeholder="Tell us about your specific needs..."
-                      rows={3}
-                      className="resize-none"
-                      data-testid="input-message"
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button - Full Width with Gradient */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    type="submit"
-                    size="lg"
-                    disabled={!selectedDate || !selectedTime || !isValid}
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-xl h-12 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                    data-testid="button-submit"
-                  >
-                    <Check className="w-5 h-5 mr-2" />
-                    Confirm Demo Booking
-                  </Button>
-                </motion.div>
-
-                {/* Trust Badge */}
-                <div className="flex items-center justify-center gap-6 pt-2 text-xs text-slate-600">
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5 text-green-600" />
-                    <span>10M+ calls made</span>
-                  </div>
-                  <div className="w-px h-4 bg-slate-300" />
-                  <div className="flex items-center gap-1">
-                    <Award className="w-3.5 h-3.5 text-purple-600" />
-                    <span>4.9/5 rated</span>
-                  </div>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </motion.div>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
