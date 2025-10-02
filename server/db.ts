@@ -16,34 +16,34 @@ function cleanDatabaseUrl(url: string): string {
 // Function to get database URL with proper fallback
 function getDatabaseUrl(): string {
   // Try environment variables in priority order
-  const neonWithBranch = process.env.NEON_DATABASE_URL_WITH_BRANCH;
-  const neonUrl = process.env.NEON_DATABASE_URL;
-  const databaseUrl = process.env.DATABASE_URL;
+  const neonWithBranch = process.env.NEON_DATABASE_URL_WITH_BRANCH?.trim();
+  const neonUrl = process.env.NEON_DATABASE_URL?.trim();
+  const databaseUrl = process.env.DATABASE_URL?.trim();
   
   // Use the first valid URL found
-  if (neonWithBranch && neonWithBranch.trim()) {
+  if (neonWithBranch) {
     console.log('Using NEON_DATABASE_URL_WITH_BRANCH');
     return cleanDatabaseUrl(neonWithBranch);
   }
   
-  if (neonUrl && neonUrl.trim()) {
+  if (neonUrl) {
     console.log('Using NEON_DATABASE_URL');
     return cleanDatabaseUrl(neonUrl);
   }
   
-  if (databaseUrl && databaseUrl.trim()) {
+  if (databaseUrl) {
     console.log('Using DATABASE_URL');
     return cleanDatabaseUrl(databaseUrl);
   }
   
   // If no database URL is found, try to construct one from individual postgres env vars
-  const pgHost = process.env.PGHOST;
-  const pgDatabase = process.env.PGDATABASE;
-  const pgUser = process.env.PGUSER;
+  const pgHost = process.env.PGHOST?.trim();
+  const pgDatabase = process.env.PGDATABASE?.trim();
+  const pgUser = process.env.PGUSER?.trim();
   
   if (pgHost && pgDatabase && pgUser) {
-    const pgPort = process.env.PGPORT || '5432';
-    const pgPassword = process.env.PGPASSWORD || '';
+    const pgPort = process.env.PGPORT?.trim() || '5432';
+    const pgPassword = process.env.PGPASSWORD?.trim() || '';
     
     const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}?sslmode=require`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
