@@ -219,6 +219,7 @@ POST https://api.fallowl.com/webhooks
                 <a href="#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
                 <a href="#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
                 <a href="#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
+                <a href="/about" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-about">About</a>
                 <Button 
                   size="sm" 
                   className="bg-slate-900 hover:bg-slate-800 text-white text-sm rounded-xl" 
@@ -247,6 +248,7 @@ POST https://api.fallowl.com/webhooks
                   <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">Capabilities</a>
                   <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">Integrations</a>
                   <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">Testimonials</a>
+                  <a href="/about" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-about">About</a>
                   <div className="px-4 pt-2">
                     <Button 
                       size="sm" 

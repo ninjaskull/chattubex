@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import CampaignView from "@/pages/campaign-view";
 import BackupImport from "@/pages/BackupImport";
 import DemoBooking from "@/pages/demo-booking";
+import AboutUs from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
 // Protected Route component
@@ -27,6 +28,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/about" component={AboutUs} />
       <Route path="/demo" component={DemoBooking} />
       <Route path="/dashboard">
         <ProtectedRoute component={Dashboard} />
