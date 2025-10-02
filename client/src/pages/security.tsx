@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -12,12 +13,16 @@ import {
   Activity,
   CloudLightning,
   Fingerprint,
-  Mail
+  Mail,
+  Menu
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
 
 export default function Security() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [, setLocation] = useLocation();
+
   return (
     <div className="min-h-screen bg-[#F8F7F5] text-slate-900">
       {/* Navigation */}
@@ -25,33 +30,59 @@ export default function Security() {
         <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg shadow-slate-900/5">
           <div className="px-4 md:px-6">
             <div className="flex justify-between items-center h-16">
-              <Link href="/">
-                <a className="flex items-center cursor-pointer">
-                  <img 
-                    src={fallOwlLogo} 
-                    alt="FallOwl" 
-                    className="h-10 w-auto object-contain"
-                  />
-                </a>
-              </Link>
-              
-              <div className="flex items-center space-x-4">
-                <Link href="/">
-                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors">
-                    Home
-                  </a>
-                </Link>
-                <Link href="/about">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="border-2 border-slate-300 text-slate-700 hover:bg-white rounded-xl"
-                  >
-                    About
-                  </Button>
-                </Link>
+              <div className="flex items-center cursor-pointer" onClick={() => setLocation("/")}>
+                <img 
+                  src={fallOwlLogo} 
+                  alt="FallOwl" 
+                  className="h-10 w-auto object-contain"
+                />
               </div>
+              
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="/#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors">Features</a>
+                <a href="/#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors">Capabilities</a>
+                <a href="/#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors">Integrations</a>
+                <a href="/#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors">Testimonials</a>
+                <a href="/about" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" onClick={(e) => { e.preventDefault(); setLocation("/about"); }}>About</a>
+                <Button 
+                  size="sm" 
+                  className="bg-slate-900 hover:bg-slate-800 text-white text-sm rounded-xl"
+                  onClick={() => window.location.href = 'https://app.fallowl.com'}
+                >
+                  Sign in
+                </Button>
+              </div>
+
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
             </div>
+
+            {isMenuOpen && (
+              <div className="md:hidden py-4 border-t border-gray-200">
+                <div className="flex flex-col space-y-3">
+                  <a href="/#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors">Features</a>
+                  <a href="/#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors">Capabilities</a>
+                  <a href="/#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors">Integrations</a>
+                  <a href="/#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors">Testimonials</a>
+                  <a href="/about" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" onClick={(e) => { e.preventDefault(); setLocation("/about"); }}>About</a>
+                  <div className="px-4 pt-2">
+                    <Button 
+                      size="sm" 
+                      className="bg-slate-900 hover:bg-slate-800 text-white w-full rounded-xl"
+                      onClick={() => window.location.href = 'https://app.fallowl.com'}
+                    >
+                      Sign in
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </nav>
