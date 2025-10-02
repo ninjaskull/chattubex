@@ -295,6 +295,7 @@ POST https://api.fallowl.com/webhooks
                 size="lg" 
                 className="bg-slate-900 hover:bg-slate-800 text-white px-8 h-12 text-base shadow-lg hover:shadow-xl transition-all rounded-lg" 
                 data-testid="button-hero-trial"
+                onClick={() => window.location.href = 'https://app.fallowl.com'}
               >
                 Start Free Trial
               </Button>
@@ -303,8 +304,9 @@ POST https://api.fallowl.com/webhooks
                 size="lg" 
                 className="px-8 h-12 text-base border-2 border-slate-300 text-slate-700 hover:bg-white rounded-lg" 
                 data-testid="button-hero-demo"
+                onClick={() => setLocation("/demo")}
               >
-                Browse Features
+                Schedule Demo
               </Button>
             </div>
 
@@ -1096,11 +1098,11 @@ POST https://api.fallowl.com/webhooks
             Join thousands of teams using FallOwl to transform their communications
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-10 h-14 text-lg shadow-xl transform hover:scale-105 transition-all" data-testid="button-cta-trial">
+            <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-10 h-14 text-lg shadow-xl transform hover:scale-105 transition-all" data-testid="button-cta-trial" onClick={() => window.location.href = 'https://app.fallowl.com'}>
               Start Free Trial
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-purple-700 px-10 h-14 text-lg transition-all" data-testid="button-cta-demo">
+            <Button size="lg" variant="outline" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-purple-700 px-10 h-14 text-lg transition-all" data-testid="button-cta-demo" onClick={() => setLocation("/demo")}>
               Schedule a Demo
             </Button>
           </div>
