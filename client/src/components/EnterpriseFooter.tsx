@@ -17,9 +17,9 @@ import {
   Lock,
   ChevronRight,
   CheckCircle2,
-  ArrowRight,
   X,
-  Dog
+  Dog,
+  Footprints
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -449,7 +449,7 @@ export function EnterpriseFooter() {
                     {authMutation.isPending ? (
                       <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <ArrowRight className="w-4 h-4" />
+                      <Footprints className="w-4 h-4" />
                     )}
                   </Button>
                 </form>
