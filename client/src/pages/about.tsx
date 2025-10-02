@@ -463,8 +463,12 @@ export default function AboutUs() {
                     About
                   </Link>
                 </li>
+                <li>
+                  <Link href="/demo" className="hover:text-white transition-colors" data-testid="link-footer-demo">
+                    Demo Booking
+                  </Link>
+                </li>
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-blog">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-careers">Careers</a></li>
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-contact">Contact</a></li>
               </ul>
             </div>
@@ -472,10 +476,26 @@ export default function AboutUs() {
             <div>
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-privacy">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-terms">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-security">Security</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-compliance">Compliance</a></li>
+                <li>
+                  <Link href="/privacy" className="hover:text-white transition-colors" data-testid="link-footer-privacy">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-white transition-colors" data-testid="link-footer-terms">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/security" className="hover:text-white transition-colors" data-testid="link-footer-security">
+                    Security
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/compliance" className="hover:text-white transition-colors" data-testid="link-footer-compliance">
+                    Compliance
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

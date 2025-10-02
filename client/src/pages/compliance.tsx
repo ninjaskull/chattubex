@@ -476,6 +476,7 @@ export default function Compliance() {
               <h4 className="font-semibold mb-4">Company</h4>
               <div className="space-y-2">
                 <Link href="/about"><a className="block text-slate-400 hover:text-white transition-colors text-sm">About Us</a></Link>
+                <Link href="/demo"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Demo Booking</a></Link>
                 <Link href="/"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Home</a></Link>
               </div>
             </div>
