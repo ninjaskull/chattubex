@@ -108,32 +108,30 @@ export default function AboutUs() {
           <div className="px-4 md:px-6">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <Link href="/">
-                  <a data-testid="link-home">
-                    <img 
-                      src={fallOwlLogo} 
-                      alt="FallOwl" 
-                      className="h-10 w-auto object-contain"
-                    />
-                  </a>
+                <Link href="/" data-testid="link-home">
+                  <img 
+                    src={fallOwlLogo} 
+                    alt="FallOwl" 
+                    className="h-10 w-auto object-contain"
+                  />
                 </Link>
               </div>
               
               <div className="hidden md:flex items-center space-x-8">
-                <Link href="/#features">
-                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</a>
+                <Link href="/#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">
+                  Features
                 </Link>
-                <Link href="/#capabilities">
-                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
+                <Link href="/#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">
+                  Capabilities
                 </Link>
-                <Link href="/#integrations">
-                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
+                <Link href="/#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">
+                  Integrations
                 </Link>
-                <Link href="/#testimonials">
-                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
+                <Link href="/#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">
+                  Testimonials
                 </Link>
-                <Link href="/about">
-                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-about">About</a>
+                <Link href="/about" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-about">
+                  About
                 </Link>
                 <Button 
                   size="sm" 
@@ -159,20 +157,20 @@ export default function AboutUs() {
             {isMenuOpen && (
               <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
                 <div className="flex flex-col space-y-3">
-                  <Link href="/#features">
-                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">Features</a>
+                  <Link href="/#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">
+                    Features
                   </Link>
-                  <Link href="/#capabilities">
-                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">Capabilities</a>
+                  <Link href="/#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">
+                    Capabilities
                   </Link>
-                  <Link href="/#integrations">
-                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">Integrations</a>
+                  <Link href="/#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">
+                    Integrations
                   </Link>
-                  <Link href="/#testimonials">
-                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">Testimonials</a>
+                  <Link href="/#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">
+                    Testimonials
                   </Link>
-                  <Link href="/about">
-                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-about">About</a>
+                  <Link href="/about" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-about">
+                    About
                   </Link>
                   <div className="px-4 pt-2">
                     <Button 
@@ -395,14 +393,16 @@ export default function AboutUs() {
                 </div>
                 
                 <Link href="/demo">
-                  <Button 
-                    size="lg" 
-                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl group mt-4"
-                    data-testid="button-get-started"
-                  >
-                    Get Started Free
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                  <a>
+                    <Button 
+                      size="lg" 
+                      className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl group mt-4"
+                      data-testid="button-get-started"
+                    >
+                      Get Started Free
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </a>
                 </Link>
               </div>
             </CardContent>
@@ -439,18 +439,18 @@ export default function AboutUs() {
               <h4 className="font-semibold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/#features">
-                    <a className="hover:text-white transition-colors" data-testid="link-footer-features">Features</a>
+                  <Link href="/#features" className="hover:text-white transition-colors" data-testid="link-footer-features">
+                    Features
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#capabilities">
-                    <a className="hover:text-white transition-colors" data-testid="link-footer-capabilities">Capabilities</a>
+                  <Link href="/#capabilities" className="hover:text-white transition-colors" data-testid="link-footer-capabilities">
+                    Capabilities
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#integrations">
-                    <a className="hover:text-white transition-colors" data-testid="link-footer-integrations">Integrations</a>
+                  <Link href="/#integrations" className="hover:text-white transition-colors" data-testid="link-footer-integrations">
+                    Integrations
                   </Link>
                 </li>
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-api">API Docs</a></li>
@@ -461,8 +461,8 @@ export default function AboutUs() {
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/about">
-                    <a className="hover:text-white transition-colors" data-testid="link-footer-about">About</a>
+                  <Link href="/about" className="hover:text-white transition-colors" data-testid="link-footer-about">
+                    About
                   </Link>
                 </li>
                 <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-blog">Blog</a></li>
