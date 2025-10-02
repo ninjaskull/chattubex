@@ -225,7 +225,7 @@ export default function AboutUs() {
             <CardContent className="p-8 md:p-12">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="space-y-6">
-                  <div className="inline-flex items-center space-x-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full">
+                  <div className="inline-flex items-center space-x-2 bg-slate-100 text-slate-900 px-4 py-2 rounded-full">
                     <Code className="w-4 h-4" />
                     <span className="text-sm font-semibold">Built by Amit Yadav</span>
                   </div>
@@ -247,10 +247,10 @@ export default function AboutUs() {
                 
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl blur-2xl opacity-20"></div>
-                  <div className="relative bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white">
+                  <div className="relative bg-slate-900 rounded-2xl p-8 text-white">
                     <div className="space-y-4">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                           <Users className="w-6 h-6" />
                         </div>
                         <div>
@@ -260,7 +260,7 @@ export default function AboutUs() {
                       </div>
                       
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                           <TrendingUp className="w-6 h-6" />
                         </div>
                         <div>
@@ -270,7 +270,7 @@ export default function AboutUs() {
                       </div>
                       
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                           <Sparkles className="w-6 h-6" />
                         </div>
                         <div>
@@ -313,7 +313,7 @@ export default function AboutUs() {
                 data-testid={`card-feature-${index}`}
               >
                 <CardContent className="p-6">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <feature.icon className="w-7 h-7 text-white" />
                   </div>
                   
@@ -344,8 +344,8 @@ export default function AboutUs() {
                 className="text-center space-y-3 p-6 rounded-xl hover:bg-white/60 transition-all duration-300"
                 data-testid={`value-${index}`}
               >
-                <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center">
-                  <value.icon className="w-8 h-8 text-slate-900" />
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-slate-900 flex items-center justify-center">
+                  <value.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-slate-900">{value.title}</h3>
                 <p className="text-sm text-slate-600">{value.description}</p>
@@ -378,17 +378,17 @@ export default function AboutUs() {
                 </p>
                 
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
-                  <div className="flex items-center space-x-2 text-slate-700">
+                  <div className="flex items-center space-x-2 text-slate-600">
                     <PhoneCall className="w-5 h-5 text-slate-900" />
-                    <span className="text-sm">Unlimited Calls</span>
+                    <span className="text-sm font-medium">Unlimited Calls</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-slate-700">
+                  <div className="flex items-center space-x-2 text-slate-600">
                     <Database className="w-5 h-5 text-slate-900" />
-                    <span className="text-sm">Full CRM Access</span>
+                    <span className="text-sm font-medium">Full CRM Access</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-slate-700">
+                  <div className="flex items-center space-x-2 text-slate-600">
                     <Zap className="w-5 h-5 text-slate-900" />
-                    <span className="text-sm">All Integrations</span>
+                    <span className="text-sm font-medium">All Integrations</span>
                   </div>
                 </div>
                 
