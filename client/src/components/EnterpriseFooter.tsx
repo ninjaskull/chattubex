@@ -18,7 +18,8 @@ import {
   ChevronRight,
   CheckCircle2,
   ArrowRight,
-  X
+  X,
+  Dog
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -426,6 +427,7 @@ export function EnterpriseFooter() {
             
             {showPasswordField && (
               <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 animate-in fade-in slide-in-from-bottom">
+                <Dog className="w-4 h-4 text-slate-400" />
                 <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
                   <Input 
                     type="password"
