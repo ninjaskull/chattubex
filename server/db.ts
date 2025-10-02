@@ -20,18 +20,25 @@ function getDatabaseUrl(): string {
   const neonUrl = process.env.NEON_DATABASE_URL?.trim();
   const databaseUrl = process.env.DATABASE_URL?.trim();
   
+  // Debug logging to see actual values
+  console.log('Database URL check:', {
+    hasNeonWithBranch: !!neonWithBranch && neonWithBranch.length > 0,
+    hasNeonUrl: !!neonUrl && neonUrl.length > 0,
+    hasDatabaseUrl: !!databaseUrl && databaseUrl.length > 0,
+  });
+  
   // Use the first valid URL found
-  if (neonWithBranch) {
+  if (neonWithBranch && neonWithBranch.length > 0) {
     console.log('Using NEON_DATABASE_URL_WITH_BRANCH');
     return cleanDatabaseUrl(neonWithBranch);
   }
   
-  if (neonUrl) {
+  if (neonUrl && neonUrl.length > 0) {
     console.log('Using NEON_DATABASE_URL');
     return cleanDatabaseUrl(neonUrl);
   }
   
-  if (databaseUrl) {
+  if (databaseUrl && databaseUrl.length > 0) {
     console.log('Using DATABASE_URL');
     return cleanDatabaseUrl(databaseUrl);
   }
@@ -40,11 +47,16 @@ function getDatabaseUrl(): string {
   const pgHost = process.env.PGHOST?.trim();
   const pgDatabase = process.env.PGDATABASE?.trim();
   const pgUser = process.env.PGUSER?.trim();
+  const pgPort = process.env.PGPORT?.trim() || '5432';
+  const pgPassword = process.env.PGPASSWORD?.trim() || '';
   
-  if (pgHost && pgDatabase && pgUser) {
-    const pgPort = process.env.PGPORT?.trim() || '5432';
-    const pgPassword = process.env.PGPASSWORD?.trim() || '';
-    
+  console.log('PostgreSQL individual env vars:', {
+    hasPgHost: !!pgHost && pgHost.length > 0,
+    hasPgDatabase: !!pgDatabase && pgDatabase.length > 0,
+    hasPgUser: !!pgUser && pgUser.length > 0,
+  });
+  
+  if (pgHost && pgHost.length > 0 && pgDatabase && pgDatabase.length > 0 && pgUser && pgUser.length > 0) {
     const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}?sslmode=require`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
     return constructedUrl;
