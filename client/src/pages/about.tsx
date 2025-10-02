@@ -49,31 +49,31 @@ export default function AboutUs() {
       icon: Database,
       title: "Smart CRM",
       description: "Streamline your sales pipeline with our intelligent CRM system",
-      gradient: "from-purple-500 to-pink-500"
+      gradient: "from-purple-500 to-purple-600"
     },
     {
       icon: Target,
       title: "Intent Engine",
       description: "AI-powered intent detection to optimize your outreach",
-      gradient: "from-blue-500 to-cyan-500"
+      gradient: "from-teal-500 to-cyan-500"
     },
     {
       icon: Phone,
       title: "Twilio Integration",
       description: "Seamless integration with Twilio for reliable communications",
-      gradient: "from-violet-500 to-purple-500"
+      gradient: "from-orange-400 to-pink-500"
     },
     {
       icon: Mic,
       title: "Programmable Voice",
       description: "Customize voice interactions with programmable controls",
-      gradient: "from-indigo-500 to-blue-500"
+      gradient: "from-purple-500 to-purple-600"
     },
     {
       icon: Shield,
       title: "BYOC Dialer",
       description: "Bring Your Own Credentials for complete control",
-      gradient: "from-emerald-500 to-teal-500"
+      gradient: "from-teal-500 to-cyan-500"
     }
   ];
 
@@ -202,13 +202,13 @@ export default function AboutUs() {
         
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center space-y-6">
-            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 px-4 py-1.5 text-sm" data-testid="badge-status">
+            <Badge className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 px-4 py-1.5 text-sm" data-testid="badge-status">
               <Sparkles className="w-3 h-3 mr-1" />
               Under Active Development
             </Badge>
             
             <h1 className="text-5xl md:text-6xl font-bold">
-              <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
                 About Fallowl
               </span>
             </h1>
@@ -223,7 +223,7 @@ export default function AboutUs() {
       {/* Story Section */}
       <section className="px-4 md:px-6 lg:px-8 py-16">
         <div className="max-w-5xl mx-auto">
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-purple-50/30 overflow-hidden" data-testid="card-story">
+          <Card className="border-0 shadow-xl bg-white overflow-hidden" data-testid="card-story">
             <CardContent className="p-8 md:p-12">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="space-y-6">
@@ -248,8 +248,8 @@ export default function AboutUs() {
                 </div>
                 
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-500 rounded-2xl blur-2xl opacity-20"></div>
-                  <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 text-white">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl blur-2xl opacity-20"></div>
+                  <div className="relative bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white">
                     <div className="space-y-4">
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -294,7 +294,7 @@ export default function AboutUs() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
                 What We Offer
               </span>
             </h2>
@@ -333,7 +333,7 @@ export default function AboutUs() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
                 Our Values
               </span>
             </h2>
@@ -346,8 +346,8 @@ export default function AboutUs() {
                 className="text-center space-y-3 p-6 rounded-xl hover:bg-white/60 transition-all duration-300"
                 data-testid={`value-${index}`}
               >
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
-                  <value.icon className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center">
+                  <value.icon className="w-8 h-8 text-slate-900" />
                 </div>
                 <h3 className="font-bold text-slate-900">{value.title}</h3>
                 <p className="text-sm text-slate-600">{value.description}</p>
@@ -369,7 +369,7 @@ export default function AboutUs() {
                 </div>
                 
                 <h2 className="text-3xl md:text-4xl font-bold">
-                  <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
                     Currently Free to Use
                   </span>
                 </h2>
@@ -381,15 +381,15 @@ export default function AboutUs() {
                 
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
                   <div className="flex items-center space-x-2 text-slate-700">
-                    <PhoneCall className="w-5 h-5 text-purple-600" />
+                    <PhoneCall className="w-5 h-5 text-slate-900" />
                     <span className="text-sm">Unlimited Calls</span>
                   </div>
                   <div className="flex items-center space-x-2 text-slate-700">
-                    <Database className="w-5 h-5 text-purple-600" />
+                    <Database className="w-5 h-5 text-slate-900" />
                     <span className="text-sm">Full CRM Access</span>
                   </div>
                   <div className="flex items-center space-x-2 text-slate-700">
-                    <Zap className="w-5 h-5 text-purple-600" />
+                    <Zap className="w-5 h-5 text-slate-900" />
                     <span className="text-sm">All Integrations</span>
                   </div>
                 </div>
@@ -397,7 +397,7 @@ export default function AboutUs() {
                 <Link href="/demo">
                   <Button 
                     size="lg" 
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl group mt-4"
+                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl group mt-4"
                     data-testid="button-get-started"
                   >
                     Get Started Free
