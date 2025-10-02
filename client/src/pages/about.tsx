@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,13 +19,30 @@ import {
   PhoneCall,
   Database,
   Lock,
-  Cpu
+  Cpu,
+  Mail,
+  Menu
 } from "lucide-react";
 import { Link } from "wouter";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
 
 export default function AboutUs() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const [showHeader, setShowHeader] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowHeader(true);
+      } else {
+        setShowHeader(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const features = [
     {
@@ -86,27 +103,90 @@ export default function AboutUs() {
   return (
     <div className="min-h-screen bg-[#F8F7F5] text-slate-900">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 px-4 md:px-6 lg:px-8 py-4 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center">
-            <Link href="/">
-              <a className="flex items-center" data-testid="link-home">
-                <img 
-                  src={fallOwlLogo} 
-                  alt="FallOwl" 
-                  className="h-10 w-auto object-contain"
-                />
-              </a>
-            </Link>
-            
-            <div className="flex items-center space-x-6">
-              <Link href="/">
-                <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-home-nav">Home</a>
-              </Link>
-              <Link href="/demo">
-                <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-demo">Book Demo</a>
-              </Link>
+      <nav className={`${showHeader ? 'fixed top-0 animate-in slide-in-from-top duration-300' : 'relative top-4'} left-0 right-0 z-50 px-4 md:px-6 lg:px-8 ${!showHeader && 'mb-8'} transition-all`}>
+        <div className={`max-w-7xl mx-auto bg-white/80 backdrop-blur-xl ${showHeader ? 'rounded-b-2xl mt-0' : 'rounded-2xl mt-0'} border border-gray-200/50 shadow-lg shadow-slate-900/5`}>
+          <div className="px-4 md:px-6">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <Link href="/">
+                  <a data-testid="link-home">
+                    <img 
+                      src={fallOwlLogo} 
+                      alt="FallOwl" 
+                      className="h-10 w-auto object-contain"
+                    />
+                  </a>
+                </Link>
+              </div>
+              
+              <div className="hidden md:flex items-center space-x-8">
+                <Link href="/#features">
+                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</a>
+                </Link>
+                <Link href="/#capabilities">
+                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
+                </Link>
+                <Link href="/#integrations">
+                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
+                </Link>
+                <Link href="/#testimonials">
+                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
+                </Link>
+                <Link href="/about">
+                  <a className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-about">About</a>
+                </Link>
+                <Button 
+                  size="sm" 
+                  className="bg-slate-900 hover:bg-slate-800 text-white text-sm rounded-xl" 
+                  data-testid="button-signin"
+                  onClick={() => window.location.href = 'https://app.fallowl.com'}
+                >
+                  Sign in
+                </Button>
+              </div>
+
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden"
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
             </div>
+
+            {isMenuOpen && (
+              <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
+                <div className="flex flex-col space-y-3">
+                  <Link href="/#features">
+                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">Features</a>
+                  </Link>
+                  <Link href="/#capabilities">
+                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">Capabilities</a>
+                  </Link>
+                  <Link href="/#integrations">
+                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">Integrations</a>
+                  </Link>
+                  <Link href="/#testimonials">
+                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">Testimonials</a>
+                  </Link>
+                  <Link href="/about">
+                    <a className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-about">About</a>
+                  </Link>
+                  <div className="px-4 pt-2">
+                    <Button 
+                      size="sm" 
+                      className="bg-slate-900 hover:bg-slate-800 text-white w-full rounded-xl" 
+                      data-testid="button-mobile-signin"
+                      onClick={() => window.location.href = 'https://app.fallowl.com'}
+                    >
+                      Sign in
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </nav>
@@ -331,42 +411,81 @@ export default function AboutUs() {
       </section>
 
       {/* Footer */}
-      <footer className="px-4 md:px-6 lg:px-8 py-12 bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <img 
-                src={fallOwlLogo} 
-                alt="FallOwl" 
-                className="h-10 w-auto object-contain mb-4 brightness-0 invert"
-              />
-              <p className="text-slate-400 text-sm">
-                Making sales and cold calling effortless.
+      <footer className="py-16 bg-slate-900 text-slate-300">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid md:grid-cols-5 gap-12 mb-12">
+            <div className="md:col-span-2">
+              <div className="mb-4">
+                <img 
+                  src={fallOwlLogo} 
+                  alt="FallOwl" 
+                  className="h-12 w-auto object-contain invert"
+                />
+              </div>
+              <p className="text-sm mb-6 text-slate-400">
+                The modern CRM with Twilio-powered calling, automatic recording, and enterprise-grade features.
               </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Quick Links</h3>
-              <div className="space-y-2">
-                <Link href="/">
-                  <a className="block text-slate-400 hover:text-white transition-colors text-sm" data-testid="link-footer-home">Home</a>
-                </Link>
-                <Link href="/demo">
-                  <a className="block text-slate-400 hover:text-white transition-colors text-sm" data-testid="link-footer-demo">Book Demo</a>
-                </Link>
+              <div className="flex gap-4">
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-email">
+                  <Mail className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-phone">
+                  <Phone className="w-5 h-5" />
+                </Button>
               </div>
             </div>
-            
+
             <div>
-              <h3 className="font-semibold mb-4">Contact</h3>
-              <p className="text-slate-400 text-sm">
-                Built with ❤️ by Amit Yadav
-              </p>
+              <h4 className="font-semibold text-white mb-4">Product</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/#features">
+                    <a className="hover:text-white transition-colors" data-testid="link-footer-features">Features</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#capabilities">
+                    <a className="hover:text-white transition-colors" data-testid="link-footer-capabilities">Capabilities</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#integrations">
+                    <a className="hover:text-white transition-colors" data-testid="link-footer-integrations">Integrations</a>
+                  </Link>
+                </li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-api">API Docs</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/about">
+                    <a className="hover:text-white transition-colors" data-testid="link-footer-about">About</a>
+                  </Link>
+                </li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-blog">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-careers">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-contact">Contact</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-privacy">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-terms">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-security">Security</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-compliance">Compliance</a></li>
+              </ul>
             </div>
           </div>
-          
-          <div className="pt-8 border-t border-slate-800 text-center text-slate-400 text-sm">
-            <p>© 2025 Fallowl. All rights reserved.</p>
+
+          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-slate-400">
+              © 2025 FallOwl. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
