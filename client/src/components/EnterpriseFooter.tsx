@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -16,16 +16,41 @@ import {
   Award,
   Lock,
   ChevronRight,
-  CheckCircle2
+  CheckCircle2,
+  ArrowRight,
+  X
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { setAuthenticated } from "@/lib/auth";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
 
 export function EnterpriseFooter() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
+  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [password, setPassword] = useState("");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const authMutation = useMutation({
+    mutationFn: async (password: string) => {
+      const response = await apiRequest("POST", "/api/auth", { password });
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      setAuthenticated(true);
+      localStorage.setItem("auth_token", data.token);
+      toast({ title: "Access granted", description: "Welcome to the dashboard!" });
+      setLocation("/dashboard");
+    },
+    onError: () => {
+      toast({ title: "Access denied", description: "Invalid credentials", variant: "destructive" });
+    },
+  });
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +66,23 @@ export function EnterpriseFooter() {
       setEmail("");
       setIsSubscribing(false);
     }, 1000);
+  };
+
+  const handleYearClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    
+    if (newCount >= 5) {
+      setShowPasswordField(true);
+      setClickCount(0);
+    }
+  };
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.trim()) {
+      authMutation.mutate(password);
+    }
   };
 
   const productLinks = [
@@ -351,7 +393,7 @@ export function EnterpriseFooter() {
           {/* Copyright */}
           <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
             <p data-testid="text-footer-copyright">
-              © 2025 FallOwl, Inc. All rights reserved.
+              © <span onClick={handleYearClick} className="cursor-pointer hover:text-white transition-colors" data-testid="text-footer-year">2025</span> FallOwl, Inc. All rights reserved.
             </p>
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
@@ -381,6 +423,45 @@ export function EnterpriseFooter() {
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span>
               All Systems Operational
             </Badge>
+            
+            {showPasswordField && (
+              <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 animate-in fade-in slide-in-from-bottom">
+                <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
+                  <Input 
+                    type="password"
+                    placeholder="Admin access" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-32 h-8 text-xs bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                    autoFocus
+                    data-testid="input-admin-password"
+                  />
+                  <Button 
+                    type="submit"
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
+                    disabled={authMutation.isPending}
+                    data-testid="button-admin-submit"
+                  >
+                    {authMutation.isPending ? (
+                      <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <ArrowRight className="w-4 h-4" />
+                    )}
+                  </Button>
+                </form>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-slate-500 hover:text-slate-300"
+                  onClick={() => setShowPasswordField(false)}
+                  data-testid="button-admin-close"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
