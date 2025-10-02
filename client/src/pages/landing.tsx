@@ -58,6 +58,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
+import { EnterpriseFooter } from "@/components/EnterpriseFooter";
 
 export default function Landing() {
   const [clickCount, setClickCount] = useState(0);
@@ -1114,132 +1115,7 @@ POST https://api.fallowl.com/webhooks
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 bg-slate-900 text-slate-300">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid md:grid-cols-5 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <div className="mb-4">
-                <img 
-                  src={fallOwlLogo} 
-                  alt="FallOwl" 
-                  className="h-12 w-auto object-contain invert"
-                />
-              </div>
-              <p className="text-sm mb-6 text-slate-400">
-                The modern CRM with Twilio-powered calling, automatic recording, and enterprise-grade features.
-              </p>
-              <div className="flex gap-4">
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-email">
-                  <Mail className="w-5 h-5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-phone">
-                  <Phone className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#features" className="hover:text-white transition-colors" data-testid="link-footer-features">Features</a></li>
-                <li><a href="#capabilities" className="hover:text-white transition-colors" data-testid="link-footer-capabilities">Capabilities</a></li>
-                <li><a href="#integrations" className="hover:text-white transition-colors" data-testid="link-footer-integrations">Integrations</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-api">API Docs</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/about" className="hover:text-white transition-colors" data-testid="link-footer-about">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/demo" className="hover:text-white transition-colors" data-testid="link-footer-demo">
-                    Demo Booking
-                  </Link>
-                </li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-blog">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-contact">Contact</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/privacy" className="hover:text-white transition-colors" data-testid="link-footer-privacy">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-white transition-colors" data-testid="link-footer-terms">
-                    Terms
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/security" className="hover:text-white transition-colors" data-testid="link-footer-security">
-                    Security
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/compliance" className="hover:text-white transition-colors" data-testid="link-footer-compliance">
-                    Compliance
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-slate-400">
-              © <span onClick={handleYearClick} className="cursor-pointer hover:text-white transition-colors" data-testid="text-footer-year">2025</span> FallOwl. All rights reserved.
-            </p>
-            
-            {showPasswordField && (
-              <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 animate-in fade-in slide-in-from-bottom">
-                <form onSubmit={handleAdminLogin} className="flex items-center space-x-2">
-                  <Input 
-                    type="password"
-                    placeholder="Admin access" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-32 h-8 text-xs bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                    autoFocus
-                    data-testid="input-admin-password"
-                  />
-                  <Button 
-                    type="submit"
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
-                    disabled={authMutation.isPending}
-                    data-testid="button-admin-submit"
-                  >
-                    {authMutation.isPending ? (
-                      <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <ArrowRight className="w-4 h-4" />
-                    )}
-                  </Button>
-                </form>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-slate-500 hover:text-slate-300"
-                  onClick={() => setShowPasswordField(false)}
-                  data-testid="button-admin-close"
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </footer>
+      <EnterpriseFooter />
     </div>
   );
 }

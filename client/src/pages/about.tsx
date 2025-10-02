@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
+import { EnterpriseFooter } from "@/components/EnterpriseFooter";
 
 export default function AboutUs() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
@@ -408,105 +409,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 bg-slate-900 text-slate-300">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid md:grid-cols-5 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <div className="mb-4">
-                <img 
-                  src={fallOwlLogo} 
-                  alt="FallOwl" 
-                  className="h-12 w-auto object-contain invert"
-                />
-              </div>
-              <p className="text-sm mb-6 text-slate-400">
-                The modern CRM with Twilio-powered calling, automatic recording, and enterprise-grade features.
-              </p>
-              <div className="flex gap-4">
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-email">
-                  <Mail className="w-5 h-5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800" data-testid="button-footer-phone">
-                  <Phone className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/#features" className="hover:text-white transition-colors" data-testid="link-footer-features">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#capabilities" className="hover:text-white transition-colors" data-testid="link-footer-capabilities">
-                    Capabilities
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#integrations" className="hover:text-white transition-colors" data-testid="link-footer-integrations">
-                    Integrations
-                  </Link>
-                </li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-api">API Docs</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/about" className="hover:text-white transition-colors" data-testid="link-footer-about">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/demo" className="hover:text-white transition-colors" data-testid="link-footer-demo">
-                    Demo Booking
-                  </Link>
-                </li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-blog">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors" data-testid="link-footer-contact">Contact</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/privacy" className="hover:text-white transition-colors" data-testid="link-footer-privacy">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-white transition-colors" data-testid="link-footer-terms">
-                    Terms
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/security" className="hover:text-white transition-colors" data-testid="link-footer-security">
-                    Security
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/compliance" className="hover:text-white transition-colors" data-testid="link-footer-compliance">
-                    Compliance
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-slate-400">
-              © 2025 FallOwl. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <EnterpriseFooter />
     </div>
   );
 }

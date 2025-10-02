@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import fallOwlLogo from "@assets/FallOwl_logo_1759280190715.png";
+import { EnterpriseFooter } from "@/components/EnterpriseFooter";
 
 export default function Privacy() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -363,43 +364,7 @@ export default function Privacy() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12 px-6 lg:px-8 mt-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <div className="space-y-2">
-                <Link href="/privacy"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Privacy Policy</a></Link>
-                <Link href="/terms"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Terms of Service</a></Link>
-                <Link href="/security"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Security</a></Link>
-                <Link href="/compliance"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Compliance</a></Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <div className="space-y-2">
-                <Link href="/about"><a className="block text-slate-400 hover:text-white transition-colors text-sm">About Us</a></Link>
-                <Link href="/demo"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Demo Booking</a></Link>
-                <Link href="/"><a className="block text-slate-400 hover:text-white transition-colors text-sm">Home</a></Link>
-              </div>
-            </div>
-            <div className="md:col-span-2">
-              <img 
-                src={fallOwlLogo} 
-                alt="FallOwl" 
-                className="h-8 w-auto object-contain mb-4"
-              />
-              <p className="text-slate-400 text-sm">
-                Enterprise-grade cloud communications platform
-              </p>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 text-sm">
-            <p>© 2025 FallOwl. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <EnterpriseFooter />
     </div>
   );
 }
