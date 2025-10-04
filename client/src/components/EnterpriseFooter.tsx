@@ -87,7 +87,7 @@ export function EnterpriseFooter() {
   };
 
   const productLinks = [
-    { label: "Features", href: "/#features", testId: "link-footer-features" },
+    { label: "Features", href: "/features", testId: "link-footer-features" },
     { label: "Capabilities", href: "/#capabilities", testId: "link-footer-capabilities" },
     { label: "Integrations", href: "/#integrations", testId: "link-footer-integrations" },
     { label: "API Documentation", href: "/api-docs", testId: "link-footer-api" },

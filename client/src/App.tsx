@@ -15,6 +15,7 @@ import Terms from "@/pages/terms";
 import Security from "@/pages/security";
 import Compliance from "@/pages/compliance";
 import ApiDocs from "@/pages/api-docs";
+import Features from "@/pages/features";
 import NotFound from "@/pages/not-found";
 
 // Protected Route component
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/security" component={Security} />
       <Route path="/compliance" component={Compliance} />
       <Route path="/api-docs" component={ApiDocs} />
+      <Route path="/features" component={Features} />
       <Route path="/dashboard">
         <ProtectedRoute component={Dashboard} />
       </Route>
