@@ -2481,13 +2481,13 @@ You have access to campaign and contact databases with 263+ records. Your missio
   // Execute a confirmed SQL query (read-only)
   app.post('/api/duggu/nl/execute', async (req, res) => {
     try {
-      const { sql } = req.body;
+      const { sql, userQuery } = req.body;
       
       if (!sql || typeof sql !== 'string' || sql.trim().length === 0) {
         return res.status(400).json({ message: 'SQL query is required' });
       }
 
-      const result = await nlQueryService.executeQuery(sql);
+      const result = await nlQueryService.executeQuery(sql, userQuery);
       res.json(result);
     } catch (error) {
       console.error('Error executing query:', error);
