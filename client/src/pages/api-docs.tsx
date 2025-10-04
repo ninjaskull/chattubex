@@ -1078,43 +1078,6 @@ calls = client.calls.list()`}</pre>
         </div>
       </section>
 
-      {/* SDKs and Libraries */}
-      <section className="py-16 bg-[#F8F7F5]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold mb-4">Official SDKs & Libraries</h2>
-            <p className="text-lg text-slate-600">
-              Use our official libraries to integrate FallOwl into your application quickly and easily.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: "Node.js", icon: "📦", install: "npm install fallowl", color: "from-green-500 to-emerald-600" },
-              { name: "Python", icon: "🐍", install: "pip install fallowl", color: "from-blue-500 to-blue-600" },
-              { name: "Ruby", icon: "💎", install: "gem install fallowl", color: "from-red-500 to-red-600" },
-              { name: "PHP", icon: "🐘", install: "composer require fallowl/fallowl-php", color: "from-purple-500 to-purple-600" },
-              { name: "Java", icon: "☕", install: "maven: com.fallowl:fallowl-java", color: "from-orange-500 to-orange-600" },
-              { name: "Go", icon: "🔵", install: "go get github.com/fallowl/fallowl-go", color: "from-cyan-500 to-teal-600" }
-            ].map((sdk, index) => (
-              <Card key={index} className="bg-white border-gray-200 hover:shadow-lg transition-all">
-                <CardContent className="p-6">
-                  <div className="text-4xl mb-3">{sdk.icon}</div>
-                  <h3 className="font-semibold text-lg mb-2">{sdk.name}</h3>
-                  <div className="bg-slate-900 rounded-lg p-3 mb-3">
-                    <code className="text-xs text-white">{sdk.install}</code>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full" data-testid={`button-docs-${sdk.name.toLowerCase()}`}>
-                    <FileText className="w-4 h-4 mr-2" />
-                    View Docs
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <EnterpriseFooter />
     </div>
   );
