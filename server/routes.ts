@@ -15,6 +15,8 @@ import { dugguChatbotService } from "./services/dugguChatbotService";
 import { externalDbInspector } from "./services/externalDbInspector";
 import { externalDugguService } from "./services/externalDugguService";
 import { nlQueryService } from "./services/nlQueryService";
+import { advancedSearchService } from "./services/advancedSearchService";
+import { z } from "zod";
 
 // Helper function to clean AI responses from unwanted patterns
 function cleanStreamResponse(content: string): string {
@@ -2522,6 +2524,140 @@ You have access to campaign and contact databases with 263+ records. Your missio
     } catch (error) {
       console.error('Error getting query suggestions:', error);
       res.status(500).json({ message: 'Failed to get suggestions' });
+    }
+  });
+
+  // Advanced Search Intelligence Routes (Apollo.io / ZoomInfo style)
+  
+  // Zod schemas for validation
+  const searchFilterSchema = z.object({
+    column: z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_-]*$/, 'Invalid column name'),
+    operator: z.enum(['equals', 'not_equals', 'contains', 'not_contains', 'starts_with', 'ends_with', 
+                       'greater_than', 'less_than', 'greater_or_equal', 'less_or_equal', 
+                       'is_null', 'is_not_null', 'in', 'not_in', 'between']),
+    value: z.any().optional(),
+    value2: z.any().optional(),
+  });
+
+  const searchQuerySchema = z.object({
+    table: z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_-]*$/, 'Invalid table name'),
+    filters: z.array(searchFilterSchema).default([]),
+    sortBy: z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_-]*$/, 'Invalid sort column').optional(),
+    sortOrder: z.enum(['asc', 'desc']).optional(),
+    page: z.number().int().positive().optional(),
+    pageSize: z.number().int().positive().max(1000).optional(),
+    database: z.enum(['main', 'readonly']).optional(),
+  });
+  
+  // Get all available tables from a database
+  app.get('/api/advanced-search/tables', async (req, res) => {
+    try {
+      const database = (req.query.database as 'main' | 'readonly') || 'main';
+      
+      // Validate database parameter
+      if (!['main', 'readonly'].includes(database)) {
+        return res.status(400).json({ message: 'Invalid database parameter' });
+      }
+      
+      const tables = await advancedSearchService.getTables(database);
+      res.json({ tables, database });
+    } catch (error) {
+      console.error('Error getting tables:', error);
+      res.status(500).json({ message: 'Failed to get tables' });
+    }
+  });
+
+  // Get metadata for a specific table
+  app.get('/api/advanced-search/tables/:tableName/metadata', async (req, res) => {
+    try {
+      const { tableName } = req.params;
+      const database = (req.query.database as 'main' | 'readonly') || 'main';
+      
+      // Validate table name
+      if (!/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(tableName)) {
+        return res.status(400).json({ message: 'Invalid table name' });
+      }
+      
+      // Validate database parameter
+      if (!['main', 'readonly'].includes(database)) {
+        return res.status(400).json({ message: 'Invalid database parameter' });
+      }
+      
+      const metadata = await advancedSearchService.getTableMetadata(tableName, database);
+      res.json(metadata);
+    } catch (error) {
+      console.error(`Error getting metadata for table ${req.params.tableName}:`, error);
+      res.status(500).json({ message: 'Failed to get table metadata' });
+    }
+  });
+
+  // Get all tables with metadata
+  app.get('/api/advanced-search/metadata', async (req, res) => {
+    try {
+      const database = (req.query.database as 'main' | 'readonly') || 'main';
+      
+      // Validate database parameter
+      if (!['main', 'readonly'].includes(database)) {
+        return res.status(400).json({ message: 'Invalid database parameter' });
+      }
+      
+      const metadata = await advancedSearchService.getAllTablesMetadata(database);
+      res.json({ tables: metadata, database });
+    } catch (error) {
+      console.error('Error getting all tables metadata:', error);
+      res.status(500).json({ message: 'Failed to get tables metadata' });
+    }
+  });
+
+  // Execute advanced search with filters
+  app.post('/api/advanced-search/search', async (req, res) => {
+    try {
+      // Validate request body with Zod
+      const validation = searchQuerySchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: 'Invalid search query', 
+          errors: validation.error.errors 
+        });
+      }
+
+      const searchQuery = validation.data as any;
+      const result = await advancedSearchService.search(searchQuery);
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error executing advanced search:', error);
+      res.status(500).json({ 
+        message: error.message || 'Failed to execute search' 
+      });
+    }
+  });
+
+  // Export search results to CSV
+  app.post('/api/advanced-search/export', async (req, res) => {
+    try {
+      // Validate request body with Zod
+      const validation = searchQuerySchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: 'Invalid search query', 
+          errors: validation.error.errors 
+        });
+      }
+
+      const searchQuery = validation.data as any;
+      const csv = await advancedSearchService.exportToCSV(searchQuery);
+      
+      // Set headers for CSV download
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="export_${searchQuery.table}_${Date.now()}.csv"`);
+      res.send(csv);
+    } catch (error: any) {
+      console.error('Error exporting search results:', error);
+      res.status(500).json({ 
+        message: error.message || 'Failed to export search results' 
+      });
     }
   });
 

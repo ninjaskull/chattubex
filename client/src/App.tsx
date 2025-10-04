@@ -19,6 +19,7 @@ import ApiDocs from "@/pages/api-docs";
 import Features from "@/pages/features";
 import NotFound from "@/pages/not-found";
 import NLQueryInterface from "@/components/NLQueryInterface";
+import AdvancedSearch from "@/pages/advanced-search";
 
 // Protected Route component
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
@@ -55,6 +56,9 @@ function Router() {
       </Route>
       <Route path="/nl-query">
         <ProtectedRoute component={NLQueryInterface} />
+      </Route>
+      <Route path="/advanced-search">
+        <ProtectedRoute component={AdvancedSearch} />
       </Route>
       <Route component={NotFound} />
     </Switch>

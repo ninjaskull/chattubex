@@ -11,7 +11,8 @@ import {
   Target,
   Dog,
   Home,
-  Database
+  Database,
+  Search
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,6 +21,7 @@ import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
 
 import PawMate from "@/components/pawmate-enhanced";
+import AdvancedSearch from "@/pages/advanced-search";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -59,6 +61,7 @@ export default function Dashboard() {
   const navigationItems = [
     { id: "files", label: "Campaigns", icon: FolderOpen },
     { id: "notes", label: "Documents", icon: MessageSquare },
+    { id: "search", label: "Advanced Search", icon: Search },
     { id: "pawmate", label: assistantName, icon: Dog }
   ];
 
@@ -178,7 +181,7 @@ export default function Dashboard() {
         {/* Mobile Navigation (horizontal tabs on mobile) */}
         <div className="md:hidden w-full p-4 bg-white/60 backdrop-blur-sm border-b border-slate-200/50">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-white/80">
+            <TabsList className="grid w-full grid-cols-4 bg-white/80">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -194,10 +197,11 @@ export default function Dashboard() {
         
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className={`mx-auto px-6 py-6 ${activeTab === "search" ? "max-w-full" : "max-w-7xl"}`}>
             <div className="main-content-area">
               {activeTab === "files" && <CampaignList />}
               {activeTab === "notes" && <NotesDocuments />}
+              {activeTab === "search" && <AdvancedSearch />}
               {activeTab === "pawmate" && <PawMate />}
             </div>
           </div>
