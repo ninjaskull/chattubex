@@ -97,6 +97,8 @@ let _databaseUrl: string | null = null;
 let _readOnlyDatabaseUrl: string | null = null;
 let _pool: Pool | null = null;
 let _readOnlyPool: Pool | null = null;
+let _db: ReturnType<typeof drizzle> | null = null;
+let _readOnlyDb: ReturnType<typeof drizzle> | null = null;
 
 function initializeDatabaseUrl(): string {
   if (!_databaseUrl) {
@@ -112,67 +114,90 @@ function initializeReadOnlyDatabaseUrl(): string {
   return _readOnlyDatabaseUrl;
 }
 
+function getPool(): Pool {
+  if (!_pool) {
+    const databaseUrl = initializeDatabaseUrl();
+    _pool = new Pool({ 
+      connectionString: databaseUrl,
+      ssl: databaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+      max: 10,
+      min: 2,
+      idleTimeoutMillis: 60000,
+      connectionTimeoutMillis: 20000,
+      allowExitOnIdle: false,
+      query_timeout: 30000,
+      statement_timeout: 30000,
+    });
+    
+    _pool.on('error', (err) => {
+      console.error('Main database pool error:', err);
+    });
+  }
+  return _pool;
+}
+
+function getReadOnlyPool(): Pool {
+  if (!_readOnlyPool) {
+    const readOnlyDatabaseUrl = initializeReadOnlyDatabaseUrl();
+    _readOnlyPool = new Pool({
+      connectionString: readOnlyDatabaseUrl,
+      ssl: readOnlyDatabaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+      max: 5,
+      min: 1,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 15000,
+      allowExitOnIdle: false,
+      query_timeout: 15000,
+      statement_timeout: 15000,
+    });
+    
+    _readOnlyPool.on('error', (err) => {
+      console.error('Read-only database pool error:', err);
+    });
+  }
+  return _readOnlyPool;
+}
+
 // Main database pool for write operations
 export const pool = new Proxy({} as Pool, {
   get(target, prop) {
-    if (!_pool) {
-      const databaseUrl = initializeDatabaseUrl();
-      _pool = new Pool({ 
-        connectionString: databaseUrl,
-        ssl: databaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
-        max: 10,
-        min: 2,
-        idleTimeoutMillis: 60000,
-        connectionTimeoutMillis: 20000,
-        allowExitOnIdle: false,
-        query_timeout: 30000,
-        statement_timeout: 30000,
-      });
-      
-      _pool.on('error', (err) => {
-        console.error('Main database pool error:', err);
-      });
-    }
-    return Reflect.get(_pool, prop);
+    return Reflect.get(getPool(), prop);
   }
 });
 
 // Read-only database pool specifically for Duggu chatbot searches
 export const readOnlyPool = new Proxy({} as Pool, {
   get(target, prop) {
-    if (!_readOnlyPool) {
-      const readOnlyDatabaseUrl = initializeReadOnlyDatabaseUrl();
-      _readOnlyPool = new Pool({
-        connectionString: readOnlyDatabaseUrl,
-        ssl: readOnlyDatabaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
-        max: 5,
-        min: 1,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 15000,
-        allowExitOnIdle: false,
-        query_timeout: 15000,
-        statement_timeout: 15000,
-      });
-      
-      _readOnlyPool.on('error', (err) => {
-        console.error('Read-only database pool error:', err);
-      });
-    }
-    return Reflect.get(_readOnlyPool, prop);
+    return Reflect.get(getReadOnlyPool(), prop);
   }
 });
 
 // Main database instance
-export const db = drizzle(pool, { schema });
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(target, prop) {
+    if (!_db) {
+      _db = drizzle(getPool(), { schema });
+    }
+    return Reflect.get(_db, prop);
+  }
+});
 
 // Read-only database instance for Duggu chatbot
-export const readOnlyDb = drizzle(readOnlyPool, { schema });
+export const readOnlyDb = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(target, prop) {
+    if (!_readOnlyDb) {
+      _readOnlyDb = drizzle(getReadOnlyPool(), { schema });
+    }
+    return Reflect.get(_readOnlyDb, prop);
+  }
+});
 
 // Test connection on startup with retry logic
 async function testConnection(retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
-      const client = await pool.connect();
+      const mainPool = getPool();
+      const client = await mainPool.connect();
       await client.query('SELECT 1');
       client.release();
       console.log('Main database connection established successfully');
@@ -193,7 +218,8 @@ async function testConnection(retries = 3) {
 async function testReadOnlyConnection(retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
-      const client = await readOnlyPool.connect();
+      const roPool = getReadOnlyPool();
+      const client = await roPool.connect();
       await client.query('SELECT 1');
       client.release();
       console.log('Read-only database connection for Duggu chatbot established successfully');
