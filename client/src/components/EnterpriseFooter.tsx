@@ -120,12 +120,6 @@ export function EnterpriseFooter() {
     { icon: Youtube, href: "https://youtube.com", label: "YouTube", testId: "link-social-youtube" },
   ];
 
-  const trustBadges = [
-    { icon: Shield, label: "SOC 2 Type II", testId: "badge-soc2" },
-    { icon: Lock, label: "GDPR Compliant", testId: "badge-gdpr" },
-    { icon: Award, label: "ISO 27001", testId: "badge-iso" },
-    { icon: Shield, label: "HIPAA Ready", testId: "badge-hipaa" },
-  ];
 
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
@@ -358,28 +352,6 @@ export function EnterpriseFooter() {
                 <span>We respect your privacy. Unsubscribe at any time.</span>
               </div>
             </form>
-
-            {/* Trust Badges */}
-            <div className="mt-8">
-              <h5 className="text-xs uppercase tracking-wider text-slate-500 mb-4 font-semibold">
-                Trusted & Certified
-              </h5>
-              <div className="grid grid-cols-2 gap-3">
-                {trustBadges.map((badge) => {
-                  const Icon = badge.icon;
-                  return (
-                    <div
-                      key={badge.testId}
-                      className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-800"
-                      data-testid={badge.testId}
-                    >
-                      <Icon className="w-4 h-4 text-green-400" />
-                      <span className="font-medium">{badge.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </div>
 
