@@ -120,20 +120,17 @@ export default function AboutUs() {
               </div>
               
               <div className="hidden md:flex items-center space-x-8">
-                <Link href="/#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">
+                <Link href="/features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">
                   Features
-                </Link>
-                <Link href="/#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">
-                  Capabilities
                 </Link>
                 <Link href="/#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">
                   Integrations
                 </Link>
-                <Link href="/#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">
-                  Testimonials
-                </Link>
                 <Link href="/about" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-about">
                   About
+                </Link>
+                <Link href="/api-docs" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-api-docs">
+                  API Doc
                 </Link>
                 <Button 
                   size="sm" 
@@ -159,20 +156,17 @@ export default function AboutUs() {
             {isMenuOpen && (
               <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
                 <div className="flex flex-col space-y-3">
-                  <Link href="/#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">
+                  <Link href="/features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">
                     Features
-                  </Link>
-                  <Link href="/#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">
-                    Capabilities
                   </Link>
                   <Link href="/#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">
                     Integrations
                   </Link>
-                  <Link href="/#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">
-                    Testimonials
-                  </Link>
                   <Link href="/about" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-about">
                     About
+                  </Link>
+                  <Link href="/api-docs" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-api-docs">
+                    API Doc
                   </Link>
                   <div className="px-4 pt-2">
                     <Button 
