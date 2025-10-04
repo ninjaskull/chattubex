@@ -121,9 +121,9 @@ export function EnterpriseFooter() {
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
         {/* Top Section: Logo, Newsletter, Social */}
-        <div className="grid lg:grid-cols-12 gap-12 mb-16">
+        <div className="grid lg:grid-cols-12 gap-8 mb-10">
           {/* Company Info */}
           <div className="lg:col-span-4">
             <div className="mb-6">
@@ -189,7 +189,7 @@ export function EnterpriseFooter() {
           </div>
 
           {/* Links Columns */}
-          <div className="lg:col-span-5 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="lg:col-span-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Product */}
             <div>
               <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">
@@ -312,7 +312,7 @@ export function EnterpriseFooter() {
           </div>
 
           {/* Newsletter Signup */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">
               Stay Updated
             </h4>
