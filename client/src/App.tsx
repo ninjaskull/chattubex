@@ -14,6 +14,7 @@ import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import Security from "@/pages/security";
 import Compliance from "@/pages/compliance";
+import ApiDocs from "@/pages/api-docs";
 import NotFound from "@/pages/not-found";
 
 // Protected Route component
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/security" component={Security} />
       <Route path="/compliance" component={Compliance} />
+      <Route path="/api-docs" component={ApiDocs} />
       <Route path="/dashboard">
         <ProtectedRoute component={Dashboard} />
       </Route>
