@@ -88,11 +88,8 @@ export function EnterpriseFooter() {
 
   const productLinks = [
     { label: "Features", href: "/features", testId: "link-footer-features" },
-    { label: "Capabilities", href: "/#capabilities", testId: "link-footer-capabilities" },
-    { label: "Integrations", href: "/#integrations", testId: "link-footer-integrations" },
     { label: "API Documentation", href: "/api-docs", testId: "link-footer-api" },
     { label: "Pricing", href: "#", testId: "link-footer-pricing" },
-    { label: "Changelog", href: "#", testId: "link-footer-changelog" },
   ];
 
   const resourcesLinks = [
