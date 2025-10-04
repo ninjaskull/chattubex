@@ -123,7 +123,7 @@ export function EnterpriseFooter() {
   ];
 
   const socialLinks = [
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn", testId: "link-social-linkedin" },
+    { icon: Linkedin, href: "https://www.linkedin.com/company/fallowl", label: "LinkedIn", testId: "link-social-linkedin" },
     { icon: Twitter, href: "https://twitter.com", label: "Twitter", testId: "link-social-twitter" },
     { icon: Github, href: "https://github.com", label: "GitHub", testId: "link-social-github" },
     { icon: Youtube, href: "https://youtube.com", label: "YouTube", testId: "link-social-youtube" },
@@ -161,21 +161,26 @@ export function EnterpriseFooter() {
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-3 text-sm text-slate-400">
                 <Mail className="w-4 h-4 shrink-0" />
-                <a href="mailto:support@fallowl.com" className="hover:text-white transition-colors" data-testid="link-footer-email">
-                  support@fallowl.com
+                <a href="mailto:info@fallowl.com" className="hover:text-white transition-colors" data-testid="link-footer-email">
+                  info@fallowl.com
                 </a>
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-400">
                 <Phone className="w-4 h-4 shrink-0" />
-                <a href="tel:+18005551234" className="hover:text-white transition-colors" data-testid="link-footer-phone">
-                  +1 (800) 555-1234
+                <a href="tel:+917588993347" className="hover:text-white transition-colors" data-testid="link-footer-phone">
+                  +91 7588993347
+                </a>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-slate-400">
+                <Phone className="w-4 h-4 shrink-0" />
+                <a href="tel:+16073262176" className="hover:text-white transition-colors" data-testid="link-footer-phone-us">
+                  +1 607-326-2176 (US)
                 </a>
               </div>
               <div className="flex items-start gap-3 text-sm text-slate-400">
                 <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
                 <span data-testid="text-footer-address">
-                  123 Tech Avenue, Suite 400<br />
-                  San Francisco, CA 94105
+                  Pune, Maharashtra
                 </span>
               </div>
             </div>
