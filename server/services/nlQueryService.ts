@@ -21,6 +21,9 @@ interface QueryIntent {
   explanation: string;
   tablesInvolved: string[];
   isReadOnly: boolean;
+  isAmbiguous?: boolean;
+  clarifyingQuestions?: string[];
+  userFriendlyIntent?: string;
 }
 
 interface QueryResult {
@@ -29,6 +32,7 @@ interface QueryResult {
   error?: string;
   rowCount?: number;
   executionTime?: number;
+  insights?: string[];
 }
 
 /**
@@ -148,9 +152,10 @@ export class NLQueryService {
   }
 
   /**
-   * Analyze natural language query and generate SQL
+   * Analyze natural language query with enhanced intent interpretation
+   * Detects ambiguity and generates clarifying questions
    */
-  async analyzeQuery(userQuery: string): Promise<QueryIntent> {
+  async analyzeQueryEnhanced(userQuery: string): Promise<QueryIntent> {
     if (!this.openai) {
       throw new Error('OpenAI API key not configured');
     }
@@ -159,28 +164,42 @@ export class NLQueryService {
     const schemas = await this.getDatabaseSchema();
     const schemaSummary = this.generateSchemaSummary(schemas);
 
-    const systemPrompt = `You are a SQL expert assistant that converts natural language queries into PostgreSQL SELECT queries.
+    const systemPrompt = `You are Duggu, an intelligent data analyst assistant. Your job is to help users explore their database safely and effectively.
 
 ${schemaSummary}
 
-Important Rules:
-1. Generate ONLY read-only SELECT queries - never INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, or any write operations
-2. Use proper PostgreSQL syntax
-3. Include appropriate JOINs when querying related tables
-4. Use LIMIT clause to prevent returning too many rows (default 100 unless user specifies)
-5. Use proper WHERE clauses for filtering
-6. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
-7. Return valid JSON with the following structure:
+Your task:
+1. Interpret the user's question and explain what you understood in a friendly, conversational way
+2. Detect if the query is ambiguous or lacks specifics
+3. Generate a PostgreSQL SELECT query (read-only operations ONLY)
+4. Provide clarifying questions if the query is ambiguous
+
+Rules:
+- ONLY generate SELECT queries - never INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, or any write operations
+- Use LIMIT clause (default 100 unless user specifies)
+- Use proper JOINs, WHERE clauses, and aggregate functions when appropriate
+- Be conversational and friendly in explanations
+
+Return JSON with this structure:
 {
-  "intent": "brief description of what the user wants",
-  "confidence": 0-100 (how confident you are in understanding the query),
-  "suggestedSQL": "the generated SQL query",
-  "explanation": "plain English explanation of what the query does",
-  "tablesInvolved": ["array", "of", "table", "names"],
-  "isReadOnly": true (MUST always be true)
+  "userFriendlyIntent": "A friendly explanation like 'It looks like you're asking for...'",
+  "intent": "technical description",
+  "confidence": 0-100,
+  "isAmbiguous": true/false,
+  "clarifyingQuestions": ["question 1", "question 2"] (only if isAmbiguous is true),
+  "suggestedSQL": "the SQL query" (only if not ambiguous or confidence > 60),
+  "explanation": "what the query does in plain English",
+  "tablesInvolved": ["table1", "table2"],
+  "isReadOnly": true
 }
 
-If the user asks for a write operation, set isReadOnly to false and explain that only read operations are allowed.`;
+Ambiguity indicators:
+- Missing time ranges (e.g., "recent", "this month" without current date context)
+- Vague quantities (e.g., "many", "few")
+- Unclear filters (e.g., "active users" if no status column exists)
+- Multiple possible interpretations
+
+If confidence < 60, set isAmbiguous to true and provide clarifying questions.`;
 
     try {
       const response = await this.openai.chat.completions.create({
@@ -201,7 +220,7 @@ If the user asks for a write operation, set isReadOnly to false and explain that
       const queryIntent: QueryIntent = JSON.parse(content);
       
       // Validate that the query is read-only
-      if (!this.isReadOnlyQuery(queryIntent.suggestedSQL)) {
+      if (queryIntent.suggestedSQL && !this.isReadOnlyQuery(queryIntent.suggestedSQL)) {
         queryIntent.isReadOnly = false;
         queryIntent.explanation = 'This query contains write operations which are not allowed. Only SELECT queries are permitted.';
       }
@@ -211,6 +230,13 @@ If the user asks for a write operation, set isReadOnly to false and explain that
       console.error('Error analyzing query:', error);
       throw new Error('Failed to analyze query');
     }
+  }
+
+  /**
+   * Analyze natural language query and generate SQL (original method maintained for compatibility)
+   */
+  async analyzeQuery(userQuery: string): Promise<QueryIntent> {
+    return this.analyzeQueryEnhanced(userQuery);
   }
 
   /**
@@ -255,9 +281,82 @@ If the user asks for a write operation, set isReadOnly to false and explain that
   }
 
   /**
-   * Execute a read-only SQL query with transaction-level enforcement
+   * Generate insights from query results using AI
    */
-  async executeQuery(sql: string): Promise<QueryResult> {
+  async generateInsights(data: any[], userQuery: string, sql: string): Promise<string[]> {
+    if (!this.openai || !data || data.length === 0) {
+      return [];
+    }
+
+    try {
+      // Prepare data summary for AI
+      const rowCount = data.length;
+      const columnNames = Object.keys(data[0] || {});
+      const sampleRows = data.slice(0, 5);
+      
+      // Calculate basic statistics
+      const stats: any = {};
+      for (const col of columnNames) {
+        const values = data.map(row => row[col]).filter(v => v !== null && v !== undefined);
+        const numericValues = values.filter(v => typeof v === 'number' && !isNaN(v));
+        
+        if (numericValues.length > 0) {
+          stats[col] = {
+            count: numericValues.length,
+            sum: numericValues.reduce((a, b) => a + b, 0),
+            avg: numericValues.reduce((a, b) => a + b, 0) / numericValues.length,
+            min: Math.min(...numericValues),
+            max: Math.max(...numericValues)
+          };
+        }
+      }
+
+      const systemPrompt = `You are Duggu, an intelligent data analyst. Generate 3-5 concise, actionable insights from query results.
+
+User's question: "${userQuery}"
+SQL executed: ${sql}
+Rows returned: ${rowCount}
+Columns: ${columnNames.join(', ')}
+Sample data: ${JSON.stringify(sampleRows)}
+Statistics: ${JSON.stringify(stats)}
+
+Generate insights that:
+1. Summarize key findings (totals, counts, trends)
+2. Highlight interesting patterns or outliers
+3. Answer the user's original question
+4. Are specific and data-driven
+5. Are easy to understand
+
+Return a JSON array of insight strings: ["insight 1", "insight 2", ...]
+Maximum 5 insights, each under 100 characters.`;
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: 'Generate insights from this data.' }
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.4,
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        return [];
+      }
+
+      const result = JSON.parse(content);
+      return result.insights || result.data || [];
+    } catch (error) {
+      console.error('Error generating insights:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Execute a read-only SQL query with transaction-level enforcement and generate insights
+   */
+  async executeQuery(sql: string, userQuery?: string): Promise<QueryResult> {
     // Double-check that query is read-only
     if (!this.isReadOnlyQuery(sql)) {
       return {
@@ -279,11 +378,18 @@ If the user asks for a write operation, set isReadOnly to false and explain that
       
       const executionTime = Date.now() - startTime;
 
+      // Generate insights if we have data and a user query
+      let insights: string[] = [];
+      if (result.rows && result.rows.length > 0 && userQuery) {
+        insights = await this.generateInsights(result.rows, userQuery, sql);
+      }
+
       return {
         success: true,
         data: result.rows,
         rowCount: result.rowCount || 0,
-        executionTime
+        executionTime,
+        insights
       };
     } catch (error: any) {
       // Rollback on error
