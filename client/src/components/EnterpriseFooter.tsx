@@ -96,21 +96,14 @@ export function EnterpriseFooter() {
   ];
 
   const resourcesLinks = [
-    { label: "Documentation", href: "#", testId: "link-footer-docs" },
-    { label: "Developer Portal", href: "#", testId: "link-footer-devportal" },
-    { label: "Help Center", href: "#", testId: "link-footer-help" },
-    { label: "Community Forum", href: "#", testId: "link-footer-community" },
+    { label: "Help Center", href: "https://app.fallowl.com", testId: "link-footer-help" },
     { label: "Blog", href: "#", testId: "link-footer-blog" },
     { label: "Status Page", href: "#", testId: "link-footer-status" },
   ];
 
   const companyLinks = [
     { label: "About Us", href: "/about", testId: "link-footer-about" },
-    { label: "Careers", href: "#", testId: "link-footer-careers" },
-    { label: "Press Kit", href: "#", testId: "link-footer-press" },
-    { label: "Partners", href: "#", testId: "link-footer-partners" },
     { label: "Demo Booking", href: "/demo", testId: "link-footer-demo" },
-    { label: "Contact Sales", href: "#", testId: "link-footer-contact" },
   ];
 
   const legalLinks = [
@@ -118,8 +111,6 @@ export function EnterpriseFooter() {
     { label: "Terms of Service", href: "/terms", testId: "link-footer-terms" },
     { label: "Security", href: "/security", testId: "link-footer-security" },
     { label: "Compliance", href: "/compliance", testId: "link-footer-compliance" },
-    { label: "Cookie Policy", href: "#", testId: "link-footer-cookies" },
-    { label: "Data Processing", href: "#", testId: "link-footer-dpa" },
   ];
 
   const socialLinks = [
