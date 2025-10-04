@@ -92,42 +92,74 @@ function getReadOnlyDatabaseUrl(): string {
   return getDatabaseUrl();
 }
 
-const databaseUrl = getDatabaseUrl();
-const readOnlyDatabaseUrl = getReadOnlyDatabaseUrl();
+// Lazy initialization of database URLs and pools
+let _databaseUrl: string | null = null;
+let _readOnlyDatabaseUrl: string | null = null;
+let _pool: Pool | null = null;
+let _readOnlyPool: Pool | null = null;
+
+function initializeDatabaseUrl(): string {
+  if (!_databaseUrl) {
+    _databaseUrl = getDatabaseUrl();
+  }
+  return _databaseUrl;
+}
+
+function initializeReadOnlyDatabaseUrl(): string {
+  if (!_readOnlyDatabaseUrl) {
+    _readOnlyDatabaseUrl = getReadOnlyDatabaseUrl();
+  }
+  return _readOnlyDatabaseUrl;
+}
 
 // Main database pool for write operations
-export const pool = new Pool({ 
-  connectionString: databaseUrl,
-  ssl: databaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false, // SSL for Neon
-  max: 10, // Higher pool size for Neon
-  min: 2,  // Keep some connections alive
-  idleTimeoutMillis: 60000, // Longer idle timeout for cloud
-  connectionTimeoutMillis: 20000, // Longer timeout for cloud connection
-  allowExitOnIdle: false, // Keep pool alive for cloud database
-  query_timeout: 30000, // Longer query timeout for cloud
-  statement_timeout: 30000, // Longer statement timeout for cloud
+export const pool = new Proxy({} as Pool, {
+  get(target, prop) {
+    if (!_pool) {
+      const databaseUrl = initializeDatabaseUrl();
+      _pool = new Pool({ 
+        connectionString: databaseUrl,
+        ssl: databaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+        max: 10,
+        min: 2,
+        idleTimeoutMillis: 60000,
+        connectionTimeoutMillis: 20000,
+        allowExitOnIdle: false,
+        query_timeout: 30000,
+        statement_timeout: 30000,
+      });
+      
+      _pool.on('error', (err) => {
+        console.error('Main database pool error:', err);
+      });
+    }
+    return Reflect.get(_pool, prop);
+  }
 });
 
 // Read-only database pool specifically for Duggu chatbot searches
-export const readOnlyPool = new Pool({
-  connectionString: readOnlyDatabaseUrl,
-  ssl: readOnlyDatabaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false, // SSL for Neon
-  max: 5, // Smaller pool size for read-only operations
-  min: 1,  // Keep minimal connections alive
-  idleTimeoutMillis: 30000, // Shorter idle timeout for read operations
-  connectionTimeoutMillis: 15000, // Shorter timeout for read operations
-  allowExitOnIdle: false, // Keep pool alive
-  query_timeout: 15000, // Shorter query timeout for searches
-  statement_timeout: 15000, // Shorter statement timeout for searches
-});
-
-// Handle pool errors
-pool.on('error', (err) => {
-  console.error('Main database pool error:', err);
-});
-
-readOnlyPool.on('error', (err) => {
-  console.error('Read-only database pool error:', err);
+export const readOnlyPool = new Proxy({} as Pool, {
+  get(target, prop) {
+    if (!_readOnlyPool) {
+      const readOnlyDatabaseUrl = initializeReadOnlyDatabaseUrl();
+      _readOnlyPool = new Pool({
+        connectionString: readOnlyDatabaseUrl,
+        ssl: readOnlyDatabaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+        max: 5,
+        min: 1,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 15000,
+        allowExitOnIdle: false,
+        query_timeout: 15000,
+        statement_timeout: 15000,
+      });
+      
+      _readOnlyPool.on('error', (err) => {
+        console.error('Read-only database pool error:', err);
+      });
+    }
+    return Reflect.get(_readOnlyPool, prop);
+  }
 });
 
 // Main database instance
