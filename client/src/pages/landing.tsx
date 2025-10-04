@@ -216,11 +216,10 @@ POST https://api.fallowl.com/webhooks
               </div>
               
               <div className="hidden md:flex items-center space-x-8">
-                <a href="#features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</a>
-                <a href="#capabilities" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-capabilities">Capabilities</a>
+                <Link href="/features" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-features">Features</Link>
                 <a href="#integrations" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-integrations">Integrations</a>
-                <a href="#testimonials" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-testimonials">Testimonials</a>
                 <Link href="/about" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-about">About</Link>
+                <Link href="/api-docs" className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors" data-testid="link-api-docs">API Doc</Link>
                 <Button 
                   size="sm" 
                   className="bg-slate-900 hover:bg-slate-800 text-white text-sm rounded-xl" 
@@ -245,11 +244,10 @@ POST https://api.fallowl.com/webhooks
             {isMenuOpen && (
               <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
                 <div className="flex flex-col space-y-3">
-                  <a href="#features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">Features</a>
-                  <a href="#capabilities" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-capabilities">Capabilities</a>
+                  <Link href="/features" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-features">Features</Link>
                   <a href="#integrations" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-integrations">Integrations</a>
-                  <a href="#testimonials" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-testimonials">Testimonials</a>
                   <Link href="/about" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-about">About</Link>
+                  <Link href="/api-docs" className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-purple-600 rounded-lg hover:bg-slate-50 transition-colors" data-testid="link-mobile-api-docs">API Doc</Link>
                   <div className="px-4 pt-2">
                     <Button 
                       size="sm" 
