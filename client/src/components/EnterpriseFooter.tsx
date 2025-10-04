@@ -121,7 +121,7 @@ export function EnterpriseFooter() {
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+      <div className="max-w-full mx-auto px-8 lg:px-12 py-10">
         {/* Top Section: Logo, Newsletter, Social */}
         <div className="grid lg:grid-cols-12 gap-8 mb-10">
           {/* Company Info */}
