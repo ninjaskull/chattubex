@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { readOnlyDb, readOnlyPool } from '../db';
+import { readOnlyDb, readOnlyPool, pool as writePool } from '../db';
 import OpenAI from 'openai';
 
 interface TableSchema {
@@ -215,6 +215,7 @@ If the user asks for a write operation, set isReadOnly to false and explain that
 
   /**
    * Validate that a SQL query is read-only
+   * Uses comprehensive checks to prevent write operations
    */
   private isReadOnlyQuery(sql: string): boolean {
     const upperSQL = sql.trim().toUpperCase();
@@ -223,24 +224,38 @@ If the user asks for a write operation, set isReadOnly to false and explain that
     const writeKeywords = [
       'INSERT', 'UPDATE', 'DELETE', 'DROP', 'CREATE', 'ALTER', 
       'TRUNCATE', 'GRANT', 'REVOKE', 'EXEC', 'EXECUTE',
-      'CALL', 'MERGE', 'REPLACE', 'RENAME'
+      'CALL', 'MERGE', 'REPLACE', 'RENAME', 'SET', 'COPY'
     ];
 
+    // Check for write keywords anywhere in the query (not just at start)
+    // This catches CTEs with writes: WITH x AS (UPDATE ...) SELECT ...
     for (const keyword of writeKeywords) {
-      // Check if the keyword appears at the start or after semicolon
-      if (upperSQL.startsWith(keyword) || 
-          upperSQL.includes(`;${keyword}`) || 
-          upperSQL.includes(`; ${keyword}`)) {
+      // Use word boundaries to avoid false positives
+      const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+      if (regex.test(sql)) {
         return false;
       }
     }
 
-    // Must start with SELECT or WITH (for CTEs)
-    return upperSQL.startsWith('SELECT') || upperSQL.startsWith('WITH');
+    // Query must start with SELECT or WITH for CTEs
+    // But we already checked that WITH doesn't contain write operations above
+    if (!upperSQL.startsWith('SELECT') && !upperSQL.startsWith('WITH')) {
+      return false;
+    }
+
+    // Check for multiple statements (semicolon-separated)
+    // Only allow if all are SELECT/WITH
+    const statements = sql.split(';').map(s => s.trim()).filter(s => s.length > 0);
+    if (statements.length > 1) {
+      // Multiple statements not allowed for safety
+      return false;
+    }
+
+    return true;
   }
 
   /**
-   * Execute a read-only SQL query
+   * Execute a read-only SQL query with transaction-level enforcement
    */
   async executeQuery(sql: string): Promise<QueryResult> {
     // Double-check that query is read-only
@@ -252,9 +267,16 @@ If the user asks for a write operation, set isReadOnly to false and explain that
     }
 
     const startTime = Date.now();
+    const client = await readOnlyPool.connect();
 
     try {
-      const result = await readOnlyPool.query(sql);
+      // Use PostgreSQL's transaction-level read-only enforcement
+      await client.query('BEGIN TRANSACTION READ ONLY');
+      
+      const result = await client.query(sql);
+      
+      await client.query('COMMIT');
+      
       const executionTime = Date.now() - startTime;
 
       return {
@@ -264,16 +286,26 @@ If the user asks for a write operation, set isReadOnly to false and explain that
         executionTime
       };
     } catch (error: any) {
+      // Rollback on error
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Error rolling back transaction:', rollbackError);
+      }
+      
       console.error('Error executing query:', error);
       return {
         success: false,
         error: error.message || 'Query execution failed'
       };
+    } finally {
+      client.release();
     }
   }
 
   /**
    * Store query feedback for learning
+   * Uses write-capable pool for INSERT operations
    */
   async storeFeedback(
     userQuery: string,
@@ -282,8 +314,8 @@ If the user asks for a write operation, set isReadOnly to false and explain that
     userFeedback?: string
   ): Promise<void> {
     try {
-      // Store in ai_interactions table for learning
-      await readOnlyPool.query(`
+      // Store in ai_interactions table for learning - use write pool for INSERT
+      await writePool.query(`
         INSERT INTO ai_interactions (
           user_message, 
           ai_response, 
@@ -300,9 +332,12 @@ If the user asks for a write operation, set isReadOnly to false and explain that
         userFeedback || (wasAccurate ? 'accurate' : 'inaccurate'),
         JSON.stringify({ queryType: 'nl_to_sql', timestamp: new Date().toISOString() })
       ]);
+      
+      console.log('Query feedback stored successfully');
     } catch (error) {
       console.error('Error storing feedback:', error);
-      // Don't throw - feedback storage shouldn't break the main flow
+      // Re-throw to surface the error for monitoring
+      throw new Error(`Failed to store feedback: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
