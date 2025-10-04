@@ -20,6 +20,9 @@ interface QueryIntent {
   explanation: string;
   tablesInvolved: string[];
   isReadOnly: boolean;
+  isAmbiguous?: boolean;
+  clarifyingQuestions?: string[];
+  userFriendlyIntent?: string;
 }
 
 interface QueryResult {
@@ -28,6 +31,7 @@ interface QueryResult {
   error?: string;
   rowCount?: number;
   executionTime?: number;
+  insights?: string[];
 }
 
 export default function NLQueryInterface() {
@@ -121,7 +125,10 @@ export default function NLQueryInterface() {
       const response = await fetch('/api/duggu/nl/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sql: queryIntent.suggestedSQL })
+        body: JSON.stringify({ 
+          sql: queryIntent.suggestedSQL,
+          userQuery: userQuery 
+        })
       });
 
       if (response.ok) {
@@ -292,32 +299,67 @@ export default function NLQueryInterface() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-blue-600" />
-                  Query Understanding
+                  {queryIntent.isAmbiguous ? "I need more information" : "Query Understanding"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-1">What I understood:</p>
-                  <p className="text-sm text-muted-foreground">{queryIntent.explanation}</p>
-                </div>
+                {/* User-friendly Intent */}
+                {queryIntent.userFriendlyIntent && (
+                  <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+                    <Sparkles className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-900 dark:text-blue-100">
+                      {queryIntent.userFriendlyIntent}
+                    </AlertDescription>
+                  </Alert>
+                )}
                 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium">Generated SQL:</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(queryIntent.suggestedSQL)}
-                      data-testid="button-copy-sql"
-                    >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
-                    </Button>
+                {/* Clarifying Questions if Ambiguous */}
+                {queryIntent.isAmbiguous && queryIntent.clarifyingQuestions && queryIntent.clarifyingQuestions.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">To help you better, please clarify:</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      {queryIntent.clarifyingQuestions.map((question, idx) => (
+                        <li key={idx} className="text-sm text-muted-foreground">
+                          {question}
+                        </li>
+                      ))}
+                    </ul>
+                    <Alert variant="default" className="mt-3">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Please refine your question with more details and try again.
+                      </AlertDescription>
+                    </Alert>
                   </div>
-                  <pre className="bg-slate-100 dark:bg-slate-900 p-3 rounded text-xs overflow-x-auto">
-                    <code>{queryIntent.suggestedSQL}</code>
-                  </pre>
-                </div>
+                )}
+                
+                {/* Show SQL only if not ambiguous */}
+                {!queryIntent.isAmbiguous && (
+                  <>
+                    <div>
+                      <p className="text-sm font-medium mb-1">Technical explanation:</p>
+                      <p className="text-sm text-muted-foreground">{queryIntent.explanation}</p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-medium">Generated SQL:</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(queryIntent.suggestedSQL)}
+                          data-testid="button-copy-sql"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                      <pre className="bg-slate-100 dark:bg-slate-900 p-3 rounded text-xs overflow-x-auto">
+                        <code>{queryIntent.suggestedSQL}</code>
+                      </pre>
+                    </div>
+                  </>
+                )}
                 
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">
