@@ -21,7 +21,6 @@ import NotesDocuments from "@/components/notes-documents";
 import CampaignList from "@/components/campaign-list";
 
 import PawMate from "@/components/pawmate-enhanced";
-import AdvancedSearch from "@/pages/advanced-search";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -61,8 +60,12 @@ export default function Dashboard() {
   const navigationItems = [
     { id: "files", label: "Campaigns", icon: FolderOpen },
     { id: "notes", label: "Documents", icon: MessageSquare },
-    { id: "search", label: "Advanced Search", icon: Search },
     { id: "pawmate", label: assistantName, icon: Dog }
+  ];
+  
+  // Separate action items that navigate to other pages
+  const actionItems = [
+    { id: "search", label: "Advanced Search", icon: Search, path: "/advanced-search" }
   ];
 
   const handleLogout = () => {
@@ -139,6 +142,29 @@ export default function Dashboard() {
                   </button>
                 );
               })}
+              
+              {/* Action items that navigate to other pages */}
+              <div className="pt-2 mt-2 border-t border-slate-200/50">
+                {actionItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setLocation(item.path)}
+                      className="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      title={!isSidebarHovered ? item.label : undefined}
+                      data-testid={`nav-${item.id}`}
+                    >
+                      <Icon className="shrink-0 h-4 w-4" />
+                      <span className={`ml-3 text-sm font-medium transition-all duration-300 overflow-hidden whitespace-nowrap ${
+                        isSidebarHovered ? 'w-auto opacity-100' : 'w-0 opacity-0'
+                      }`}>
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </nav>
 
@@ -181,7 +207,7 @@ export default function Dashboard() {
         {/* Mobile Navigation (horizontal tabs on mobile) */}
         <div className="md:hidden w-full p-4 bg-white/60 backdrop-blur-sm border-b border-slate-200/50">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-white/80">
+            <TabsList className="grid w-full grid-cols-3 bg-white/80">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -193,15 +219,34 @@ export default function Dashboard() {
               })}
             </TabsList>
           </Tabs>
+          
+          {/* Mobile action buttons */}
+          <div className="mt-2 flex gap-2">
+            {actionItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button
+                  key={item.id}
+                  onClick={() => setLocation(item.path)}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  data-testid={`mobile-nav-${item.id}`}
+                >
+                  <Icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </Button>
+              );
+            })}
+          </div>
         </div>
         
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className={`mx-auto px-6 py-6 ${activeTab === "search" ? "max-w-full" : "max-w-7xl"}`}>
+          <div className="mx-auto px-6 py-6 max-w-7xl">
             <div className="main-content-area">
               {activeTab === "files" && <CampaignList />}
               {activeTab === "notes" && <NotesDocuments />}
-              {activeTab === "search" && <AdvancedSearch />}
               {activeTab === "pawmate" && <PawMate />}
             </div>
           </div>
