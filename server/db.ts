@@ -16,47 +16,34 @@ function cleanDatabaseUrl(url: string): string {
 // Function to get database URL with proper fallback
 function getDatabaseUrl(): string {
   // Try environment variables in priority order
-  const neonWithBranch = process.env.NEON_DATABASE_URL_WITH_BRANCH?.trim();
-  const neonUrl = process.env.NEON_DATABASE_URL?.trim();
-  const databaseUrl = process.env.DATABASE_URL?.trim();
-  
-  // Debug logging to see actual values
-  console.log('Database URL check:', {
-    hasNeonWithBranch: !!neonWithBranch && neonWithBranch.length > 0,
-    hasNeonUrl: !!neonUrl && neonUrl.length > 0,
-    hasDatabaseUrl: !!databaseUrl && databaseUrl.length > 0,
-  });
+  const neonWithBranch = process.env.NEON_DATABASE_URL_WITH_BRANCH;
+  const neonUrl = process.env.NEON_DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL;
   
   // Use the first valid URL found
-  if (neonWithBranch && neonWithBranch.length > 0) {
+  if (neonWithBranch && neonWithBranch.trim()) {
     console.log('Using NEON_DATABASE_URL_WITH_BRANCH');
     return cleanDatabaseUrl(neonWithBranch);
   }
   
-  if (neonUrl && neonUrl.length > 0) {
+  if (neonUrl && neonUrl.trim()) {
     console.log('Using NEON_DATABASE_URL');
     return cleanDatabaseUrl(neonUrl);
   }
   
-  if (databaseUrl && databaseUrl.length > 0) {
+  if (databaseUrl && databaseUrl.trim()) {
     console.log('Using DATABASE_URL');
     return cleanDatabaseUrl(databaseUrl);
   }
   
   // If no database URL is found, try to construct one from individual postgres env vars
-  const pgHost = process.env.PGHOST?.trim();
-  const pgDatabase = process.env.PGDATABASE?.trim();
-  const pgUser = process.env.PGUSER?.trim();
-  const pgPort = process.env.PGPORT?.trim() || '5432';
-  const pgPassword = process.env.PGPASSWORD?.trim() || '';
+  const pgHost = process.env.PGHOST;
+  const pgDatabase = process.env.PGDATABASE;
+  const pgUser = process.env.PGUSER;
+  const pgPort = process.env.PGPORT || '5432';
+  const pgPassword = process.env.PGPASSWORD || '';
   
-  console.log('PostgreSQL individual env vars:', {
-    hasPgHost: !!pgHost && pgHost.length > 0,
-    hasPgDatabase: !!pgDatabase && pgDatabase.length > 0,
-    hasPgUser: !!pgUser && pgUser.length > 0,
-  });
-  
-  if (pgHost && pgHost.length > 0 && pgDatabase && pgDatabase.length > 0 && pgUser && pgUser.length > 0) {
+  if (pgHost && pgHost.trim() && pgDatabase && pgDatabase.trim() && pgUser && pgUser.trim()) {
     const constructedUrl = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}?sslmode=require`;
     console.log('Constructed database URL from individual PostgreSQL environment variables');
     return constructedUrl;
@@ -64,7 +51,6 @@ function getDatabaseUrl(): string {
 
   // If we still don't have a URL, throw an error
   console.error("Database URL not found. Please ensure DATABASE_URL environment variable is set.");
-  console.error("Available env vars:", Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('NEON') || key.includes('PG')));
   throw new Error(
     "Database URL must be set. Did you forget to provision a database?",
   );
