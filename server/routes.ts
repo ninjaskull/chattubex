@@ -14,6 +14,7 @@ import { databaseService } from "./services/databaseService";
 import { dugguChatbotService } from "./services/dugguChatbotService";
 import { externalDbInspector } from "./services/externalDbInspector";
 import { externalDugguService } from "./services/externalDugguService";
+import { nlQueryService } from "./services/nlQueryService";
 
 // Helper function to clean AI responses from unwanted patterns
 function cleanStreamResponse(content: string): string {
@@ -2440,6 +2441,87 @@ You have access to campaign and contact databases with 263+ records. Your missio
     } catch (error) {
       console.error('Duggu chatbot get top companies error:', error);
       res.status(500).json({ message: 'Failed to get top companies' });
+    }
+  });
+
+  // Natural Language Query Routes for Duggu AI-Powered Database Queries
+  
+  // Get database schema for NL query context
+  app.get('/api/duggu/nl/schema', async (req, res) => {
+    try {
+      const refresh = req.query.refresh === 'true';
+      const schema = await nlQueryService.getDatabaseSchema(refresh);
+      res.json({ schema, timestamp: new Date().toISOString() });
+    } catch (error) {
+      console.error('Error getting database schema:', error);
+      res.status(500).json({ message: 'Failed to retrieve database schema' });
+    }
+  });
+
+  // Analyze natural language query and generate SQL
+  app.post('/api/duggu/nl/analyze', async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string' || query.trim().length === 0) {
+        return res.status(400).json({ message: 'Query text is required' });
+      }
+
+      const queryIntent = await nlQueryService.analyzeQuery(query);
+      res.json(queryIntent);
+    } catch (error: any) {
+      console.error('Error analyzing natural language query:', error);
+      res.status(500).json({ 
+        message: error.message || 'Failed to analyze query',
+        error: error.message 
+      });
+    }
+  });
+
+  // Execute a confirmed SQL query (read-only)
+  app.post('/api/duggu/nl/execute', async (req, res) => {
+    try {
+      const { sql } = req.body;
+      
+      if (!sql || typeof sql !== 'string' || sql.trim().length === 0) {
+        return res.status(400).json({ message: 'SQL query is required' });
+      }
+
+      const result = await nlQueryService.executeQuery(sql);
+      res.json(result);
+    } catch (error) {
+      console.error('Error executing query:', error);
+      res.status(500).json({ message: 'Failed to execute query' });
+    }
+  });
+
+  // Store feedback for query learning
+  app.post('/api/duggu/nl/feedback', async (req, res) => {
+    try {
+      const { userQuery, generatedSQL, wasAccurate, userFeedback } = req.body;
+      
+      if (!userQuery || !generatedSQL || typeof wasAccurate !== 'boolean') {
+        return res.status(400).json({ 
+          message: 'userQuery, generatedSQL, and wasAccurate (boolean) are required' 
+        });
+      }
+
+      await nlQueryService.storeFeedback(userQuery, generatedSQL, wasAccurate, userFeedback);
+      res.json({ success: true, message: 'Feedback stored successfully' });
+    } catch (error) {
+      console.error('Error storing feedback:', error);
+      res.status(500).json({ message: 'Failed to store feedback' });
+    }
+  });
+
+  // Get query suggestions based on schema
+  app.get('/api/duggu/nl/suggestions', async (req, res) => {
+    try {
+      const suggestions = await nlQueryService.getQuerySuggestions();
+      res.json({ suggestions });
+    } catch (error) {
+      console.error('Error getting query suggestions:', error);
+      res.status(500).json({ message: 'Failed to get suggestions' });
     }
   });
 
